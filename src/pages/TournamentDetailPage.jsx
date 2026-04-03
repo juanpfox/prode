@@ -31,7 +31,7 @@ export default function TournamentDetailPage() {
 
       const { data: pls } = await supabase
         .from('tournament_players')
-        .select('user_id, role, status, users(display_name, avatar_url)')
+        .select('user_id, role, status, users(display_name)')
         .eq('tournament_id', id)
 
       setPlayers(pls ?? [])
@@ -70,14 +70,12 @@ export default function TournamentDetailPage() {
   )
   if (!tournament) return (
     <AppShell>
-      <p style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '3rem' }}>
-        {t('tournaments.not_found')}
-      </p>
+      <p style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '3rem' }}>{t('tournaments.not_found')}</p>
     </AppShell>
   )
 
-  const approved = players.filter(p => p.status === 'approved')
-  const pending  = players.filter(p => p.status === 'pending')
+  const approved  = players.filter(p => p.status === 'approved')
+  const pending   = players.filter(p => p.status === 'pending')
   const isApproved = myStatus === 'approved'
   const isPending  = myStatus === 'pending'
   const modes = tournament.competitions?.available_modes ?? []
@@ -108,36 +106,26 @@ export default function TournamentDetailPage() {
                   {tournament.invite_code}
                 </p>
               </div>
-              <button className="btn btn-ghost btn-sm" onClick={copyCode}>
-                {copied ? '✓' : '📋'}
-              </button>
+              <button className="btn btn-ghost btn-sm" onClick={copyCode}>{copied ? '✓' : '📋'}</button>
             </div>
           )}
 
           {isPending && (
             <div style={{ marginTop: '0.75rem', padding: '0.625rem', background: '#fef3c7',
-                borderRadius: 'var(--r-md)', color: 'var(--warning)', fontSize: '0.875rem' }}>
+                borderRadius: 'var(--r-md)', color: '#92400e', fontSize: '0.875rem' }}>
               ⏳ {t('tournaments.pending_msg')}
             </div>
           )}
         </div>
 
-        {/* Actions — pronósticos */}
-        {isApproved && modes.length > 0 && (
-          <div style={{ marginBottom: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            {modes.includes('partidos') && (
-              <button className="btn btn-primary"
-                onClick={() => navigate(`/torneo/${id}/pronosticos`)}>
-                ⚽ {t('predictions.predict_matches')}
-              </button>
-            )}
-            {modes.includes('posiciones') && (
-              <button className="btn btn-ghost"
-                onClick={() => navigate(`/torneo/${id}/posiciones`)}>
-                📊 {t('predictions.predict_standings')}
-              </button>
-            )}
-          </div>
+        {/* Predictions CTA — approved players only */}
+        {isApproved && modes.includes('partidos') && (
+          <button
+            className="btn btn-primary"
+            style={{ width: '100%', marginBottom: '1.25rem', fontSize: '1rem', padding: '0.875rem' }}
+            onClick={() => navigate(`/torneo/${id}/pronosticos`)}>
+            ⚽ {t('predictions.go_predict')}
+          </button>
         )}
 
         {/* Pending approvals (admin only) */}
@@ -152,9 +140,7 @@ export default function TournamentDetailPage() {
                   style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span style={{ fontWeight: 600 }}>{p.users?.display_name ?? 'Usuario'}</span>
                   <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <button className="btn btn-primary btn-sm" onClick={() => approvePlayer(p.user_id)}>
-                      ✓ {t('common.approve')}
-                    </button>
+                    <button className="btn btn-primary btn-sm" onClick={() => approvePlayer(p.user_id)}>✓ {t('common.approve')}</button>
                     <button className="btn btn-ghost btn-sm" onClick={() => rejectPlayer(p.user_id)}>✕</button>
                   </div>
                 </div>
@@ -163,7 +149,7 @@ export default function TournamentDetailPage() {
           </section>
         )}
 
-        {/* Players */}
+        {/* Players list */}
         {isApproved && (
           <section>
             <h3 style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '0.75rem' }}>
@@ -175,9 +161,7 @@ export default function TournamentDetailPage() {
                   style={{ display: 'flex', alignItems: 'center', gap: '0.75rem',
                     background: p.user_id === user.id ? 'var(--primary-subtle)' : undefined,
                     border: p.user_id === user.id ? '1px solid var(--primary)' : undefined }}>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '0.875rem', width: '1.25rem' }}>
-                    {i + 1}
-                  </span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '0.875rem', width: '1.25rem' }}>{i + 1}</span>
                   <span style={{ flex: 1, fontWeight: 600 }}>
                     {p.users?.display_name ?? 'Usuario'}
                     {p.user_id === user.id && (
@@ -186,9 +170,7 @@ export default function TournamentDetailPage() {
                       </span>
                     )}
                   </span>
-                  <span className={`badge ${p.role === 'admin' ? 'badge-green' : 'badge-gray'}`}>
-                    {p.role}
-                  </span>
+                  <span className={`badge ${p.role === 'admin' ? 'badge-green' : 'badge-gray'}`}>{p.role}</span>
                 </div>
               ))}
             </div>
