@@ -18,7 +18,12 @@
     "loading": "Loading...",
     "sign_out": "Sign out",
     "error_generic": "Something went wrong, please try again",
-    "back": "Back"
+    "back": "Back",
+    "approve": "Approve",
+    "you": "you"
+  },
+  "home": {
+    "competitions": "Competitions"
   },
   "modes": {
     "posiciones": "Standings",
@@ -40,14 +45,20 @@
     "empty": "You are not in any tournament yet",
     "players": "{{count}} player",
     "players_plural": "{{count}} players",
+    "players_count": "Players ({{count}})",
     "name_placeholder": "Tournament name",
     "select_competition": "Select a competition",
-    "enter_code": "Invite code",
-    "invalid_code": "Invalid code",
-    "invite_code": "Code",
+    "enter_code": "ABC123",
+    "enter_code_label": "Have an invite code?",
+    "invalid_code": "Invalid code or tournament not found",
+    "invite_code": "Invite code",
     "pending_approval": "Pending requests",
+    "pending_msg": "Your request is pending approval",
     "tab_mine": "My tournaments",
-    "tab_public": "All"
+    "tab_public": "All",
+    "already_requested": "You already sent a request to this tournament",
+    "join_requested": "Request sent to \"{{name}}\". Wait for admin approval.",
+    "not_found": "Tournament not found"
   },
   "nav": {
     "home": "Home",
@@ -56,13 +67,17 @@
     "profile": "Profile"
   },
   "leaderboard": {
-    "no_scores": "No scores yet"
+    "no_scores": "No scores yet",
+    "matches": "matches"
   },
   "profile": {
     "display_name": "Display name",
     "display_name_placeholder": "Your name in the prode",
     "save": "Save",
     "saved": "Saved",
-    "stats": "Stats"
+    "stats": "Stats",
+    "stat_active_tournaments": "active tournaments",
+    "stat_created": "tournaments created",
+    "stat_pending": "pending requests"
   }
 }
