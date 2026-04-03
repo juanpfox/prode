@@ -79,5 +79,18 @@
     "stat_active_tournaments": "torneos activos",
     "stat_created": "torneos creados",
     "stat_pending": "solicitudes pendientes"
+  },
+  "predictions": {
+    "title": "Pronósticos",
+    "predict_matches": "Pronosticar partidos",
+    "predict_standings": "Pronosticar posiciones",
+    "save": "Guardar pronóstico",
+    "saved": "Guardado",
+    "not_member": "Necesitás ser miembro aprobado para pronosticar",
+    "no_matches": "No hay partidos cargados todavía",
+    "pen_winner": "Ganador por penales",
+    "pen": "pen",
+    "your_pick": "Tu pronóstico",
+    "locked": "Bloqueado"
   }
 }
