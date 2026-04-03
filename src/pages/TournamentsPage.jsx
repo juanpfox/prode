@@ -15,40 +15,34 @@ export default function TournamentsPage() {
   const [publicTournaments, setPublicTournaments] = useState([])
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState('mine')
-  const [showCreate, setShowCreate] = useState(!!searchParams.get('new'))
+  const [showCreate, setShowCreate] = useState(!!searchParams.get('comp') || !!searchParams.get('new'))
   const [joinCode, setJoinCode] = useState('')
   const [joining, setJoining] = useState(false)
-  const [createForm, setCreateForm] = useState({ name: '', competition_id: '' })
+  const [createForm, setCreateForm] = useState({
+    name: '',
+    competition_id: searchParams.get('comp') ?? ''
+  })
   const [creating, setCreating] = useState(false)
   const [competitions, setCompetitions] = useState([])
   const [error, setError] = useState(null)
+  const [joinMsg, setJoinMsg] = useState(null)
 
   useEffect(() => { loadData() }, [user])
 
   async function loadData() {
     setLoading(true)
     try {
-      const { data: myData } = await supabase
-        .from('tournament_players')
-        .select('role, status, tournaments(id, name, invite_code, competition_id, competitions(name, type))')
-        .eq('user_id', user.id)
-        .eq('status', 'approved')
-
+      const [{ data: myData }, { data: pubData }, { data: comps }] = await Promise.all([
+        supabase.from('tournament_players')
+          .select('role, status, tournaments(id, name, invite_code, competitions(name, type))')
+          .eq('user_id', user.id).eq('status', 'approved'),
+        supabase.from('tournaments')
+          .select('id, name, invite_code, competitions(name, type)')
+          .order('created_at', { ascending: false }).limit(30),
+        supabase.from('competitions').select('id, name, type, status').order('name'),
+      ])
       setMyTournaments(myData?.map(tp => ({ ...tp.tournaments, role: tp.role })) ?? [])
-
-      const { data: pubData } = await supabase
-        .from('tournaments')
-        .select('id, name, invite_code, competition_id, competitions(name, type)')
-        .order('created_at', { ascending: false })
-        .limit(20)
-
       setPublicTournaments(pubData ?? [])
-
-      const { data: comps } = await supabase
-        .from('competitions')
-        .select('id, name, type, status')
-        .order('name')
-
       setCompetitions(comps ?? [])
     } finally {
       setLoading(false)
@@ -63,10 +57,8 @@ export default function TournamentsPage() {
     try {
       const { data, error: err } = await supabase
         .from('tournaments')
-        .insert({ name: createForm.name.trim(), competition_id: createForm.competition_id })
-        .select('id')
-        .single()
-
+        .insert({ name: createForm.name.trim(), competition_id: createForm.competition_id, created_by: user.id })
+        .select('id').single()
       if (err) throw err
       setShowCreate(false)
       setCreateForm({ name: '', competition_id: '' })
@@ -84,21 +76,32 @@ export default function TournamentsPage() {
     if (!joinCode.trim()) return
     setJoining(true)
     setError(null)
+    setJoinMsg(null)
     try {
       const { data: tournament, error: tErr } = await supabase
-        .from('tournaments')
-        .select('id, name')
-        .eq('invite_code', joinCode.trim().toUpperCase())
-        .single()
-
+        .from('tournaments').select('id, name')
+        .eq('invite_code', joinCode.trim().toUpperCase()).single()
       if (tErr || !tournament) throw new Error(t('tournaments.invalid_code'))
 
-      const { error: pErr } = await supabase
+      // Check if already a member
+      const { data: existing } = await supabase
         .from('tournament_players')
+        .select('status').eq('tournament_id', tournament.id).eq('user_id', user.id).single()
+
+      if (existing) {
+        if (existing.status === 'approved') {
+          navigate(`/torneo/${tournament.id}`)
+          return
+        }
+        setJoinMsg(t('tournaments.already_requested'))
+        setJoinCode('')
+        return
+      }
+
+      const { error: pErr } = await supabase.from('tournament_players')
         .insert({ tournament_id: tournament.id, user_id: user.id, role: 'player', status: 'pending' })
-
-      if (pErr && !pErr.message.includes('duplicate')) throw pErr
-
+      if (pErr) throw pErr
+      setJoinMsg(t('tournaments.join_requested', { name: tournament.name }))
       setJoinCode('')
       await loadData()
     } catch (err) {
@@ -114,13 +117,20 @@ export default function TournamentsPage() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
           <h2 className="home-section-title" style={{ marginBottom: 0 }}>{t('nav.tournaments')}</h2>
           <button className="btn btn-primary btn-sm" onClick={() => setShowCreate(v => !v)}>
-            {showCreate ? '✕' : t('tournaments.create')}
+            {showCreate ? '✕' : `+ ${t('tournaments.create')}`}
           </button>
         </div>
 
         {error && (
-          <div className="card card-sm" style={{ background: 'var(--error-subtle, #fee2e2)', color: 'var(--error, #dc2626)', marginBottom: '1rem', padding: '0.75rem 1rem' }}>
+          <div className="card card-sm" style={{ background: 'var(--error-subtle, #fee2e2)',
+              color: 'var(--error, #dc2626)', marginBottom: '1rem', padding: '0.75rem 1rem' }}>
             {error}
+          </div>
+        )}
+        {joinMsg && (
+          <div className="card card-sm" style={{ background: 'var(--primary-subtle)',
+              color: 'var(--primary)', marginBottom: '1rem', padding: '0.75rem 1rem' }}>
+            {joinMsg}
           </div>
         )}
 
@@ -128,19 +138,11 @@ export default function TournamentsPage() {
           <div className="card card-sm animate-slide-up" style={{ marginBottom: '1.5rem' }}>
             <h3 style={{ fontWeight: 700, marginBottom: '1rem' }}>{t('tournaments.create')}</h3>
             <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              <input
-                className="input"
-                placeholder={t('tournaments.name_placeholder')}
-                value={createForm.name}
-                onChange={e => setCreateForm(f => ({ ...f, name: e.target.value }))}
-                required
-              />
-              <select
-                className="input"
-                value={createForm.competition_id}
-                onChange={e => setCreateForm(f => ({ ...f, competition_id: e.target.value }))}
-                required
-              >
+              <input className="input" placeholder={t('tournaments.name_placeholder')}
+                value={createForm.name} required
+                onChange={e => setCreateForm(f => ({ ...f, name: e.target.value }))} />
+              <select className="input" value={createForm.competition_id} required
+                onChange={e => setCreateForm(f => ({ ...f, competition_id: e.target.value }))}>
                 <option value="">{t('tournaments.select_competition')}</option>
                 {competitions.map(c => (
                   <option key={c.id} value={c.id}>{c.name}</option>
@@ -154,15 +156,13 @@ export default function TournamentsPage() {
         )}
 
         <div className="card card-sm" style={{ marginBottom: '1.5rem' }}>
+          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
+            {t('tournaments.enter_code_label')}
+          </p>
           <form onSubmit={handleJoin} style={{ display: 'flex', gap: '0.5rem' }}>
-            <input
-              className="input"
-              placeholder={t('tournaments.enter_code')}
-              value={joinCode}
-              onChange={e => setJoinCode(e.target.value.toUpperCase())}
-              maxLength={8}
-              style={{ flex: 1, fontFamily: 'monospace', letterSpacing: '0.1em' }}
-            />
+            <input className="input" placeholder={t('tournaments.enter_code')}
+              value={joinCode} onChange={e => setJoinCode(e.target.value.toUpperCase())}
+              maxLength={8} style={{ flex: 1, fontFamily: 'monospace', letterSpacing: '0.1em' }} />
             <button className="btn btn-primary btn-sm" type="submit" disabled={joining || !joinCode}>
               {joining ? '…' : t('tournaments.join_btn')}
             </button>
@@ -171,11 +171,8 @@ export default function TournamentsPage() {
 
         <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
           {['mine', 'public'].map(k => (
-            <button
-              key={k}
-              className={`btn btn-sm ${tab === k ? 'btn-primary' : 'btn-ghost'}`}
-              onClick={() => setTab(k)}
-            >
+            <button key={k} className={`btn btn-sm ${tab === k ? 'btn-primary' : 'btn-ghost'}`}
+              onClick={() => setTab(k)}>
               {t(`tournaments.tab_${k}`)}
             </button>
           ))}
@@ -191,16 +188,15 @@ export default function TournamentsPage() {
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              {myTournaments.map(tr => (
-                <TournamentRow key={tr.id} tournament={tr} navigate={navigate} />
-              ))}
+              {myTournaments.map(tr => <TournamentRow key={tr.id} tournament={tr} navigate={navigate} />)}
             </div>
           )
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            {publicTournaments.map(tr => (
-              <TournamentRow key={tr.id} tournament={tr} navigate={navigate} />
-            ))}
+            {publicTournaments.length === 0
+              ? <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '2rem' }}>—</p>
+              : publicTournaments.map(tr => <TournamentRow key={tr.id} tournament={tr} navigate={navigate} />)
+            }
           </div>
         )}
       </div>
@@ -210,15 +206,20 @@ export default function TournamentsPage() {
 
 function TournamentRow({ tournament, navigate }) {
   return (
-    <button
-      className="card card-sm"
-      style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', textAlign: 'left', cursor: 'pointer' }}
-      onClick={() => navigate(`/torneo/${tournament.id}`)}
-    >
+    <button className="card card-sm"
+      style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        width: '100%', textAlign: 'left', cursor: 'pointer' }}
+      onClick={() => navigate(`/torneo/${tournament.id}`)}>
       <div>
         <p style={{ fontWeight: 700, fontSize: '0.9375rem' }}>{tournament.name}</p>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginTop: '0.2rem' }}>
-          {tournament.competitions?.name} · <span style={{ fontFamily: 'monospace' }}>{tournament.invite_code}</span>
+          {tournament.competitions?.name}
+          {tournament.invite_code && (
+            <span style={{ marginLeft: '0.5rem', fontFamily: 'monospace',
+                background: 'var(--surface-3)', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>
+              {tournament.invite_code}
+            </span>
+          )}
         </p>
       </div>
       <span style={{ color: 'var(--text-subtle)', fontSize: '1.25rem' }}>›</span>
