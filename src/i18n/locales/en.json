@@ -79,5 +79,18 @@
     "stat_active_tournaments": "active tournaments",
     "stat_created": "tournaments created",
     "stat_pending": "pending requests"
+  },
+  "predictions": {
+    "title": "Predictions",
+    "predict_matches": "Predict matches",
+    "predict_standings": "Predict standings",
+    "save": "Save prediction",
+    "saved": "Saved",
+    "not_member": "You need to be an approved member to predict",
+    "no_matches": "No matches loaded yet",
+    "pen_winner": "Penalty winner",
+    "pen": "pen",
+    "your_pick": "Your pick",
+    "locked": "Locked"
   }
 }
