@@ -1,0 +1,44 @@
+{
+  "auth": {
+    "title": "Prode Mundial",
+    "subtitle": "Predictions for the 2026 World Cup",
+    "email_label": "Email",
+    "email_placeholder": "you@email.com",
+    "sign_in": "Sign in with magic link",
+    "sending": "Sending...",
+    "check_email": "Check your email",
+    "check_email_sub": "We sent a link to {{email}}. Click it to sign in.",
+    "back": "Back"
+  },
+  "common": {
+    "loading": "Loading...",
+    "sign_out": "Sign out",
+    "error_generic": "Something went wrong, please try again"
+  },
+  "modes": {
+    "posiciones": "Standings",
+    "posiciones_desc": "Predict each team's group position and the final podium",
+    "partidos": "Matches",
+    "partidos_desc": "Predict the exact result of each match"
+  },
+  "competitions": {
+    "create_tournament": "Create tournament →",
+    "status_active": "Active",
+    "status_upcoming": "Upcoming",
+    "status_finished": "Finished"
+  },
+  "tournaments": {
+    "title": "My Tournaments",
+    "create": "Create tournament",
+    "join": "Join a tournament",
+    "empty": "You are not in any tournament yet",
+    "players": "{{count}} player",
+    "players_plural": "{{count}} players"
+  },
+  "nav": {
+    "home": "Home",
+    "tournaments": "Tournaments",
+    "leaderboard": "Leaderboard",
+    "profile": "Profile"
+  }
+}

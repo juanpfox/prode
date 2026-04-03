@@ -1,0 +1,44 @@
+{
+  "auth": {
+    "title": "Prode Mundial",
+    "subtitle": "Prognósticos para a Copa do Mundo 2026",
+    "email_label": "Email",
+    "email_placeholder": "seu@email.com",
+    "sign_in": "Entrar com magic link",
+    "sending": "Enviando...",
+    "check_email": "Verifique seu email para o link de acesso",
+    "check_email_sub": "Enviamos um link para {{email}}. Clique para entrar.",
+    "back": "Voltar"
+  },
+  "common": {
+    "loading": "Carregando...",
+    "sign_out": "Sair",
+    "error_generic": "Algo deu errado, tente novamente"
+  },
+  "modes": {
+    "posiciones": "Posições",
+    "posiciones_desc": "Preveja a posição de cada equipe em seu grupo e o pódio",
+    "partidos": "Partidas",
+    "partidos_desc": "Preveja o resultado exato de cada partida"
+  },
+  "competitions": {
+    "create_tournament": "Criar torneio →",
+    "status_active": "Em andamento",
+    "status_upcoming": "Em breve",
+    "status_finished": "Finalizado"
+  },
+  "tournaments": {
+    "title": "Meus Torneios",
+    "create": "Criar torneio",
+    "join": "Entrar em um torneio",
+    "empty": "Você não participa de nenhum torneio ainda",
+    "players": "{{count}} jogador",
+    "players_plural": "{{count}} jogadores"
+  },
+  "nav": {
+    "home": "Início",
+    "tournaments": "Torneios",
+    "leaderboard": "Ranking",
+    "profile": "Perfil"
+  }
+}

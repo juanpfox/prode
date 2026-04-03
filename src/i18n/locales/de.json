@@ -1,0 +1,44 @@
+{
+  "auth": {
+    "title": "Prode Mundial",
+    "subtitle": "Tipps für die WM 2026",
+    "email_label": "E-Mail",
+    "email_placeholder": "du@email.com",
+    "sign_in": "Mit Magic Link anmelden",
+    "sending": "Wird gesendet...",
+    "check_email": "E-Mail prüfen",
+    "check_email_sub": "Wir haben einen Link an {{email}} gesendet. Klicke zum Anmelden.",
+    "back": "Zurück"
+  },
+  "common": {
+    "loading": "Laden...",
+    "sign_out": "Abmelden",
+    "error_generic": "Etwas ist schiefgelaufen, bitte versuche es erneut"
+  },
+  "modes": {
+    "posiciones": "Tabellen",
+    "posiciones_desc": "Tippe die Gruppenplatzierung jedes Teams und das Podium",
+    "partidos": "Spiele",
+    "partidos_desc": "Tippe das genaue Ergebnis jedes Spiels"
+  },
+  "competitions": {
+    "create_tournament": "Turnier erstellen →",
+    "status_active": "Aktiv",
+    "status_upcoming": "Demnächst",
+    "status_finished": "Beendet"
+  },
+  "tournaments": {
+    "title": "Meine Turniere",
+    "create": "Turnier erstellen",
+    "join": "Turnier beitreten",
+    "empty": "Du nimmst noch an keinem Turnier teil",
+    "players": "{{count}} Spieler",
+    "players_plural": "{{count}} Spieler"
+  },
+  "nav": {
+    "home": "Start",
+    "tournaments": "Turniere",
+    "leaderboard": "Rangliste",
+    "profile": "Profil"
+  }
+}

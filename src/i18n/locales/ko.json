@@ -1,0 +1,44 @@
+{
+  "auth": {
+    "title": "프로드 문디알",
+    "subtitle": "2026 월드컵 예측",
+    "email_label": "이메일",
+    "email_placeholder": "당신@이메일.com",
+    "sign_in": "매직 링크로 로그인",
+    "sending": "전송 중...",
+    "check_email": "이메일을 확인하세요",
+    "check_email_sub": "{{email}}로 링크를 보냈습니다. 클릭하여 로그인하세요.",
+    "back": "뒤로"
+  },
+  "common": {
+    "loading": "로딩 중...",
+    "sign_out": "로그아웃",
+    "error_generic": "오류가 발생했습니다. 다시 시도해 주세요"
+  },
+  "modes": {
+    "posiciones": "순위표",
+    "posiciones_desc": "각 팀의 조별 순위와 포디움을 예측하세요",
+    "partidos": "경기",
+    "partidos_desc": "각 경기의 정확한 결과를 예측하세요"
+  },
+  "competitions": {
+    "create_tournament": "토너먼트 만들기 →",
+    "status_active": "진행 중",
+    "status_upcoming": "예정",
+    "status_finished": "종료"
+  },
+  "tournaments": {
+    "title": "내 토너먼트",
+    "create": "토너먼트 만들기",
+    "join": "토너먼트 참여",
+    "empty": "아직 참여 중인 토너먼트가 없습니다",
+    "players": "{{count}}명",
+    "players_plural": "{{count}}명"
+  },
+  "nav": {
+    "home": "홈",
+    "tournaments": "토너먼트",
+    "leaderboard": "순위",
+    "profile": "프로필"
+  }
+}

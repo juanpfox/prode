@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(ls C:/Users/juanp/gitRepos/prode/.env*)",
+      "Bash(npm run:*)"
+    ]
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "auth": {
+    "title": "世界杯竞猜",
+    "subtitle": "2026年世界杯预测",
+    "email_label": "电子邮件",
+    "email_placeholder": "你@邮件.com",
+    "sign_in": "使用魔法链接登录",
+    "sending": "发送中...",
+    "check_email": "查看您的邮件",
+    "check_email_sub": "我们向 {{email}} 发送了一个链接。点击登录。",
+    "back": "返回"
+  },
+  "common": {
+    "loading": "加载中...",
+    "sign_out": "退出登录",
+    "error_generic": "出现错误，请重试"
+  },
+  "modes": {
+    "posiciones": "积分榜",
+    "posiciones_desc": "预测每支球队在小组中的排名和颁奖台",
+    "partidos": "比赛",
+    "partidos_desc": "预测每场比赛的确切比分"
+  },
+  "competitions": {
+    "create_tournament": "创建联赛 →",
+    "status_active": "进行中",
+    "status_upcoming": "即将开始",
+    "status_finished": "已结束"
+  },
+  "tournaments": {
+    "title": "我的联赛",
+    "create": "创建联赛",
+    "join": "加入联赛",
+    "empty": "您还没有参加任何联赛",
+    "players": "{{count}}名球员",
+    "players_plural": "{{count}}名球员"
+  },
+  "nav": {
+    "home": "首页",
+    "tournaments": "联赛",
+    "leaderboard": "排行榜",
+    "profile": "个人资料"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "auth": {
+    "title": "প্রোড মুন্দিয়াল",
+    "subtitle": "বিশ্বকাপ ২০২৬-এর পূর্বাভাস",
+    "email_label": "ইমেইল",
+    "email_placeholder": "আপনি@ইমেইল.com",
+    "sign_in": "ম্যাজিক লিংক দিয়ে সাইন ইন করুন",
+    "sending": "পাঠানো হচ্ছে...",
+    "check_email": "আপনার ইমেইল দেখুন",
+    "check_email_sub": "আমরা {{email}}-এ একটি লিংক পাঠিয়েছি। সাইন ইন করতে ক্লিক করুন।",
+    "back": "ফিরে যান"
+  },
+  "common": {
+    "loading": "লোড হচ্ছে...",
+    "sign_out": "সাইন আউট",
+    "error_generic": "কিছু ভুল হয়েছে, আবার চেষ্টা করুন"
+  },
+  "modes": {
+    "posiciones": "স্ট্যান্ডিং",
+    "posiciones_desc": "প্রতিটি দলের গ্রুপ পজিশন এবং পোডিয়াম পূর্বাভাস দিন",
+    "partidos": "ম্যাচ",
+    "partidos_desc": "প্রতিটি ম্যাচের সঠিক ফলাফল পূর্বাভাস দিন"
+  },
+  "competitions": {
+    "create_tournament": "টুর্নামেন্ট তৈরি করুন →",
+    "status_active": "চলছে",
+    "status_upcoming": "আসছে",
+    "status_finished": "শেষ"
+  },
+  "tournaments": {
+    "title": "আমার টুর্নামেন্ট",
+    "create": "টুর্নামেন্ট তৈরি করুন",
+    "join": "টুর্নামেন্টে যোগ দিন",
+    "empty": "আপনি এখনও কোনো টুর্নামেন্টে নেই",
+    "players": "{{count}} খেলোয়াড়",
+    "players_plural": "{{count}} খেলোয়াড়"
+  },
+  "nav": {
+    "home": "হোম",
+    "tournaments": "টুর্নামেন্ট",
+    "leaderboard": "র‌্যাংকিং",
+    "profile": "প্রোফাইল"
+  }
+}

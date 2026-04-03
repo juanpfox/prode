@@ -1,0 +1,44 @@
+{
+  "auth": {
+    "title": "プロード・ムンディアル",
+    "subtitle": "2026ワールドカップの予想",
+    "email_label": "メールアドレス",
+    "email_placeholder": "あなた@メール.com",
+    "sign_in": "マジックリンクでサインイン",
+    "sending": "送信中...",
+    "check_email": "メールを確認してください",
+    "check_email_sub": "{{email}} にリンクを送りました。クリックしてサインインしてください。",
+    "back": "戻る"
+  },
+  "common": {
+    "loading": "読み込み中...",
+    "sign_out": "サインアウト",
+    "error_generic": "エラーが発生しました。もう一度お試しください"
+  },
+  "modes": {
+    "posiciones": "順位表",
+    "posiciones_desc": "各チームのグループ順位と表彰台を予想する",
+    "partidos": "試合",
+    "partidos_desc": "各試合の正確なスコアを予想する"
+  },
+  "competitions": {
+    "create_tournament": "トーナメントを作成 →",
+    "status_active": "開催中",
+    "status_upcoming": "近日開催",
+    "status_finished": "終了"
+  },
+  "tournaments": {
+    "title": "マイトーナメント",
+    "create": "トーナメントを作成",
+    "join": "トーナメントに参加",
+    "empty": "まだトーナメントに参加していません",
+    "players": "{{count}}人のプレイヤー",
+    "players_plural": "{{count}}人のプレイヤー"
+  },
+  "nav": {
+    "home": "ホーム",
+    "tournaments": "トーナメント",
+    "leaderboard": "ランキング",
+    "profile": "プロフィール"
+  }
+}

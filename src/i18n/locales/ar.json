@@ -1,0 +1,44 @@
+{
+  "auth": {
+    "title": "برودي موندياي",
+    "subtitle": "توقعات كأس العالم 2026",
+    "email_label": "البريد الإلكتروني",
+    "email_placeholder": "أنت@بريد.com",
+    "sign_in": "تسجيل الدخول برابط سحري",
+    "sending": "جارٍ الإرسال...",
+    "check_email": "تحقق من بريدك الإلكتروني",
+    "check_email_sub": "أرسلنا رابطاً إلى {{email}}. انقر للدخول.",
+    "back": "رجوع"
+  },
+  "common": {
+    "loading": "جارٍ التحميل...",
+    "sign_out": "تسجيل الخروج",
+    "error_generic": "حدث خطأ، يرجى المحاولة مرة أخرى"
+  },
+  "modes": {
+    "posiciones": "الترتيب",
+    "posiciones_desc": "توقع مركز كل فريق في مجموعته والمنصة",
+    "partidos": "المباريات",
+    "partidos_desc": "توقع النتيجة الدقيقة لكل مباراة"
+  },
+  "competitions": {
+    "create_tournament": "إنشاء بطولة →",
+    "status_active": "جارٍ",
+    "status_upcoming": "قادم",
+    "status_finished": "منتهي"
+  },
+  "tournaments": {
+    "title": "بطولاتي",
+    "create": "إنشاء بطولة",
+    "join": "الانضمام إلى بطولة",
+    "empty": "أنت لا تشارك في أي بطولة حتى الآن",
+    "players": "{{count}} لاعب",
+    "players_plural": "{{count}} لاعبين"
+  },
+  "nav": {
+    "home": "الرئيسية",
+    "tournaments": "البطولات",
+    "leaderboard": "الترتيب",
+    "profile": "الملف الشخصي"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "auth": {
+    "title": "प्रोड मुंडियाल",
+    "subtitle": "विश्व कप 2026 के लिए भविष्यवाणियां",
+    "email_label": "ईमेल",
+    "email_placeholder": "आप@ईमेल.com",
+    "sign_in": "मैजिक लिंक से साइन इन करें",
+    "sending": "भेजा जा रहा है...",
+    "check_email": "अपना ईमेल जांचें",
+    "check_email_sub": "हमने {{email}} पर एक लिंक भेजा है। साइन इन करने के लिए क्लिक करें।",
+    "back": "वापस"
+  },
+  "common": {
+    "loading": "लोड हो रहा है...",
+    "sign_out": "साइन आउट",
+    "error_generic": "कुछ गलत हो गया, फिर से कोशिश करें"
+  },
+  "modes": {
+    "posiciones": "स्टैंडिंग",
+    "posiciones_desc": "हर टीम की ग्रुप पोजीशन और पोडियम की भविष्यवाणी करें",
+    "partidos": "मैच",
+    "partidos_desc": "हर मैच का सटीक स्कोर बताएं"
+  },
+  "competitions": {
+    "create_tournament": "टूर्नामेंट बनाएं →",
+    "status_active": "चल रहा है",
+    "status_upcoming": "आगामी",
+    "status_finished": "समाप्त"
+  },
+  "tournaments": {
+    "title": "मेरे टूर्नामेंट",
+    "create": "टूर्नामेंट बनाएं",
+    "join": "टूर्नामेंट में शामिल हों",
+    "empty": "आप अभी तक किसी टूर्नामेंट में नहीं हैं",
+    "players": "{{count}} खिलाड़ी",
+    "players_plural": "{{count}} खिलाड़ी"
+  },
+  "nav": {
+    "home": "होम",
+    "tournaments": "टूर्नामेंट",
+    "leaderboard": "रैंकिंग",
+    "profile": "प्रोफ़ाइल"
+  }
+}
