@@ -16,7 +16,8 @@
   "common": {
     "loading": "Cargando...",
     "sign_out": "Cerrar sesión",
-    "error_generic": "Algo salió mal, intentá de nuevo"
+    "error_generic": "Algo salió mal, intentá de nuevo",
+    "back": "Volver"
   },
   "modes": {
     "posiciones": "Posiciones",
@@ -34,14 +35,33 @@
     "title": "Mis Torneos",
     "create": "Crear torneo",
     "join": "Unirse a un torneo",
+    "join_btn": "Unirse",
     "empty": "No participás en ningún torneo todavía",
     "players": "{{count}} jugador",
-    "players_plural": "{{count}} jugadores"
+    "players_plural": "{{count}} jugadores",
+    "name_placeholder": "Nombre del torneo",
+    "select_competition": "Seleccioná una competición",
+    "enter_code": "Código de invitación",
+    "invalid_code": "Código inválido",
+    "invite_code": "Código",
+    "pending_approval": "Solicitudes pendientes",
+    "tab_mine": "Mis torneos",
+    "tab_public": "Todos"
   },
   "nav": {
     "home": "Inicio",
     "tournaments": "Torneos",
     "leaderboard": "Ranking",
     "profile": "Perfil"
+  },
+  "leaderboard": {
+    "no_scores": "Aún no hay puntos registrados"
+  },
+  "profile": {
+    "display_name": "Nombre para mostrar",
+    "display_name_placeholder": "Tu nombre en el prode",
+    "save": "Guardar",
+    "saved": "Guardado",
+    "stats": "Estadísticas"
   }
 }
