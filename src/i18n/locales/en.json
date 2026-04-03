@@ -81,16 +81,18 @@
     "stat_pending": "pending requests"
   },
   "predictions": {
-    "title": "Predictions",
-    "predict_matches": "Predict matches",
-    "predict_standings": "Predict standings",
-    "save": "Save prediction",
+    "title": "My Predictions",
+    "go_predict": "Enter predictions",
+    "lock_info": "Locked 1 hour before each match",
+    "locked": "Locked",
+    "finished": "Finished",
+    "save": "Save",
     "saved": "Saved",
-    "not_member": "You need to be an approved member to predict",
-    "no_matches": "No matches loaded yet",
     "pen_winner": "Penalty winner",
-    "pen": "pen",
-    "your_pick": "Your pick",
-    "locked": "Locked"
+    "no_access": "You don't have access to this tournament",
+    "result": "Result",
+    "exact": "Exact!",
+    "winner_ok": "Correct winner",
+    "miss": "Missed"
   }
 }
