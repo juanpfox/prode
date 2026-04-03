@@ -7,6 +7,7 @@ import LoginPage from './pages/LoginPage'
 import HomePage from './pages/HomePage'
 import TournamentsPage from './pages/TournamentsPage'
 import TournamentDetailPage from './pages/TournamentDetailPage'
+import PredictionsPage from './pages/PredictionsPage'
 import LeaderboardPage from './pages/LeaderboardPage'
 import ProfilePage from './pages/ProfilePage'
 
@@ -33,12 +34,13 @@ export default function App() {
     <BrowserRouter>
       {user ? (
         <Routes>
-          <Route path="/"           element={<HomePage />} />
-          <Route path="/torneos"    element={<TournamentsPage />} />
-          <Route path="/torneo/:id" element={<TournamentDetailPage />} />
-          <Route path="/ranking"    element={<LeaderboardPage />} />
-          <Route path="/perfil"     element={<ProfilePage />} />
-          <Route path="*"           element={<Navigate to="/" replace />} />
+          <Route path="/"                             element={<HomePage />} />
+          <Route path="/torneos"                      element={<TournamentsPage />} />
+          <Route path="/torneo/:id"                   element={<TournamentDetailPage />} />
+          <Route path="/torneo/:tournamentId/pronosticos" element={<PredictionsPage />} />
+          <Route path="/ranking"                      element={<LeaderboardPage />} />
+          <Route path="/perfil"                       element={<ProfilePage />} />
+          <Route path="*"                             element={<Navigate to="/" replace />} />
         </Routes>
       ) : (
         <Routes>
