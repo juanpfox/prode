@@ -26,7 +26,7 @@ export default function HomePage() {
         />
         <CompetitionCard
           emoji="⭐"
-          name="UEFA Champions League 2024/25"
+          name="Champions League"
           modes={[t('modes.partidos')]}
           status="active"
           flag="🇪🇺"
