@@ -1,10 +1,14 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './hooks/useAuth'
-import { useTheme } from './hooks/useTheme'
-import { applyRTL } from './hooks/useTheme'
+import { useTheme, applyRTL } from './hooks/useTheme'
 import LoginPage from './pages/LoginPage'
 import HomePage from './pages/HomePage'
+import TournamentsPage from './pages/TournamentsPage'
+import TournamentDetailPage from './pages/TournamentDetailPage'
+import LeaderboardPage from './pages/LeaderboardPage'
+import ProfilePage from './pages/ProfilePage'
 
 function LoadingScreen() {
   const { t } = useTranslation()
@@ -23,19 +27,31 @@ function LoadingScreen() {
   )
 }
 
-export default function App() {
-  // Initialize theme on mount (in case React renders before the inline script)
-  useTheme()
+function PrivateRoutes() {
+  return (
+    <Routes>
+      <Route path="/"         element={<HomePage />} />
+      <Route path="/torneos"  element={<TournamentsPage />} />
+      <Route path="/torneo/:id" element={<TournamentDetailPage />} />
+      <Route path="/ranking"  element={<LeaderboardPage />} />
+      <Route path="/perfil"   element={<ProfilePage />} />
+      <Route path="*"         element={<Navigate to="/" replace />} />
+    </Routes>
+  )
+}
 
+export default function App() {
+  useTheme()
   const { i18n } = useTranslation()
   const { user, loading } = useAuth()
 
-  // Sync RTL when language changes
-  useEffect(() => {
-    applyRTL(i18n.language)
-  }, [i18n.language])
+  useEffect(() => { applyRTL(i18n.language) }, [i18n.language])
 
   if (loading) return <LoadingScreen />
-  if (!user)   return <LoginPage />
-  return <HomePage />
+
+  return (
+    <BrowserRouter>
+      {user ? <PrivateRoutes /> : <Routes><Route path="*" element={<LoginPage />} /></Routes>}
+    </BrowserRouter>
+  )
 }
