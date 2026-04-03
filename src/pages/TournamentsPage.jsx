@@ -23,14 +23,11 @@ export default function TournamentsPage() {
   const [competitions, setCompetitions] = useState([])
   const [error, setError] = useState(null)
 
-  useEffect(() => {
-    loadData()
-  }, [user])
+  useEffect(() => { loadData() }, [user])
 
   async function loadData() {
     setLoading(true)
     try {
-      // Mis torneos (donde soy jugador aprobado)
       const { data: myData } = await supabase
         .from('tournament_players')
         .select('role, status, tournaments(id, name, invite_code, competition_id, competitions(name, type))')
@@ -39,7 +36,6 @@ export default function TournamentsPage() {
 
       setMyTournaments(myData?.map(tp => ({ ...tp.tournaments, role: tp.role })) ?? [])
 
-      // Torneos públicos
       const { data: pubData } = await supabase
         .from('tournaments')
         .select('id, name, invite_code, competition_id, competitions(name, type)')
@@ -48,7 +44,6 @@ export default function TournamentsPage() {
 
       setPublicTournaments(pubData ?? [])
 
-      // Competiciones disponibles
       const { data: comps } = await supabase
         .from('competitions')
         .select('id, name, type, status')
@@ -76,7 +71,7 @@ export default function TournamentsPage() {
       setShowCreate(false)
       setCreateForm({ name: '', competition_id: '' })
       await loadData()
-      navigate(\`/torneo/${data.id}\`)
+      navigate(`/torneo/${data.id}`)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -158,7 +153,6 @@ export default function TournamentsPage() {
           </div>
         )}
 
-        {/* Join by code */}
         <div className="card card-sm" style={{ marginBottom: '1.5rem' }}>
           <form onSubmit={handleJoin} style={{ display: 'flex', gap: '0.5rem' }}>
             <input
@@ -175,7 +169,6 @@ export default function TournamentsPage() {
           </form>
         </div>
 
-        {/* Tabs */}
         <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
           {['mine', 'public'].map(k => (
             <button
@@ -198,15 +191,15 @@ export default function TournamentsPage() {
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              {myTournaments.map(t_ => (
-                <TournamentRow key={t_.id} tournament={t_} navigate={navigate} />
+              {myTournaments.map(tr => (
+                <TournamentRow key={tr.id} tournament={tr} navigate={navigate} />
               ))}
             </div>
           )
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            {publicTournaments.map(t_ => (
-              <TournamentRow key={t_.id} tournament={t_} navigate={navigate} />
+            {publicTournaments.map(tr => (
+              <TournamentRow key={tr.id} tournament={tr} navigate={navigate} />
             ))}
           </div>
         )}
