@@ -110,6 +110,42 @@
   line-height: 1.5;
 }
 
+/* Divider */
+.login-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 1.5rem 0;
+  color: var(--text-subtle);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.login-divider::before,
+.login-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--border);
+}
+
+.login-divider:not(:empty)::before { margin-right: 1rem; }
+.login-divider:not(:empty)::after  { margin-left: 1rem; }
+
+/* Google button */
+.btn-google {
+  background: var(--surface);
+  color: var(--text-2);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-sm);
+}
+.btn-google:hover:not(:disabled) {
+  background: var(--surface-2);
+  border-color: var(--text-subtle);
+  box-shadow: var(--shadow-md);
+}
+
 /* Tablet and up */
 @media (min-width: 480px) {
   .login-center { padding-top: 6rem; }

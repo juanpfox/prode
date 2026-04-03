@@ -8,7 +8,9 @@
     "sending": "Enviando...",
     "check_email": "Verifique seu email para o link de acesso",
     "check_email_sub": "Enviamos um link para {{email}}. Clique para entrar.",
-    "back": "Voltar"
+    "back": "Voltar",
+    "or_continue_with": "ou continue com",
+    "sign_in_google": "Entrar com o Google"
   },
   "common": {
     "loading": "Carregando...",

@@ -19,9 +19,21 @@ export function useAuth() {
   }, [])
 
   const signInWithEmail = async (email) => {
+    const redirectUrl = import.meta.env.VITE_SITE_URL || window.location.origin
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: window.location.origin },
+      options: { emailRedirectTo: redirectUrl },
+    })
+    return { error }
+  }
+
+  const signInWithGoogle = async () => {
+    const redirectUrl = import.meta.env.VITE_SITE_URL || window.location.origin
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: redirectUrl,
+      },
     })
     return { error }
   }
@@ -30,5 +42,5 @@ export function useAuth() {
     await supabase.auth.signOut()
   }
 
-  return { user, loading, signInWithEmail, signOut }
+  return { user, loading, signInWithEmail, signInWithGoogle, signOut }
 }
