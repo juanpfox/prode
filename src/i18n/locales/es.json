@@ -6,7 +6,7 @@
     "email_placeholder": "tu@email.com",
     "sign_in": "Ingresar con magic link",
     "sending": "Enviando...",
-    "check_email": "Revisá tu email para el link de acceso",
+    "check_email": "Revisá tu email",
     "check_email_sub": "Te enviamos un link a {{email}}. Hacé clic para ingresar.",
     "back": "Volver",
     "or_continue_with": "o continúa con",
@@ -18,7 +18,12 @@
     "loading": "Cargando...",
     "sign_out": "Cerrar sesión",
     "error_generic": "Algo salió mal, intentá de nuevo",
-    "back": "Volver"
+    "back": "Volver",
+    "approve": "Aprobar",
+    "you": "vos"
+  },
+  "home": {
+    "competitions": "Competiciones"
   },
   "modes": {
     "posiciones": "Posiciones",
@@ -40,14 +45,20 @@
     "empty": "No participás en ningún torneo todavía",
     "players": "{{count}} jugador",
     "players_plural": "{{count}} jugadores",
+    "players_count": "Jugadores ({{count}})",
     "name_placeholder": "Nombre del torneo",
     "select_competition": "Seleccioná una competición",
-    "enter_code": "Código de invitación",
-    "invalid_code": "Código inválido",
-    "invite_code": "Código",
+    "enter_code": "ABC123",
+    "enter_code_label": "Tenés un código de invitación?",
+    "invalid_code": "Código inválido o torneo no encontrado",
+    "invite_code": "Código de invitación",
     "pending_approval": "Solicitudes pendientes",
+    "pending_msg": "Tu solicitud está pendiente de aprobación",
     "tab_mine": "Mis torneos",
-    "tab_public": "Todos"
+    "tab_public": "Todos",
+    "already_requested": "Ya enviaste una solicitud a este torneo",
+    "join_requested": "Solicitud enviada a \"{{name}}\". Esperá la aprobación del admin.",
+    "not_found": "Torneo no encontrado"
   },
   "nav": {
     "home": "Inicio",
@@ -56,13 +67,17 @@
     "profile": "Perfil"
   },
   "leaderboard": {
-    "no_scores": "Aún no hay puntos registrados"
+    "no_scores": "Aún no hay puntos registrados",
+    "matches": "partidos"
   },
   "profile": {
     "display_name": "Nombre para mostrar",
     "display_name_placeholder": "Tu nombre en el prode",
     "save": "Guardar",
     "saved": "Guardado",
-    "stats": "Estadísticas"
+    "stats": "Estadísticas",
+    "stat_active_tournaments": "torneos activos",
+    "stat_created": "torneos creados",
+    "stat_pending": "solicitudes pendientes"
   }
 }
