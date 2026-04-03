@@ -205,6 +205,8 @@ Cada entidad tiene campo `external_id` para mapear sin depender de IDs internos.
 
 ---
 
+Repo GitHub: https://github.com/juanpfox/prode
+
 ## Pendientes / próximos pasos
 - [X] Crear repo GitHub (`prode-mundial`, privado)
 - [X] `npm create vite@latest prode-mundial -- --template react`
