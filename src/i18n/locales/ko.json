@@ -8,7 +8,10 @@
     "sending": "전송 중...",
     "check_email": "이메일을 확인하세요",
     "check_email_sub": "{{email}}로 링크를 보냈습니다. 클릭하여 로그인하세요.",
-    "back": "뒤로"
+    "back": "뒤로",
+    "or_continue_with": "또는 계속",
+    "sign_in_google": "Google로 로그인",
+    "email_required": "먼저 이메일을 입력한 후 버튼을 클릭하세요"
   },
   "common": {
     "loading": "로딩 중...",

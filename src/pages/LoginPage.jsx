@@ -11,9 +11,15 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState('idle') // idle | sending | sent | error
   const [errorMsg, setErrorMsg] = useState('')
+  const [emailError, setEmailError] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (!email) {
+      setEmailError(true)
+      return
+    }
+    setEmailError(false)
     setStatus('sending')
     setErrorMsg('')
     const { error } = await signInWithEmail(email)
@@ -75,6 +81,14 @@ export default function LoginPage() {
             <>
               <form onSubmit={handleSubmit} noValidate>
                 <div className="form-group" style={{ marginBottom: '1rem' }}>
+                  {emailError && (
+                    <p className="form-error" style={{ marginBottom: '0.5rem' }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                      </svg>
+                      {t('auth.email_required')}
+                    </p>
+                  )}
                   <label className="form-label" htmlFor="email">
                     {t('auth.email_label')}
                   </label>
@@ -82,10 +96,10 @@ export default function LoginPage() {
                     id="email"
                     type="email"
                     className="form-input"
+                    style={emailError ? { borderColor: 'var(--error, #ef4444)', boxShadow: '0 0 0 2px rgba(239,68,68,0.2)' } : undefined}
                     placeholder={t('auth.email_placeholder')}
                     value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    required
+                    onChange={e => { setEmail(e.target.value); if (emailError) setEmailError(false) }}
                     autoComplete="email"
                     autoFocus
                     disabled={status === 'sending'}
@@ -95,7 +109,7 @@ export default function LoginPage() {
                 <button
                   type="submit"
                   className="btn btn-primary btn-lg btn-full"
-                  disabled={status === 'sending' || !email}
+                  disabled={status === 'sending'}
                 >
                   {status === 'sending' ? (
                     <>

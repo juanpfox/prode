@@ -8,7 +8,10 @@
     "sending": "Wird gesendet...",
     "check_email": "E-Mail prüfen",
     "check_email_sub": "Wir haben einen Link an {{email}} gesendet. Klicke zum Anmelden.",
-    "back": "Zurück"
+    "back": "Zurück",
+    "or_continue_with": "oder weiter mit",
+    "sign_in_google": "Mit Google anmelden",
+    "email_required": "Bitte zuerst E-Mail eingeben und dann auf den Button klicken"
   },
   "common": {
     "loading": "Laden...",

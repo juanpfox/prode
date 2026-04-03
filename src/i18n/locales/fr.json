@@ -8,7 +8,10 @@
     "sending": "Envoi en cours...",
     "check_email": "Consultez votre email",
     "check_email_sub": "Nous avons envoyé un lien à {{email}}. Cliquez pour vous connecter.",
-    "back": "Retour"
+    "back": "Retour",
+    "or_continue_with": "ou continuer avec",
+    "sign_in_google": "Se connecter avec Google",
+    "email_required": "Veuillez d'abord saisir votre e-mail, puis cliquer sur le bouton"
   },
   "common": {
     "loading": "Chargement...",

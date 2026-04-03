@@ -10,7 +10,8 @@
     "check_email_sub": "Enviamos um link para {{email}}. Clique para entrar.",
     "back": "Voltar",
     "or_continue_with": "ou continue com",
-    "sign_in_google": "Entrar com o Google"
+    "sign_in_google": "Entrar com o Google",
+    "email_required": "Primeiro digite seu e-mail e depois clique no botão"
   },
   "common": {
     "loading": "Carregando...",

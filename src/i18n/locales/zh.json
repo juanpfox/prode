@@ -8,7 +8,10 @@
     "sending": "发送中...",
     "check_email": "查看您的邮件",
     "check_email_sub": "我们向 {{email}} 发送了一个链接。点击登录。",
-    "back": "返回"
+    "back": "返回",
+    "or_continue_with": "或继续使用",
+    "sign_in_google": "使用 Google 登录",
+    "email_required": "请先输入您的电子邮件，然后点击按钮"
   },
   "common": {
     "loading": "加载中...",
