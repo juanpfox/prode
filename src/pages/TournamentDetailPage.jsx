@@ -80,6 +80,7 @@ export default function TournamentDetailPage() {
   const pending  = players.filter(p => p.status === 'pending')
   const isApproved = myStatus === 'approved'
   const isPending  = myStatus === 'pending'
+  const modes = tournament.competitions?.available_modes ?? []
 
   return (
     <AppShell>
@@ -88,7 +89,7 @@ export default function TournamentDetailPage() {
           ← {t('common.back')}
         </button>
 
-        {/* Header card */}
+        {/* Header */}
         <div className="card card-sm" style={{ marginBottom: '1.25rem' }}>
           <h2 style={{ fontWeight: 800, fontSize: '1.125rem' }}>{tournament.name}</h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginTop: '0.25rem' }}>
@@ -121,6 +122,24 @@ export default function TournamentDetailPage() {
           )}
         </div>
 
+        {/* Actions — pronósticos */}
+        {isApproved && modes.length > 0 && (
+          <div style={{ marginBottom: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            {modes.includes('partidos') && (
+              <button className="btn btn-primary"
+                onClick={() => navigate(`/torneo/${id}/pronosticos`)}>
+                ⚽ {t('predictions.predict_matches')}
+              </button>
+            )}
+            {modes.includes('posiciones') && (
+              <button className="btn btn-ghost"
+                onClick={() => navigate(`/torneo/${id}/posiciones`)}>
+                📊 {t('predictions.predict_standings')}
+              </button>
+            )}
+          </div>
+        )}
+
         {/* Pending approvals (admin only) */}
         {myRole === 'admin' && pending.length > 0 && (
           <section style={{ marginBottom: '1.5rem' }}>
@@ -133,7 +152,9 @@ export default function TournamentDetailPage() {
                   style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span style={{ fontWeight: 600 }}>{p.users?.display_name ?? 'Usuario'}</span>
                   <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <button className="btn btn-primary btn-sm" onClick={() => approvePlayer(p.user_id)}>✓ {t('common.approve')}</button>
+                    <button className="btn btn-primary btn-sm" onClick={() => approvePlayer(p.user_id)}>
+                      ✓ {t('common.approve')}
+                    </button>
                     <button className="btn btn-ghost btn-sm" onClick={() => rejectPlayer(p.user_id)}>✕</button>
                   </div>
                 </div>
