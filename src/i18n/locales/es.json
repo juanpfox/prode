@@ -96,5 +96,11 @@
     "exact": "¡Exacto!",
     "winner_ok": "Ganador correcto",
     "miss": "Fallaste"
+  },
+  "posiciones": {
+    "hint": "Arrastrá los equipos para ordenarlos dentro de cada grupo. Luego elegí el podio.",
+    "group": "Grupo",
+    "podium": "Podio mundial",
+    "pick_team": "Elegí un equipo"
   }
 }

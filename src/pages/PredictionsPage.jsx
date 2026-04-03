@@ -1,9 +1,10 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabase'
 import AppShell from '../components/AppShell'
+import PosicionesPredictionsPage from './PosicionesPredictionsPage'
 
 const STAGE_ORDER = ['group', 'r16', 'qf', 'sf', 'third_place', 'final']
 const STAGE_LABEL = {
@@ -24,9 +25,9 @@ export default function PredictionsPage() {
 
   const [tournament, setTournament] = useState(null)
   const [matches, setMatches] = useState([])
-  const [predictions, setPredictions] = useState({}) // match_id -> { home_goals, away_goals, pen_pick }
-  const [saving, setSaving] = useState({})           // match_id -> bool
-  const [saved, setSaved]   = useState({})           // match_id -> bool
+  const [predictions, setPredictions] = useState({})
+  const [saving, setSaving] = useState({})
+  const [saved, setSaved]   = useState({})
   const [loading, setLoading] = useState(true)
   const [myStatus, setMyStatus] = useState(null)
 
@@ -35,39 +36,38 @@ export default function PredictionsPage() {
   async function loadAll() {
     setLoading(true)
     try {
-      // Tournament info
       const { data: tr } = await supabase
         .from('tournaments')
         .select('*, competitions(name, type, available_modes)')
         .eq('id', tournamentId).single()
       setTournament(tr)
 
-      // My membership
       const { data: tp } = await supabase
         .from('tournament_players')
         .select('status, role')
         .eq('tournament_id', tournamentId).eq('user_id', user.id).single()
       setMyStatus(tp?.status ?? null)
 
-      // Matches for this competition
-      const { data: ms } = await supabase
-        .from('matches')
-        .select('*, home_team:teams!home_team_id(name, code), away_team:teams!away_team_id(name, code)')
-        .eq('competition_id', tr?.competition_id)
-        .order('kickoff_at')
-      setMatches(ms ?? [])
+      // Only load matches if this is a partidos tournament
+      if (tr?.mode === 'partidos') {
+        const { data: ms } = await supabase
+          .from('matches')
+          .select('*, home_team:teams!home_team_id(name, code), away_team:teams!away_team_id(name, code)')
+          .eq('competition_id', tr?.competition_id)
+          .order('kickoff_at')
+        setMatches(ms ?? [])
 
-      // My existing predictions
-      const { data: preds } = await supabase
-        .from('match_predictions')
-        .select('match_id, home_goals, away_goals, pen_pick')
-        .eq('tournament_id', tournamentId).eq('user_id', user.id)
+        const { data: preds } = await supabase
+          .from('match_predictions')
+          .select('match_id, home_goals, away_goals, pen_pick')
+          .eq('tournament_id', tournamentId).eq('user_id', user.id)
 
-      const predMap = {}
-      for (const p of preds ?? []) {
-        predMap[p.match_id] = { home_goals: p.home_goals ?? '', away_goals: p.away_goals ?? '', pen_pick: p.pen_pick ?? '' }
+        const predMap = {}
+        for (const p of preds ?? []) {
+          predMap[p.match_id] = { home_goals: p.home_goals ?? '', away_goals: p.away_goals ?? '', pen_pick: p.pen_pick ?? '' }
+        }
+        setPredictions(predMap)
       }
-      setPredictions(predMap)
     } finally {
       setLoading(false)
     }
@@ -88,7 +88,6 @@ export default function PredictionsPage() {
     const pred = predictions[match.id] ?? {}
     const home = pred.home_goals !== '' && pred.home_goals !== undefined ? parseInt(pred.home_goals) : 0
     const away = pred.away_goals !== '' && pred.away_goals !== undefined ? parseInt(pred.away_goals) : 0
-
     setSaving(s => ({ ...s, [match.id]: true }))
     try {
       const payload = {
@@ -109,7 +108,6 @@ export default function PredictionsPage() {
     }
   }
 
-  // Group matches by stage
   const byStage = {}
   for (const m of matches) {
     if (!byStage[m.stage]) byStage[m.stage] = []
@@ -134,6 +132,14 @@ export default function PredictionsPage() {
     </AppShell>
   )
 
+  // ── Route to posiciones page ─────────────────────────────
+  if (tournament?.mode === 'posiciones') {
+    return <PosicionesPredictionsPage tournament={tournament} />
+  }
+
+  // ── Partidos page (match results) ────────────────────────
+  const hasMatches = matches.length > 0
+
   return (
     <AppShell>
       <div className="animate-fade-in">
@@ -148,6 +154,15 @@ export default function PredictionsPage() {
         <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginBottom: '1.5rem' }}>
           {t('predictions.lock_info')}
         </p>
+
+        {!hasMatches && (
+          <div className="home-empty card card-sm">
+            <span style={{ fontSize: '2rem' }}>📅</span>
+            <p style={{ color: 'var(--text-muted)' }}>
+              {lang === 'es' ? 'Aún no hay partidos cargados para esta competición.' : 'No matches loaded yet for this competition.'}
+            </p>
+          </div>
+        )}
 
         {STAGE_ORDER.filter(s => byStage[s]?.length).map(stage => (
           <section key={stage} style={{ marginBottom: '2rem' }}>
@@ -197,7 +212,6 @@ function MatchCard({ match, pred, locked, saving, saved, onChange, onSave, t }) 
       opacity: locked && !predFilled ? 0.65 : 1,
       borderColor: saved ? 'var(--primary)' : undefined,
     }}>
-      {/* Teams + date */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           marginBottom: '0.625rem' }}>
         <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{kickoffStr}</span>
@@ -208,29 +222,22 @@ function MatchCard({ match, pred, locked, saving, saved, onChange, onSave, t }) 
         )}
       </div>
 
-      {/* Score row */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', gap: '0.5rem' }}>
-        {/* Home */}
         <span style={{ fontWeight: 700, fontSize: '0.9rem', textAlign: 'right' }}>{home}</span>
-
-        {/* Score inputs or result */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
           {hasResult ? (
-            // Real result
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
               <ResultBubble val={match.home_goals} />
               <span style={{ color: 'var(--text-muted)', fontWeight: 700 }}>-</span>
               <ResultBubble val={match.away_goals} />
             </div>
           ) : locked ? (
-            // Locked, show prediction read-only
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
               <ResultBubble val={pred.home_goals !== '' ? pred.home_goals : '?'} muted={pred.home_goals === ''} />
               <span style={{ color: 'var(--text-muted)', fontWeight: 700 }}>-</span>
               <ResultBubble val={pred.away_goals !== '' ? pred.away_goals : '?'} muted={pred.away_goals === ''} />
             </div>
           ) : (
-            // Editable inputs
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
               <GoalInput val={pred.home_goals ?? ''} onChange={v => onChange('home_goals', v)} />
               <span style={{ color: 'var(--text-muted)', fontWeight: 600, fontSize: '0.75rem' }}>vs</span>
@@ -238,12 +245,9 @@ function MatchCard({ match, pred, locked, saving, saved, onChange, onSave, t }) 
             </div>
           )}
         </div>
-
-        {/* Away */}
         <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{away}</span>
       </div>
 
-      {/* Penalty pick (eliminatoria, empate pronosticado) */}
       {showPens && (
         <div style={{ marginTop: '0.625rem', display: 'flex', alignItems: 'center', gap: '0.5rem',
             justifyContent: 'center' }}>
@@ -259,12 +263,10 @@ function MatchCard({ match, pred, locked, saving, saved, onChange, onSave, t }) 
         </div>
       )}
 
-      {/* Prediction vs result comparison */}
       {hasResult && predFilled && (
         <PredResult match={match} pred={pred} t={t} />
       )}
 
-      {/* Save button */}
       {!locked && predFilled && (
         <button
           className="btn btn-primary btn-sm"
@@ -331,12 +333,12 @@ function PredResult({ match, pred, t }) {
 
   const exactBoth = pHome === rHome && pAway === rAway
   const predWinner = pHome > pAway ? 'home' : pHome < pAway ? 'away' : 'draw'
-  const realWinner = match.winner // 'home' | 'away' | 'draw'
+  const realWinner = match.winner
   const correctWinner = predWinner === realWinner
 
   return (
     <div style={{ marginTop: '0.5rem', padding: '0.375rem 0.625rem',
-        background: exactBoth ? 'var(--primary-subtle)' : correctWinner ? 'var(--surface-2)' : 'var(--surface-2)',
+        background: 'var(--surface-2)',
         borderRadius: 'var(--r-sm)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
       <span style={{ fontSize: '0.9rem' }}>
         {exactBoth ? '🎯' : correctWinner ? '✅' : '❌'}

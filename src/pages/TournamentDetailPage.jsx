@@ -92,6 +92,15 @@ export default function TournamentDetailPage() {
           <h2 style={{ fontWeight: 800, fontSize: '1.125rem' }}>{tournament.name}</h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginTop: '0.25rem' }}>
             {tournament.competitions?.name}
+            {tournament.mode && (
+              <span style={{
+                marginLeft: '0.5rem', fontSize: '0.75rem', fontWeight: 700,
+                background: 'var(--primary-subtle)', color: 'var(--primary)',
+                borderRadius: '4px', padding: '0.1rem 0.4rem'
+              }}>
+                {tournament.mode === 'posiciones' ? '🏆 Posiciones' : '⚽ Partidos'}
+              </span>
+            )}
           </p>
 
           {tournament.invite_code && (
@@ -119,12 +128,12 @@ export default function TournamentDetailPage() {
         </div>
 
         {/* Predictions CTA — approved players only */}
-        {isApproved && modes.includes('partidos') && (
+        {isApproved && (tournament.mode === 'partidos' || tournament.mode === 'posiciones') && (
           <button
             className="btn btn-primary"
             style={{ width: '100%', marginBottom: '1.25rem', fontSize: '1rem', padding: '0.875rem' }}
             onClick={() => navigate(`/torneo/${id}/pronosticos`)}>
-            ⚽ {t('predictions.go_predict')}
+            {tournament.mode === 'posiciones' ? '🏆' : '⚽'} {t('predictions.go_predict')}
           </button>
         )}
 

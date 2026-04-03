@@ -96,5 +96,11 @@
     "exact": "Exact!",
     "winner_ok": "Correct winner",
     "miss": "Missed"
+  },
+  "posiciones": {
+    "hint": "Drag teams to rank them within each group. Then pick the world podium.",
+    "group": "Group",
+    "podium": "World podium",
+    "pick_team": "Pick a team"
   }
 }
