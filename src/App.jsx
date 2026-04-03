@@ -34,13 +34,13 @@ export default function App() {
     <BrowserRouter>
       {user ? (
         <Routes>
-          <Route path="/"                             element={<HomePage />} />
-          <Route path="/torneos"                      element={<TournamentsPage />} />
-          <Route path="/torneo/:id"                   element={<TournamentDetailPage />} />
-          <Route path="/torneo/:tournamentId/pronosticos" element={<PredictionsPage />} />
-          <Route path="/ranking"                      element={<LeaderboardPage />} />
-          <Route path="/perfil"                       element={<ProfilePage />} />
-          <Route path="*"                             element={<Navigate to="/" replace />} />
+          <Route path="/"                          element={<HomePage />} />
+          <Route path="/torneos"                   element={<TournamentsPage />} />
+          <Route path="/torneo/:id"                element={<TournamentDetailPage />} />
+          <Route path="/torneo/:id/pronosticos"    element={<PredictionsPage />} />
+          <Route path="/ranking"                   element={<LeaderboardPage />} />
+          <Route path="/perfil"                    element={<ProfilePage />} />
+          <Route path="*"                          element={<Navigate to="/" replace />} />
         </Routes>
       ) : (
         <Routes>
