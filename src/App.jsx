@@ -13,30 +13,11 @@ import ProfilePage from './pages/ProfilePage'
 function LoadingScreen() {
   const { t } = useTranslation()
   return (
-    <div style={{
-      minHeight: '100dvh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      flexDirection: 'column',
-      gap: '1rem',
-    }}>
+    <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center',
+        justifyContent: 'center', flexDirection: 'column', gap: '1rem' }}>
       <span style={{ fontSize: '2.5rem', animation: 'bounce-soft 1.5s ease-in-out infinite' }}>⚽</span>
       <p style={{ color: 'var(--text-muted)', fontSize: '0.9375rem' }}>{t('common.loading')}</p>
     </div>
-  )
-}
-
-function PrivateRoutes() {
-  return (
-    <Routes>
-      <Route path="/"         element={<HomePage />} />
-      <Route path="/torneos"  element={<TournamentsPage />} />
-      <Route path="/torneo/:id" element={<TournamentDetailPage />} />
-      <Route path="/ranking"  element={<LeaderboardPage />} />
-      <Route path="/perfil"   element={<ProfilePage />} />
-      <Route path="*"         element={<Navigate to="/" replace />} />
-    </Routes>
   )
 }
 
@@ -44,14 +25,26 @@ export default function App() {
   useTheme()
   const { i18n } = useTranslation()
   const { user, loading } = useAuth()
-
   useEffect(() => { applyRTL(i18n.language) }, [i18n.language])
 
   if (loading) return <LoadingScreen />
 
   return (
     <BrowserRouter>
-      {user ? <PrivateRoutes /> : <Routes><Route path="*" element={<LoginPage />} /></Routes>}
+      {user ? (
+        <Routes>
+          <Route path="/"           element={<HomePage />} />
+          <Route path="/torneos"    element={<TournamentsPage />} />
+          <Route path="/torneo/:id" element={<TournamentDetailPage />} />
+          <Route path="/ranking"    element={<LeaderboardPage />} />
+          <Route path="/perfil"     element={<ProfilePage />} />
+          <Route path="*"           element={<Navigate to="/" replace />} />
+        </Routes>
+      ) : (
+        <Routes>
+          <Route path="*" element={<LoginPage />} />
+        </Routes>
+      )}
     </BrowserRouter>
   )
 }
