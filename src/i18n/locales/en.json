@@ -16,7 +16,8 @@
   "common": {
     "loading": "Loading...",
     "sign_out": "Sign out",
-    "error_generic": "Something went wrong, please try again"
+    "error_generic": "Something went wrong, please try again",
+    "back": "Back"
   },
   "modes": {
     "posiciones": "Standings",
@@ -34,14 +35,33 @@
     "title": "My Tournaments",
     "create": "Create tournament",
     "join": "Join a tournament",
+    "join_btn": "Join",
     "empty": "You are not in any tournament yet",
     "players": "{{count}} player",
-    "players_plural": "{{count}} players"
+    "players_plural": "{{count}} players",
+    "name_placeholder": "Tournament name",
+    "select_competition": "Select a competition",
+    "enter_code": "Invite code",
+    "invalid_code": "Invalid code",
+    "invite_code": "Code",
+    "pending_approval": "Pending requests",
+    "tab_mine": "My tournaments",
+    "tab_public": "All"
   },
   "nav": {
     "home": "Home",
     "tournaments": "Tournaments",
     "leaderboard": "Leaderboard",
     "profile": "Profile"
+  },
+  "leaderboard": {
+    "no_scores": "No scores yet"
+  },
+  "profile": {
+    "display_name": "Display name",
+    "display_name_placeholder": "Your name in the prode",
+    "save": "Save",
+    "saved": "Saved",
+    "stats": "Stats"
   }
 }
