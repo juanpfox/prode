@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 
+const GUEST_EMAIL = 'guest@prodemundial.dev'
+const GUEST_PASS  = 'guest1234'
+
 export function useAuth() {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -31,9 +34,15 @@ export function useAuth() {
     const redirectUrl = import.meta.env.VITE_SITE_URL || window.location.origin
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: {
-        redirectTo: redirectUrl,
-      },
+      options: { redirectTo: redirectUrl },
+    })
+    return { error }
+  }
+
+  const signInAsGuest = async () => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email: GUEST_EMAIL,
+      password: GUEST_PASS,
     })
     return { error }
   }
@@ -42,5 +51,5 @@ export function useAuth() {
     await supabase.auth.signOut()
   }
 
-  return { user, loading, signInWithEmail, signInWithGoogle, signOut }
+  return { user, loading, signInWithEmail, signInWithGoogle, signInAsGuest, signOut }
 }
