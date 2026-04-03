@@ -15,11 +15,9 @@ export default function LeaderboardPage() {
   const [loadingScores, setLoadingScores] = useState(false)
 
   useEffect(() => {
-    supabase
-      .from('tournament_players')
+    supabase.from('tournament_players')
       .select('tournaments(id, name)')
-      .eq('user_id', user.id)
-      .eq('status', 'approved')
+      .eq('user_id', user.id).eq('status', 'approved')
       .then(({ data }) => {
         const ts = data?.map(tp => tp.tournaments).filter(Boolean) ?? []
         setMyTournaments(ts)
@@ -31,9 +29,8 @@ export default function LeaderboardPage() {
   useEffect(() => {
     if (!selected) return
     setLoadingScores(true)
-    supabase
-      .from('scores')
-      .select('user_id, total_points, users(display_name, avatar_url)')
+    supabase.from('scores')
+      .select('user_id, total_points, matches_scored, users(display_name)')
       .eq('tournament_id', selected)
       .order('total_points', { ascending: false })
       .then(({ data }) => {
@@ -41,6 +38,8 @@ export default function LeaderboardPage() {
         setLoadingScores(false)
       })
   }, [selected])
+
+  const MEDALS = ['🥇', '🥈', '🥉']
 
   return (
     <AppShell>
@@ -57,13 +56,11 @@ export default function LeaderboardPage() {
         ) : (
           <>
             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1.25rem' }}>
-              {myTournaments.map(t_ => (
-                <button
-                  key={t_.id}
-                  className={`btn btn-sm ${selected === t_.id ? 'btn-primary' : 'btn-ghost'}`}
-                  onClick={() => setSelected(t_.id)}
-                >
-                  {t_.name}
+              {myTournaments.map(tr => (
+                <button key={tr.id}
+                  className={`btn btn-sm ${selected === tr.id ? 'btn-primary' : 'btn-ghost'}`}
+                  onClick={() => setSelected(tr.id)}>
+                  {tr.name}
                 </button>
               ))}
             </div>
@@ -78,20 +75,22 @@ export default function LeaderboardPage() {
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 {scores.map((s, i) => (
-                  <div
-                    key={s.user_id}
-                    className="card card-sm"
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: '0.75rem',
+                  <div key={s.user_id} className="card card-sm"
+                    style={{ display: 'flex', alignItems: 'center', gap: '0.75rem',
                       background: s.user_id === user.id ? 'var(--primary-subtle)' : undefined,
-                      border: s.user_id === user.id ? '1px solid var(--primary)' : undefined,
-                    }}
-                  >
-                    <span style={{ fontWeight: 800, fontSize: '1rem', width: '1.5rem', color: i < 3 ? 'var(--primary)' : 'var(--text-muted)' }}>
-                      {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}
+                      border: s.user_id === user.id ? '1px solid var(--primary)' : undefined }}>
+                    <span style={{ fontWeight: 800, fontSize: '1.1rem', width: '1.75rem', textAlign: 'center' }}>
+                      {MEDALS[i] ?? i + 1}
                     </span>
                     <span style={{ flex: 1, fontWeight: 600 }}>{s.users?.display_name ?? 'Usuario'}</span>
-                    <span style={{ fontWeight: 800, color: 'var(--primary)' }}>{s.total_points} pts</span>
+                    <div style={{ textAlign: 'right' }}>
+                      <p style={{ fontWeight: 800, color: 'var(--primary)', fontSize: '1rem' }}>
+                        {s.total_points} pts
+                      </p>
+                      <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                        {s.matches_scored} {t('leaderboard.matches')}
+                      </p>
+                    </div>
                   </div>
                 ))}
               </div>
