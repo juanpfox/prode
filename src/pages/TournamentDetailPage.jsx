@@ -21,12 +21,12 @@ export default function TournamentDetailPage() {
   async function loadTournament() {
     setLoading(true)
     try {
-      const { data: t_ } = await supabase
+      const { data: tr } = await supabase
         .from('tournaments')
         .select('*, competitions(name, type, status)')
         .eq('id', id)
         .single()
-      setTournament(t_)
+      setTournament(tr)
 
       const { data: pls } = await supabase
         .from('tournament_players')
