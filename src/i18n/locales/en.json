@@ -58,7 +58,9 @@
     "tab_public": "All",
     "already_requested": "You already sent a request to this tournament",
     "join_requested": "Request sent to \"{{name}}\". Wait for admin approval.",
-    "not_found": "Tournament not found"
+    "not_found": "Tournament not found",
+    "select_mode": "Choose a game mode",
+    "mode_required": "You need to choose a mode to continue"
   },
   "nav": {
     "home": "Home",

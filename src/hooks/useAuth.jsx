@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react'
+import { createContext, useContext, useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 
 const GUEST_EMAIL = 'guest@prodemundial.dev'
 const GUEST_PASS  = 'guest1234'
 
-export function useAuth() {
+const AuthContext = createContext(null)
+
+export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
 
@@ -51,5 +53,13 @@ export function useAuth() {
     await supabase.auth.signOut()
   }
 
-  return { user, loading, signInWithEmail, signInWithGoogle, signInAsGuest, signOut }
+  return (
+    <AuthContext.Provider value={{ user, loading, signInWithEmail, signInWithGoogle, signInAsGuest, signOut }}>
+      {children}
+    </AuthContext.Provider>
+  )
+}
+
+export function useAuth() {
+  return useContext(AuthContext)
 }

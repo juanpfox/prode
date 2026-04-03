@@ -86,9 +86,8 @@ export default function PredictionsPage() {
 
   async function savePred(match) {
     const pred = predictions[match.id] ?? {}
-    const home = parseInt(pred.home_goals)
-    const away = parseInt(pred.away_goals)
-    if (isNaN(home) || isNaN(away)) return
+    const home = pred.home_goals !== '' && pred.home_goals !== undefined ? parseInt(pred.home_goals) : 0
+    const away = pred.away_goals !== '' && pred.away_goals !== undefined ? parseInt(pred.away_goals) : 0
 
     setSaving(s => ({ ...s, [match.id]: true }))
     try {
@@ -102,6 +101,7 @@ export default function PredictionsPage() {
       }
       await supabase.from('match_predictions')
         .upsert(payload, { onConflict: 'tournament_id,user_id,match_id' })
+      setPredictions(prev => ({ ...prev, [match.id]: { home_goals: String(home), away_goals: String(away), pen_pick: pred.pen_pick || '' } }))
       setSaved(s => ({ ...s, [match.id]: true }))
       setTimeout(() => setSaved(s => ({ ...s, [match.id]: false })), 2000)
     } finally {
@@ -190,7 +190,7 @@ function MatchCard({ match, pred, locked, saving, saved, onChange, onSave, t }) 
     && pred.home_goals !== '' && pred.away_goals !== ''
     && parseInt(pred.home_goals) === parseInt(pred.away_goals)
 
-  const predFilled = pred.home_goals !== '' && pred.away_goals !== '' && pred.home_goals !== undefined
+  const predFilled = (pred.home_goals !== '' && pred.home_goals !== undefined) || (pred.away_goals !== '' && pred.away_goals !== undefined)
 
   return (
     <div className="card card-sm" style={{
@@ -233,7 +233,7 @@ function MatchCard({ match, pred, locked, saving, saved, onChange, onSave, t }) 
             // Editable inputs
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
               <GoalInput val={pred.home_goals ?? ''} onChange={v => onChange('home_goals', v)} />
-              <span style={{ color: 'var(--text-muted)', fontWeight: 700, fontSize: '0.9rem' }}>-</span>
+              <span style={{ color: 'var(--text-muted)', fontWeight: 600, fontSize: '0.75rem' }}>vs</span>
               <GoalInput val={pred.away_goals ?? ''} onChange={v => onChange('away_goals', v)} />
             </div>
           )}
@@ -279,20 +279,33 @@ function MatchCard({ match, pred, locked, saving, saved, onChange, onSave, t }) 
 }
 
 function GoalInput({ val, onChange }) {
+  const num = val === '' ? null : parseInt(val)
+  const inc = () => onChange(String(num === null ? 1 : Math.min(20, num + 1)))
+  const dec = () => { if (num !== null && num > 0) onChange(String(num - 1)) }
+
+  const btnStyle = {
+    width: '100%', padding: '0.2rem 0', fontSize: '1rem', fontWeight: 700,
+    color: 'var(--text-muted)', background: 'transparent', border: 'none', cursor: 'pointer',
+    lineHeight: 1,
+  }
   return (
-    <input
-      type="number" min="0" max="20"
-      value={val}
-      onChange={e => onChange(e.target.value)}
-      style={{
-        width: '2.5rem', height: '2.5rem', textAlign: 'center',
-        fontSize: '1.1rem', fontWeight: 700,
-        background: 'var(--surface-2)', border: '1.5px solid var(--border)',
-        borderRadius: 'var(--r-md)', color: 'var(--text)',
-        outline: 'none',
-      }}
-      onFocus={e => e.target.select()}
-    />
+    <div style={{
+      display: 'flex', flexDirection: 'column', alignItems: 'center',
+      width: '2.75rem', border: '1.5px solid var(--border)',
+      borderRadius: 'var(--r-md)', overflow: 'hidden', background: 'var(--surface-2)',
+    }}>
+      <button style={btnStyle} onClick={inc}>+</button>
+      <div style={{
+        width: '100%', textAlign: 'center', padding: '0.2rem 0',
+        fontSize: '1.1rem', fontWeight: 700, color: 'var(--text)',
+        background: 'var(--surface-3)', borderTop: '1px solid var(--border)',
+        borderBottom: '1px solid var(--border)', minHeight: '1.6rem',
+        lineHeight: '1.6rem',
+      }}>
+        {num !== null ? num : ''}
+      </div>
+      <button style={btnStyle} onClick={dec}>−</button>
+    </div>
   )
 }
 

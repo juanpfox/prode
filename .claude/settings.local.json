@@ -3,7 +3,14 @@
     "allow": [
       "Bash(npm install:*)",
       "Bash(ls C:/Users/juanp/gitRepos/prode/.env*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(ls /c/Users/juanp/gitRepos/prode/.env*)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d.get\\(''''dependencies'''',{}\\), indent=2\\)\\)\")",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(pkill -f \"vite\")"
     ]
   }
 }

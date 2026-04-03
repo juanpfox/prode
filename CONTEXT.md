@@ -210,9 +210,13 @@ Repo GitHub: https://github.com/juanpfox/prode
 ## Pendientes / próximos pasos
 - [X] Crear repo GitHub (`prode-mundial`, privado)
 - [X] `npm create vite@latest prode-mundial -- --template react`
-- [x] Instalar dependencias: `@supabase/supabase-js`, `react-i18next`, `@tanstack/react-query`, `vite-plugin-pwa`, `react-router-dom`, `i18next-browser-languagedetector`
-- [X] Configurar Auth (magic link como método principal)
-- [ ] Elegir e integrar API de resultados
+- [X] Instalar dependencias: `@supabase/supabase-js`, `react-i18next`, `@tanstack/react-query`, `vite-plugin-pwa`, `react-router-dom`, `i18next-browser-languagedetector`
+- [X] Configurar Auth (magic link + Google OAuth habilitado)
+- [X] UI Base y navegación (Home, Torneos, Predicciones, Ranking, Perfil)
+- [X] Favicon de fútbol
+- [X] Deploy inicial en Cloudflare Pages conectado al repo de GitHub
+- [ ] Elegir e integrar API de resultados (API-Football vs footbal-data.org)
 - [ ] Crear bot/ping para evitar pausa de Supabase Free
-- [ ] Deploy inicial en Cloudflare Pages conectado al repo de GitHub
 - [ ] Habilitar Supabase Realtime en tabla `scores`
+- [ ] Implementar lógica de cálculo de puntos en Edge Functions / Triggers
+

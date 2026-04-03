@@ -20,7 +20,8 @@ export default function TournamentsPage() {
   const [joining, setJoining] = useState(false)
   const [createForm, setCreateForm] = useState({
     name: '',
-    competition_id: searchParams.get('comp') ?? ''
+    competition_id: searchParams.get('comp') ?? '',
+    mode: ''
   })
   const [creating, setCreating] = useState(false)
   const [competitions, setCompetitions] = useState([])
@@ -51,17 +52,25 @@ export default function TournamentsPage() {
 
   async function handleCreate(e) {
     e.preventDefault()
-    if (!createForm.name.trim() || !createForm.competition_id) return
+    const selectedComp = competitions.find(c => c.id === createForm.competition_id)
+    const isWorldCup = selectedComp?.type === 'world_cup'
+    const effectiveMode = isWorldCup ? createForm.mode : 'partidos'
+    if (!createForm.name.trim() || !createForm.competition_id || !effectiveMode) return
     setCreating(true)
     setError(null)
     try {
       const { data, error: err } = await supabase
         .from('tournaments')
-        .insert({ name: createForm.name.trim(), competition_id: createForm.competition_id, created_by: user.id })
+        .insert({
+          name: createForm.name.trim(),
+          competition_id: createForm.competition_id,
+          created_by: user.id,
+          mode: effectiveMode
+        })
         .select('id').single()
       if (err) throw err
       setShowCreate(false)
-      setCreateForm({ name: '', competition_id: '' })
+      setCreateForm({ name: '', competition_id: '', mode: '' })
       await loadData()
       navigate(`/torneo/${data.id}`)
     } catch (err) {
@@ -142,13 +151,70 @@ export default function TournamentsPage() {
                 value={createForm.name} required
                 onChange={e => setCreateForm(f => ({ ...f, name: e.target.value }))} />
               <select className="input" value={createForm.competition_id} required
-                onChange={e => setCreateForm(f => ({ ...f, competition_id: e.target.value }))}>
+                onChange={e => setCreateForm(f => ({
+                  ...f,
+                  competition_id: e.target.value,
+                  mode: ''
+                }))}>
                 <option value="">{t('tournaments.select_competition')}</option>
                 {competitions.map(c => (
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
               </select>
-              <button className="btn btn-primary" type="submit" disabled={creating}>
+
+              {/* Mode selector — only for World Cup */}
+              {createForm.competition_id && competitions.find(c => c.id === createForm.competition_id)?.type === 'world_cup' && (
+                <div>
+                  <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '0.625rem', fontWeight: 600 }}>
+                    {t('tournaments.select_mode')}
+                  </p>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.625rem' }}>
+                    {['posiciones', 'partidos'].map(m => (
+                      <button
+                        key={m}
+                        type="button"
+                        onClick={() => setCreateForm(f => ({ ...f, mode: m }))}
+                        style={{
+                          padding: '0.875rem 0.75rem',
+                          borderRadius: 'var(--r-md)',
+                          border: createForm.mode === m
+                            ? '2px solid var(--primary)'
+                            : '2px solid var(--border)',
+                          background: createForm.mode === m
+                            ? 'var(--primary-subtle)'
+                            : 'var(--surface-2)',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                          transition: 'all 0.15s ease',
+                          outline: 'none'
+                        }}
+                      >
+                        <p style={{
+                          fontWeight: 700,
+                          fontSize: '0.875rem',
+                          color: createForm.mode === m ? 'var(--primary)' : 'var(--text)',
+                          marginBottom: '0.25rem'
+                        }}>
+                          {m === 'posiciones' ? '🏆' : '⚽'} {t(`modes.${m}`)}
+                        </p>
+                        <p style={{ fontSize: '0.725rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>
+                          {t(`modes.${m}_desc`)}
+                        </p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <button
+                className="btn btn-primary"
+                type="submit"
+                disabled={creating || (
+                  createForm.competition_id &&
+                  competitions.find(c => c.id === createForm.competition_id)?.type === 'world_cup' &&
+                  !createForm.mode
+                )}
+              >
                 {creating ? t('common.loading') : t('tournaments.create')}
               </button>
             </form>

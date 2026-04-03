@@ -58,7 +58,9 @@
     "tab_public": "Todos",
     "already_requested": "Ya enviaste una solicitud a este torneo",
     "join_requested": "Solicitud enviada a \"{{name}}\". Esperá la aprobación del admin.",
-    "not_found": "Torneo no encontrado"
+    "not_found": "Torneo no encontrado",
+    "select_mode": "Elegí el modo de juego",
+    "mode_required": "Tenés que elegir un modo para continuar"
   },
   "nav": {
     "home": "Inicio",
