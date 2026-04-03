@@ -16,6 +16,8 @@ export default function HomePage() {
           ⚽ <span>Prode</span> Mundial
         </div>
         <div className="app-header-actions">
+          <LangSelector />
+          <ThemeToggle />
           <button className="btn btn-ghost btn-sm" onClick={signOut}>
             {t('common.sign_out')}
           </button>
