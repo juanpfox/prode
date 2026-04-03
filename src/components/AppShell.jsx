@@ -30,10 +30,10 @@ export default function AppShell({ children }) {
       </main>
 
       <nav className="app-nav">
-        <NavItem icon="🏠" label={t('nav.home')}        path="/"              active={pathname === '/'}               onClick={() => navigate('/')} />
-        <NavItem icon="🏆" label={t('nav.tournaments')} path="/torneos"       active={pathname.startsWith('/torneo')} onClick={() => navigate('/torneos')} />
-        <NavItem icon="📊" label={t('nav.leaderboard')} path="/ranking"       active={pathname === '/ranking'}        onClick={() => navigate('/ranking')} />
-        <NavItem icon="👤" label={t('nav.profile')}     path="/perfil"        active={pathname === '/perfil'}         onClick={() => navigate('/perfil')} />
+        <NavItem icon="🏠" label={t('nav.home')}        active={pathname === '/'}               onClick={() => navigate('/')} />
+        <NavItem icon="🏆" label={t('nav.tournaments')} active={pathname.startsWith('/torneo')} onClick={() => navigate('/torneos')} />
+        <NavItem icon="📊" label={t('nav.leaderboard')} active={pathname === '/ranking'}        onClick={() => navigate('/ranking')} />
+        <NavItem icon="👤" label={t('nav.profile')}     active={pathname === '/perfil'}         onClick={() => navigate('/perfil')} />
       </nav>
     </div>
   )
