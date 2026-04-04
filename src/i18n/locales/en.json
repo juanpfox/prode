@@ -109,7 +109,27 @@
     "result": "Result",
     "exact": "Exact!",
     "winner_ok": "Correct winner",
-    "miss": "Missed"
+    "miss": "Missed",
+    "saving_changes": "Saving changes...",
+    "all_changes_saved": "All changes saved",
+    "table": {
+      "team": "Team",
+      "pj": "P",
+      "g": "W",
+      "e": "D",
+      "p": "L",
+      "dif": "Dif",
+      "pts": "Pts"
+    },
+    "stages": {
+      "group": "Group stage",
+      "r32": "Round of 32",
+      "r16": "Round of 16",
+      "qf": "Quarter-finals",
+      "sf": "Semi-finals",
+      "third_place": "Third place",
+      "final": "Final"
+    }
   },
   "posiciones": {
     "hint": "Drag teams to rank them within each group. Then pick the world podium.",
@@ -123,5 +143,19 @@
     "delete": "Delete",
     "delete_confirm": "Are you sure you want to delete this tournament? This action cannot be undone.",
     "cancel": "Cancel"
+  },
+  "teams": {
+    "PAN": "Panama", "RSA": "South Africa", "POR": "Portugal", "BIH": "Bosnia and Herzegovina", "LIV": "Liverpool",
+    "PAR": "Paraguay", "NOR": "Norway", "BEL": "Belgium", "COL": "Colombia", "LEV": "Bayer Leverkusen",
+    "JPN": "Japan", "BVB": "Borussia Dortmund", "USA": "United States", "ENG": "England", "CUW": "Curacao",
+    "GER": "Germany", "SWE": "Sweden", "MEX": "Mexico", "INT": "Inter Milan", "AUT": "Austria",
+    "UZB": "Uzbekistan", "AUS": "Australia", "GHA": "Ghana", "SUI": "Switzerland", "ARS": "Arsenal",
+    "CAN": "Canada", "TUR": "Turkey", "MAR": "Morocco", "BAR": "Barcelona", "CPV": "Cape Verde",
+    "CZE": "Czech Republic", "KOR": "South Korea", "IRN": "Iran", "BAY": "Bayern Munich", "TUN": "Tunisia",
+    "ATM": "Atletico Madrid", "HAI": "Haiti", "URU": "Uruguay", "PSG": "Paris SG", "AVL": "Aston Villa",
+    "MCI": "Manchester City", "ESP": "Spain", "NED": "Netherlands", "ALG": "Algeria", "RMA": "Real Madrid",
+    "BRA": "Brazil", "QAT": "Qatar", "JOR": "Jordan", "SCO": "Scotland", "IRQ": "Iraq", "ECU": "Ecuador",
+    "SEN": "Senegal", "KSA": "Saudi Arabia", "CIV": "Ivory Coast", "ARG": "Argentina", "NZL": "New Zealand",
+    "EGY": "Egypt", "CRO": "Croatia", "COD": "DR Congo", "FRA": "France"
   }
 }

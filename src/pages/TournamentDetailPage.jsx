@@ -182,7 +182,7 @@ export default function TournamentDetailPage() {
   return (
     <AppShell>
       <div className="animate-fade-in">
-        <button className="btn btn-ghost btn-sm" onClick={() => navigate(-1)} style={{ marginBottom: '1rem' }}>
+        <button className="btn btn-ghost btn-sm" onClick={() => navigate('/')} style={{ marginBottom: '1rem' }}>
           ← {t('common.back')}
         </button>
 

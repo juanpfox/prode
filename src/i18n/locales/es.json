@@ -109,7 +109,34 @@
     "result": "Resultado",
     "exact": "¡Exacto!",
     "winner_ok": "Ganador correcto",
-    "miss": "Fallaste"
+    "miss": "Fallaste",
+    "saving_changes": "Guardando cambios...",
+    "all_changes_saved": "Todos los cambios guardados",
+    "views": {
+      "title": "Vistas",
+      "dates": "Por Fechas",
+      "groups": "Por Grupo",
+      "playoffs": "PlayOffs",
+      "new": "NUEVO"
+    },
+    "table": {
+      "team": "Equipo",
+      "pj": "PJ",
+      "g": "G",
+      "e": "E",
+      "p": "P",
+      "dif": "Dif",
+      "pts": "Pts"
+    },
+    "stages": {
+      "group": "Fase de grupos",
+      "r32": "Dieciseisavos",
+      "r16": "Octavos",
+      "qf": "Cuartos",
+      "sf": "Semifinales",
+      "third_place": "Tercer puesto",
+      "final": "Final"
+    }
   },
   "posiciones": {
     "hint": "Arrastrá los equipos para ordenarlos dentro de cada grupo. Luego elegí el podio.",
@@ -123,5 +150,19 @@
     "delete": "Eliminar",
     "delete_confirm": "¿Estás seguro que querés eliminar este torneo? Esta acción no se puede deshacer.",
     "cancel": "Cancelar"
+  },
+  "teams": {
+    "PAN": "Panamá", "RSA": "Sudáfrica", "POR": "Portugal", "BIH": "Bosnia y Herzegovina", "LIV": "Liverpool",
+    "PAR": "Paraguay", "NOR": "Noruega", "BEL": "Bélgica", "COL": "Colombia", "LEV": "Bayer Leverkusen",
+    "JPN": "Japón", "BVB": "Borussia Dortmund", "USA": "Estados Unidos", "ENG": "Inglaterra", "CUW": "Curazao",
+    "GER": "Alemania", "SWE": "Suecia", "MEX": "México", "INT": "Inter Milan", "AUT": "Austria",
+    "UZB": "Uzbekistán", "AUS": "Australia", "GHA": "Ghana", "SUI": "Suiza", "ARS": "Arsenal",
+    "CAN": "Canadá", "TUR": "Turquía", "MAR": "Marruecos", "BAR": "Barcelona", "CPV": "Cabo Verde",
+    "CZE": "Rep. Checa", "KOR": "Corea del Sur", "IRN": "Irán", "BAY": "Bayern Munich", "TUN": "Túnez",
+    "ATM": "Atlético Madrid", "HAI": "Haití", "URU": "Uruguay", "PSG": "Paris SG", "AVL": "Aston Villa",
+    "MCI": "Manchester City", "ESP": "España", "NED": "Países Bajos", "ALG": "Argelia", "RMA": "Real Madrid",
+    "BRA": "Brasil", "QAT": "Catar", "JOR": "Jordania", "SCO": "Escocia", "IRQ": "Irak", "ECU": "Ecuador",
+    "SEN": "Senegal", "KSA": "Arabia Saudita", "CIV": "Costa de Marfil", "ARG": "Argentina", "NZL": "Nueva Zelanda",
+    "EGY": "Egipto", "CRO": "Croacia", "COD": "Rep. D. del Congo", "FRA": "Francia"
   }
 }

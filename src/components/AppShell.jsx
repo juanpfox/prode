@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth'
 import ThemeToggle from './ThemeToggle'
 import LangSelector from './LangSelector'
 
-export default function AppShell({ children }) {
+export default function AppShell({ children, saveIndicator }) {
   const { t } = useTranslation()
   const { signOut } = useAuth()
   const navigate = useNavigate()
@@ -14,9 +14,19 @@ export default function AppShell({ children }) {
     <div className="home-page">
       <header className="app-header">
         <div className="app-header-logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-          ⚽ <span>Prode</span> Mundial
+          ⚽ <span>Prode</span> <span className="hide-on-mobile">Mundial</span>
         </div>
         <div className="app-header-actions">
+          {saveIndicator === 'saving' && (
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginRight: '0.5rem', animation: 'fade-in 0.2s ease' }}>
+              {t('predictions.saving_changes')}
+            </span>
+          )}
+          {saveIndicator === 'saved' && (
+            <span style={{ fontSize: '0.75rem', color: 'var(--primary)', marginRight: '0.5rem', animation: 'fade-in 0.2s ease' }}>
+              ✓ {t('predictions.all_changes_saved')}
+            </span>
+          )}
           <LangSelector />
           <ThemeToggle />
           <button className="btn btn-ghost btn-sm" onClick={signOut}>

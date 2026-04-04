@@ -3,17 +3,17 @@ import { useTranslation } from 'react-i18next'
 import { applyRTL } from '../hooks/useTheme'
 
 const LANGUAGES = [
-  { code: 'es', label: 'Español',    flag: '🇪🇸' },
-  { code: 'pt', label: 'Português',  flag: '🇧🇷' },
-  { code: 'en', label: 'English',    flag: '🇬🇧' },
-  { code: 'fr', label: 'Français',   flag: '🇫🇷' },
-  { code: 'de', label: 'Deutsch',    flag: '🇩🇪' },
-  { code: 'ar', label: 'العربية',    flag: '🇸🇦' },
-  { code: 'hi', label: 'हिन्दी',     flag: '🇮🇳' },
-  { code: 'bn', label: 'বাংলা',      flag: '🇧🇩' },
-  { code: 'ja', label: '日本語',     flag: '🇯🇵' },
-  { code: 'ko', label: '한국어',     flag: '🇰🇷' },
-  { code: 'zh', label: '中文',       flag: '🇨🇳' },
+  { code: 'es', label: 'Español' },
+  { code: 'pt', label: 'Português' },
+  { code: 'en', label: 'English' },
+  { code: 'fr', label: 'Français' },
+  { code: 'de', label: 'Deutsch' },
+  { code: 'ar', label: 'العربية' },
+  { code: 'hi', label: 'हिन्दी' },
+  { code: 'bn', label: 'বাংলা' },
+  { code: 'ja', label: '日本語' },
+  { code: 'ko', label: '한국어' },
+  { code: 'zh', label: '中文' },
 ]
 
 export default function LangSelector() {
@@ -45,7 +45,7 @@ export default function LangSelector() {
         aria-expanded={open}
         style={{ fontSize: '1.125rem', padding: '0.375rem 0.5rem', borderRadius: 'var(--r-md)' }}
       >
-        <span>{current.flag}</span>
+        <span>🌐</span>
       </button>
 
       {open && (
@@ -82,11 +82,10 @@ export default function LangSelector() {
               onMouseEnter={e => { if (lang.code !== current.code) e.currentTarget.style.background = 'var(--surface-2)' }}
               onMouseLeave={e => { if (lang.code !== current.code) e.currentTarget.style.background = 'transparent' }}
             >
-              <span style={{ fontSize: '1.1rem' }}>{lang.flag}</span>
               <span>{lang.label}</span>
               {lang.code === current.code && (
                 <svg style={{ marginLeft: 'auto', flexShrink: 0 }} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12"/>
+                  <polyline points="20 6 9 17 4 12" />
                 </svg>
               )}
             </button>

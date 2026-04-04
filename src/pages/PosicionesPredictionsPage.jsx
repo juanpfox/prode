@@ -9,7 +9,36 @@ const GROUP_LABELS   = ['A','B','C','D','E','F','G','H','I','J','K','L']
 const PODIUM_SLOTS   = ['fourth','third','runner_up','champion']
 const PODIUM_LABELS  = { fourth: '4°', third: '3°', runner_up: '🥈 Sub', champion: '🏆 Campeón' }
 const PODIUM_LABELS_EN = { fourth: '4th', third: '3rd', runner_up: '🥈 Runner-up', champion: '🏆 Champion' }
-const POS_MEDAL      = ['🥇','🥈','🥉','4️⃣']
+
+const FIFA_TO_ISO2 = {
+  ARG: 'ar', BRA: 'br', FRA: 'fr', GER: 'de', ITA: 'it', ESP: 'es', POR: 'pt', NED: 'nl',
+  ENG: 'gb', SCO: 'gb', WAL: 'gb', NIR: 'gb', USA: 'us', MEX: 'mx', CAN: 'ca',
+  JPN: 'jp', KOR: 'kr', AUS: 'au', KSA: 'sa', QAT: 'qa', CRO: 'hr', SRB: 'rs',
+  SUI: 'ch', BEL: 'be', DEN: 'dk', POL: 'pl', URU: 'uy', COL: 'co', CHI: 'cl',
+  PER: 'pe', ECU: 'ec', MAR: 'ma', SEN: 'sn', GHA: 'gh', CMR: 'cm', NGA: 'ng',
+  RSA: 'za', BIH: 'ba', CZE: 'cz', GRE: 'gr', TUR: 'tr', EGY: 'eg', TUN: 'tn',
+  CRC: 'cr', PAN: 'pa', JAM: 'jm', HON: 'hn', PAR: 'py', BFA: 'bf', MLI: 'ml',
+  HAI: 'ht', SWE: 'se', CPV: 'cv',
+}
+
+function TeamFlag({ code, size = 20 }) {
+  const iso2 = FIFA_TO_ISO2[code] || code.slice(0, 2).toLowerCase()
+  return (
+    <img 
+      src={`https://flagcdn.com/w40/${iso2}.png`} 
+      alt={code} 
+      style={{ 
+        width: `${size}px`, 
+        height: 'auto', 
+        borderRadius: '2px', 
+        display: 'inline-block',
+        verticalAlign: 'middle',
+        boxShadow: '0 1px 2px rgba(0,0,0,0.2)'
+      }}
+      onError={(e) => { e.target.style.display = 'none' }}
+    />
+  )
+}
 
 export default function PosicionesPredictionsPage({ tournament }) {
   const { t, i18n } = useTranslation()
@@ -152,8 +181,12 @@ export default function PosicionesPredictionsPage({ tournament }) {
     }
   }
 
-  // ── Derived: all teams in an ordered flat array for podium pickers ──
-  const allTeams = Object.values(teamsByGroup).flat()
+  // ── Derived: all teams in alphabetical order for podium pickers ──
+  const allTeams = Object.values(teamsByGroup).flat().sort((a, b) => {
+    const nameA = t(`teams.${a.code}`, { defaultValue: a.name })
+    const nameB = t(`teams.${b.code}`, { defaultValue: b.name })
+    return nameA.localeCompare(nameB)
+  })
 
   if (loading) return (
     <AppShell>
@@ -198,22 +231,37 @@ export default function PosicionesPredictionsPage({ tournament }) {
                     onDragStart={() => onDragStart(group, idx)}
                     onDragOver={e => { e.preventDefault(); onDragOver(group, idx) }}
                     style={{
-                      display: 'flex', alignItems: 'center', gap: '0.625rem',
-                      padding: '0.5rem 0.75rem',
+                      display: 'flex', alignItems: 'center', gap: '0.75rem',
+                      padding: '0.55rem 0.875rem',
                       borderRadius: 'var(--r-md)',
                       background: 'var(--surface-2)',
                       border: '1.5px solid var(--border)',
                       cursor: locked ? 'default' : 'grab',
                       userSelect: 'none',
-                      transition: 'box-shadow 0.1s',
+                      transition: 'all 0.2s',
                     }}
                   >
-                    <span style={{ fontSize: '1rem', minWidth: '1.5rem' }}>{POS_MEDAL[idx]}</span>
-                    <span style={{
-                      fontFamily: 'monospace', fontSize: '0.75rem', fontWeight: 700,
-                      color: 'var(--text-muted)', minWidth: '2rem'
-                    }}>{team.code}</span>
-                    <span style={{ flex: 1, fontWeight: 600, fontSize: '0.875rem' }}>{team.name}</span>
+                    <span style={{ 
+                      fontSize: '0.9rem', 
+                      fontWeight: 800, 
+                      minWidth: '1.25rem', 
+                      color: 'var(--text-muted)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      background: 'var(--surface-3)',
+                      height: '24px',
+                      width: '24px',
+                      borderRadius: '50%',
+                    }}>{idx + 1}</span>
+                    
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', flex: 1 }}>
+                      <TeamFlag code={team.code} />
+                      <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>
+                        {t(`teams.${team.code}`, { defaultValue: team.name })}
+                      </span>
+                    </div>
+
                     {!locked && (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
                         <button
@@ -248,40 +296,54 @@ export default function PosicionesPredictionsPage({ tournament }) {
             {t('posiciones.podium')}
           </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
-            {PODIUM_SLOTS.slice().reverse().map(slot => (
-              <div key={slot} style={{
-                display: 'flex', alignItems: 'center', gap: '0.75rem',
-                padding: '0.625rem 0.875rem',
-                borderRadius: 'var(--r-md)',
-                background: podium[slot] ? 'var(--primary-subtle)' : 'var(--surface-2)',
-                border: podium[slot] ? '1.5px solid var(--primary)' : '1.5px solid var(--border)',
-              }}>
-                <span style={{ fontWeight: 700, minWidth: '4.5rem', fontSize: '0.875rem',
-                  color: podium[slot] ? 'var(--primary)' : 'var(--text-muted)' }}>
-                  {podiumLabels[slot]}
-                </span>
-                {locked ? (
-                  <span style={{ flex: 1, fontWeight: 600, fontSize: '0.875rem' }}>
-                    {allTeams.find(t => t.id === podium[slot])?.name ?? '—'}
+            {PODIUM_SLOTS.slice().reverse().map(slot => {
+              const selectedTeam = allTeams.find(t => t.id === podium[slot])
+              // Handle label override for 3rd and 4th
+              let label = podiumLabels[slot]
+              if (slot === 'third') label = '3'
+              if (slot === 'fourth') label = '4'
+
+              return (
+                <div key={slot} style={{
+                  display: 'flex', alignItems: 'center', gap: '0.75rem',
+                  padding: '0.625rem 0.875rem',
+                  borderRadius: 'var(--r-md)',
+                  background: podium[slot] ? 'var(--primary-subtle)' : 'var(--surface-2)',
+                  border: podium[slot] ? '1.5px solid var(--primary)' : '1.5px solid var(--border)',
+                }}>
+                  <span style={{ fontWeight: 700, minWidth: '5rem', fontSize: '0.875rem',
+                    color: podium[slot] ? 'var(--primary)' : 'var(--text-muted)' }}>
+                    {label}
                   </span>
-                ) : (
-                  <select
-                    className="input"
-                    style={{ flex: 1, fontSize: '0.85rem', padding: '0.3rem 0.5rem' }}
-                    value={podium[slot] ?? ''}
-                    onChange={e => setPodium(p => ({ ...p, [slot]: e.target.value || null }))}
-                  >
-                    <option value="">— {t('posiciones.pick_team')} —</option>
-                    {allTeams.map(team => (
-                      <option key={team.id} value={team.id}
-                        disabled={Object.entries(podium).some(([s, id]) => s !== slot && id === team.id)}>
-                        {team.name}
-                      </option>
-                    ))}
-                  </select>
-                )}
-              </div>
-            ))}
+                  {locked ? (
+                    <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                      {selectedTeam && <TeamFlag code={selectedTeam.code} />}
+                      <span style={{ fontWeight: 600, fontSize: '0.875rem' }}>
+                        {selectedTeam ? t(`teams.${selectedTeam.code}`, { defaultValue: selectedTeam.name }) : '—'}
+                      </span>
+                    </div>
+                  ) : (
+                    <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                      {selectedTeam && <TeamFlag code={selectedTeam.code} />}
+                      <select
+                        className="input"
+                        style={{ flex: 1, fontSize: '0.85rem', padding: '0.3rem 0.5rem' }}
+                        value={podium[slot] ?? ''}
+                        onChange={e => setPodium(p => ({ ...p, [slot]: e.target.value || null }))}
+                      >
+                        <option value="">— {t('posiciones.pick_team')} —</option>
+                        {allTeams.map(team => (
+                          <option key={team.id} value={team.id}
+                            disabled={Object.entries(podium).some(([s, id]) => s !== slot && id === team.id)}>
+                            {t(`teams.${team.code}`, { defaultValue: team.name })}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
           </div>
         </section>
 
