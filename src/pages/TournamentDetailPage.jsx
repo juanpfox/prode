@@ -46,8 +46,20 @@ export default function TournamentDetailPage() {
       setScores(scs ?? [])
 
       const me = pls?.find(p => p.user_id === user.id)
+      let myCurrentStatus = me?.status ?? null
+
+      // Fix for legacy players: if pending but tournament is auto-join, auto-approve them
+      if (myCurrentStatus === 'pending' && !tr.requires_approval) {
+        await supabase.from('tournament_players')
+          .update({ status: 'approved' })
+          .eq('tournament_id', id)
+          .eq('user_id', user.id)
+        myCurrentStatus = 'approved'
+        me.status = 'approved' // ensure local array is also updated
+      }
+
       setMyRole(me?.role ?? null)
-      setMyStatus(me?.status ?? null)
+      setMyStatus(myCurrentStatus)
     } finally {
       setLoading(false)
     }
@@ -78,6 +90,17 @@ export default function TournamentDetailPage() {
         .eq('id', id)
       if (error) throw error
       setTournament(prev => ({ ...prev, requires_approval: requires }))
+
+      // If switching to Auto (requires=false), auto-approve all pending players
+      if (!requires) {
+        await supabase.from('tournament_players')
+          .update({ status: 'approved' })
+          .eq('tournament_id', id)
+          .eq('status', 'pending')
+        
+        // Reload to update UI lists
+        loadTournament()
+      }
     } catch (err) {
       alert(t('common.error_generic'))
     } finally {
