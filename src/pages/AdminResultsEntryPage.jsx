@@ -333,19 +333,19 @@ function AdminMatchCard({ match, onChange, t }) {
       <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
         {new Date(match.kickoff_at).toLocaleDateString()} {new Date(match.kickoff_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', gap: '1rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'flex-end' }}>
-          <span style={{ fontWeight: 600 }}>{home}</span>
+      <div className="match-card-grid">
+        <div className="match-team-col home">
+          <span className="match-team-name">{home}</span>
           <TeamFlag code={match.home_team?.code} />
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <div className="match-center-col">
           <AdminGoalInput val={match.home_goals ?? ''} onChange={v => onChange(match.id, 'home_goals', v)} />
           <span style={{ fontWeight: 800 }}>-</span>
           <AdminGoalInput val={match.away_goals ?? ''} onChange={v => onChange(match.id, 'away_goals', v)} />
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <div className="match-team-col away">
           <TeamFlag code={match.away_team?.code} />
-          <span style={{ fontWeight: 600 }}>{away}</span>
+          <span className="match-team-name">{away}</span>
         </div>
       </div>
       

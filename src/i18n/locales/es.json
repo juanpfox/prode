@@ -20,6 +20,7 @@
     "error_generic": "Algo salió mal, intentá de nuevo",
     "back": "Volver",
     "approve": "Aprobar",
+    "save": "Guardar",
     "you": "vos"
   },
   "home": {
@@ -41,6 +42,7 @@
   },
   "tournaments": {
     "title": "Mis Torneos",
+    "tournament_name": "Nombre del torneo",
     "create": "Crear torneo",
     "join": "Unirse a un torneo",
     "join_btn": "Unirse",

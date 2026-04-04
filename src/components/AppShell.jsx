@@ -14,7 +14,7 @@ export default function AppShell({ children, saveIndicator }) {
     <div className="home-page">
       <header className="app-header">
         <div className="app-header-logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-          ⚽ <span>Prode</span> <span className="hide-on-mobile">Mundial</span>
+          ⚽ <span>Prode Mundial</span>
         </div>
         <div className="app-header-actions">
           {saveIndicator === 'saving' && (

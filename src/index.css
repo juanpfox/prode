@@ -380,6 +380,103 @@ body {
 }
 .match-vs { font-size: 0.75rem; font-weight: 700; color: var(--text-subtle); letter-spacing: 0.05em; }
 
+.match-card-grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.match-team-col {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.match-team-col.home { justify-content: flex-end; }
+.match-team-col.away { justify-content: flex-start; }
+
+.match-team-name {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.match-team-col.home .match-team-name { text-align: right; }
+
+.match-center-col {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.goal-input-wrapper {
+  display: flex;
+  align-items: center;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  background: var(--surface-2);
+}
+
+.goal-input-btn {
+  padding: 0.25rem 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.goal-input-val {
+  text-align: center;
+  padding: 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  background: var(--surface-3);
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  min-width: 2rem;
+  line-height: 1.8rem;
+}
+
+@media (max-width: 480px) {
+  .match-team-col.home {
+    flex-direction: column-reverse;
+  }
+  .match-team-col.away {
+    flex-direction: column;
+  }
+  .match-team-col.home, .match-team-col.away {
+    gap: 0.3rem;
+    justify-content: center;
+  }
+  .match-team-col.home .match-team-name, .match-team-col.away .match-team-name {
+    text-align: center;
+    font-size: 0.85rem;
+  }
+  
+  .goal-input-wrapper {
+    flex-direction: column-reverse;
+  }
+  
+  .goal-input-btn {
+    padding: 0.4rem 0.5rem;
+  }
+  
+  .goal-input-val {
+    border-left: none;
+    border-right: none;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    width: 100%;
+    line-height: 2rem;
+  }
+}
+
 /* ============================================================
    GROUP TABLE
    ============================================================ */
@@ -534,6 +631,30 @@ body {
   }
   .table-column {
     order: -1;
+  }
+}
+
+.posiciones-groups-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .posiciones-groups-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 900px) {
+  .posiciones-groups-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1200px) {
+  .posiciones-groups-grid {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 

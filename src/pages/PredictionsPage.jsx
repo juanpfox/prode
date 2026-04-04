@@ -57,6 +57,19 @@ export default function PredictionsPage() {
 
   // Pagination logic for playoffs view
   const [bracketOffset, setBracketOffset] = useState(0)
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 640)
+
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 640
+      setIsMobile(mobile)
+      if (!mobile) {
+        setBracketOffset(prev => Math.max(0, prev - 1)) // try to recover second column if switching back to desktop
+      }
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   // Use a ref to store pending changes and a timeout for debouncing
   const pendingChanges = useRef({})
@@ -346,22 +359,27 @@ export default function PredictionsPage() {
         {/* --- VIEW: PLAYOFFS --- */}
         {view === 'playoffs' && (() => {
           const bracketStages = playoffStages.filter(s => s !== 'third_place')
-          const visibleStages = bracketStages.slice(bracketOffset, bracketOffset + 2)
+          const visibleCount = isMobile ? 1 : 2
+          
+          // enforce bounds based on current layout
+          const safeOffset = Math.min(bracketOffset, Math.max(0, bracketStages.length - visibleCount))
+          const visibleStages = bracketStages.slice(safeOffset, safeOffset + visibleCount)
+          
           return (
             <div style={{ paddingBottom: '2rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem 1rem', background: 'var(--surface-2)', borderRadius: 'var(--r-md)', marginBottom: '1.5rem', border: '1px solid var(--border)' }}>
                 <button 
                   className="btn btn-icon" 
                   onClick={() => setBracketOffset(v => Math.max(0, v - 1))} 
-                  disabled={bracketOffset === 0}
+                  disabled={safeOffset === 0}
                   style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '0.2rem 0.6rem' }}
                 >
                   &lt;
                 </button>
                 
-                <div style={{ display: 'flex', gap: '2.5rem', flex: 1, justifyContent: 'center' }}>
+                <div style={{ display: 'flex', gap: '2.5rem', flex: 1, justifyContent: 'center', minWidth: 0 }}>
                   {visibleStages.map(stage => (
-                    <h3 key={stage} style={{ width: '320px', fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--text)', margin: 0, textAlign: 'center' }}>
+                    <h3 key={stage} style={{ width: isMobile ? 'auto' : '320px', flex: isMobile ? 1 : 'none', fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--text)', margin: 0, textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {t(`predictions.stages.${stage}`)}
                     </h3>
                   ))}
@@ -369,27 +387,74 @@ export default function PredictionsPage() {
 
                 <button 
                   className="btn btn-icon" 
-                  onClick={() => setBracketOffset(v => Math.min(bracketStages.length - 2, v + 1))} 
-                  disabled={bracketOffset >= bracketStages.length - 2 || bracketStages.length < 2}
+                  onClick={() => setBracketOffset(v => Math.min(bracketStages.length - visibleCount, v + 1))} 
+                  disabled={safeOffset >= bracketStages.length - visibleCount || bracketStages.length <= visibleCount}
                   style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '0.2rem 0.6rem' }}
                 >
                   &gt;
                 </button>
               </div>
 
-              <div className="playoff-bracket" style={{ justifyContent: 'center' }}>
-                {visibleStages.map((stage, index) => (
+              <div className={`playoff-bracket ${isMobile ? 'is-mobile' : ''}`} style={{ justifyContent: 'center', marginBottom: byStage['third_place']?.length > 0 ? '6rem' : 0 }}>
+                {visibleStages.map((stage, index) => {
+                  const isLastColumn = index === visibleStages.length - 1;
+                  return (
                   <div key={stage} className={`bracket-column ${index === 0 && bracketOffset > 0 ? 'is-shifted-first' : ''}`}>
                     <div style={{ 
                       flex: 1, 
                       display: 'flex', 
                       flexDirection: 'column',
                       position: 'relative',
-                      minHeight: byStage['third_place']?.length > 0 ? '500px' : undefined
+                      minHeight: undefined
                     }}>
-                      {byStage[stage].map(match => (
+                      {byStage[stage].map((match, matchIndex) => (
                         <div key={match.id} className="bracket-match-cell">
                           <MatchCard match={match} pred={predictions[match.id] ?? {}} locked={isLocked(match)} onChange={(f,v) => updatePred(match.id,f,v)} t={t} />
+                          
+                          {/* Outbound bracket shapes (for the last visible column only) */}
+                          {isLastColumn && stage !== 'final' && (
+                            <>
+                              {matchIndex % 2 === 0 && (
+                                <div style={{
+                                  position: 'absolute',
+                                  right: '-1.25rem',
+                                  top: '50%',
+                                  width: '1.25rem',
+                                  height: '50%',
+                                  borderTop: '2px solid var(--border-strong)',
+                                  borderRight: '2px solid var(--border-strong)',
+                                  borderTopRightRadius: '6px',
+                                  pointerEvents: 'none',
+                                  zIndex: 0
+                                }} />
+                              )}
+                              {matchIndex % 2 === 1 && (
+                                <>
+                                  <div style={{
+                                    position: 'absolute',
+                                    right: '-1.25rem',
+                                    bottom: '50%',
+                                    width: '1.25rem',
+                                    height: '50%',
+                                    borderBottom: '2px solid var(--border-strong)',
+                                    borderRight: '2px solid var(--border-strong)',
+                                    borderBottomRightRadius: '6px',
+                                    pointerEvents: 'none',
+                                    zIndex: 0
+                                  }} />
+                                  <div style={{
+                                    position: 'absolute',
+                                    right: '-2.5rem',
+                                    top: '-1px',
+                                    width: '1.25rem',
+                                    borderTop: '2px solid var(--border-strong)',
+                                    pointerEvents: 'none',
+                                    zIndex: 0
+                                  }} />
+                                </>
+                              )}
+                            </>
+                          )}
                         </div>
                       ))}
                       
@@ -397,7 +462,7 @@ export default function PredictionsPage() {
                       {stage === 'final' && byStage['third_place'] && byStage['third_place'].length > 0 && (
                         <div style={{
                           position: 'absolute',
-                          top: 'calc(50% + 95px)',
+                          top: 'calc(50% + 85px)',
                           left: 0,
                           right: 0,
                           zIndex: 10
@@ -412,7 +477,7 @@ export default function PredictionsPage() {
                       )}
                     </div>
                   </div>
-                ))}
+                )})}
               </div>
             </div>
           )
@@ -499,35 +564,35 @@ function MatchCard({ match, pred, locked, saving, saved, onChange, onSave, t }) 
         )}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', gap: '0.5rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', justifyContent: 'flex-end' }}>
-          <span style={{ fontWeight: 700, fontSize: '0.9rem', textAlign: 'right' }}>{home}</span>
+      <div className="match-card-grid">
+        <div className="match-team-col home">
+          <span className="match-team-name">{home}</span>
           <TeamFlag code={match.home_team?.code} />
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+        <div className="match-center-col">
           {hasResult ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+            <div className="match-center-col">
               <ResultBubble val={match.home_goals} />
               <span style={{ color: 'var(--text-muted)', fontWeight: 700 }}>-</span>
               <ResultBubble val={match.away_goals} />
             </div>
           ) : locked ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+            <div className="match-center-col">
               <ResultBubble val={pred.home_goals !== '' ? pred.home_goals : '?'} muted={pred.home_goals === ''} />
               <span style={{ color: 'var(--text-muted)', fontWeight: 700 }}>-</span>
               <ResultBubble val={pred.away_goals !== '' ? pred.away_goals : '?'} muted={pred.away_goals === ''} />
             </div>
           ) : (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+            <div className="match-center-col">
               <GoalInput val={pred.home_goals ?? ''} onChange={v => onChange('home_goals', v)} />
-              <span style={{ color: 'var(--text-muted)', fontWeight: 600, fontSize: '0.75rem' }}>vs</span>
+              <span style={{ color: 'var(--text-muted)', fontWeight: 800, fontSize: '0.85rem' }}>vs</span>
               <GoalInput val={pred.away_goals ?? ''} onChange={v => onChange('away_goals', v)} />
             </div>
           )}
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+        <div className="match-team-col away">
           <TeamFlag code={match.away_team?.code} />
-          <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{away}</span>
+          <span className="match-team-name">{away}</span>
         </div>
       </div>
 
@@ -562,28 +627,13 @@ function GoalInput({ val, onChange }) {
     else if (num > 0) onChange(String(num - 1))
   }
 
-  const btnStyle = {
-    padding: '0.25rem 0.5rem', fontSize: '1rem', fontWeight: 700,
-    color: 'var(--text-muted)', background: 'transparent', border: 'none', cursor: 'pointer',
-    lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center'
-  }
   return (
-    <div style={{
-      display: 'flex', alignItems: 'center',
-      border: '1.5px solid var(--border)',
-      borderRadius: 'var(--r-md)', overflow: 'hidden', background: 'var(--surface-2)',
-    }}>
-      <button style={btnStyle} onClick={dec}>−</button>
-      <div style={{
-        textAlign: 'center', padding: '0 0.5rem',
-        fontSize: '1rem', fontWeight: 700, color: 'var(--text)',
-        background: 'var(--surface-3)', borderLeft: '1px solid var(--border)',
-        borderRight: '1px solid var(--border)', minWidth: '2rem',
-        lineHeight: '1.8rem',
-      }}>
+    <div className="goal-input-wrapper">
+      <button className="goal-input-btn" onClick={dec}>−</button>
+      <div className="goal-input-val">
         {num !== null ? num : ''}
       </div>
-      <button style={btnStyle} onClick={inc}>+</button>
+      <button className="goal-input-btn" onClick={inc}>+</button>
     </div>
   )
 }
