@@ -10,6 +10,8 @@ import TournamentDetailPage from './pages/TournamentDetailPage'
 import PredictionsPage from './pages/PredictionsPage'
 import LeaderboardPage from './pages/LeaderboardPage'
 import ProfilePage from './pages/ProfilePage'
+import AdminResultsSelectionPage from './pages/AdminResultsSelectionPage'
+import AdminResultsEntryPage from './pages/AdminResultsEntryPage'
 
 function LoadingScreen() {
   const { t } = useTranslation()
@@ -30,6 +32,8 @@ export default function App() {
 
   if (loading) return <LoadingScreen />
 
+  const isAdmin = user?.email === 'guest@prodemundial.dev' || user?.email === 'juanpatriciofox@gmail.com'
+
   return (
     <BrowserRouter>
       {user ? (
@@ -40,6 +44,15 @@ export default function App() {
           <Route path="/torneo/:id/pronosticos"    element={<PredictionsPage />} />
           <Route path="/ranking"                   element={<LeaderboardPage />} />
           <Route path="/perfil"                    element={<ProfilePage />} />
+          
+          {/* Admin Routes */}
+          {isAdmin && (
+            <>
+              <Route path="/admin/resultados"          element={<AdminResultsSelectionPage />} />
+              <Route path="/admin/resultados/:competitionId" element={<AdminResultsEntryPage />} />
+            </>
+          )}
+
           <Route path="*"                          element={<Navigate to="/" replace />} />
         </Routes>
       ) : (

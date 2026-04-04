@@ -8,16 +8,31 @@ const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
+  const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
+
+  const fetchProfile = async (userId) => {
+    if (!userId) {
+      setProfile(null)
+      return
+    }
+    const { data } = await supabase.from('users').select('*').eq('id', userId).single()
+    setProfile(data)
+  }
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null)
+      const u = session?.user ?? null
+      setUser(u)
+      if (u) fetchProfile(u.id)
       setLoading(false)
     })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      const u = session?.user ?? null
+      setUser(u)
+      if (u) fetchProfile(u.id)
+      else setProfile(null)
     })
 
     return () => subscription.unsubscribe()
@@ -54,7 +69,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, signInWithEmail, signInWithGoogle, signInAsGuest, signOut }}>
+    <AuthContext.Provider value={{ user, profile, loading, signInWithEmail, signInWithGoogle, signInAsGuest, signOut, refreshProfile: () => fetchProfile(user?.id) }}>
       {children}
     </AuthContext.Provider>
   )

@@ -6,7 +6,7 @@ import LangSelector from './LangSelector'
 
 export default function AppShell({ children, saveIndicator }) {
   const { t } = useTranslation()
-  const { signOut } = useAuth()
+  const { user, profile, signOut } = useAuth()
   const navigate = useNavigate()
   const { pathname } = useLocation()
 
@@ -29,8 +29,13 @@ export default function AppShell({ children, saveIndicator }) {
           )}
           <LangSelector />
           <ThemeToggle />
-          <button className="btn btn-ghost btn-sm" onClick={signOut}>
-            {t('common.sign_out')}
+          {(user?.email === 'guest@prodemundial.dev' || user?.email === 'juanpatriciofox@gmail.com') && (
+            <button className="btn btn-ghost btn-sm header-hide-mobile" onClick={() => navigate('/admin/resultados')}>
+              🎯 {t('admin.results')}
+            </button>
+          )}
+          <button className="btn btn-ghost btn-sm" onClick={() => navigate('/perfil')}>
+            👤 <span className="header-hide-mobile">{profile?.display_name || t('nav.profile')}</span>
           </button>
         </div>
       </header>
@@ -42,8 +47,10 @@ export default function AppShell({ children, saveIndicator }) {
       <nav className="app-nav">
         <NavItem icon="🏠" label={t('nav.home')}        active={pathname === '/'}               onClick={() => navigate('/')} />
         <NavItem icon="🏆" label={t('nav.tournaments')} active={pathname.startsWith('/torneo')} onClick={() => navigate('/torneos')} />
+        {(user?.email === 'guest@prodemundial.dev' || user?.email === 'juanpatriciofox@gmail.com') && (
+          <NavItem icon="🎯" label={t('nav.admin_results')} active={pathname.startsWith('/admin/resultados')} onClick={() => navigate('/admin/resultados')} />
+        )}
         <NavItem icon="📊" label={t('nav.leaderboard')} active={pathname === '/ranking'}        onClick={() => navigate('/ranking')} />
-        <NavItem icon="👤" label={t('nav.profile')}     active={pathname === '/perfil'}         onClick={() => navigate('/perfil')} />
       </nav>
     </div>
   )

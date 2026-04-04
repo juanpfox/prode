@@ -80,7 +80,8 @@
     "home": "Home",
     "tournaments": "Tournaments",
     "leaderboard": "Leaderboard",
-    "profile": "Profile"
+    "profile": "Profile",
+    "admin_results": "Results"
   },
   "leaderboard": {
     "no_scores": "No scores yet",
@@ -164,5 +165,9 @@
     "BRA": "Brazil", "QAT": "Qatar", "JOR": "Jordan", "SCO": "Scotland", "IRQ": "Iraq", "ECU": "Ecuador",
     "SEN": "Senegal", "KSA": "Saudi Arabia", "CIV": "Ivory Coast", "ARG": "Argentina", "NZL": "New Zealand",
     "EGY": "Egypt", "CRO": "Croatia", "COD": "DR Congo", "FRA": "France"
+  },
+  "admin": {
+    "results": "Results",
+    "load_results_title": "Load Real Results"
   }
 }

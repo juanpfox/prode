@@ -80,7 +80,8 @@
     "home": "Inicio",
     "tournaments": "Torneos",
     "leaderboard": "Ranking",
-    "profile": "Perfil"
+    "profile": "Perfil",
+    "admin_results": "Resultados"
   },
   "leaderboard": {
     "no_scores": "Aún no hay puntos registrados",
@@ -164,5 +165,9 @@
     "BRA": "Brasil", "QAT": "Catar", "JOR": "Jordania", "SCO": "Escocia", "IRQ": "Irak", "ECU": "Ecuador",
     "SEN": "Senegal", "KSA": "Arabia Saudita", "CIV": "Costa de Marfil", "ARG": "Argentina", "NZL": "Nueva Zelanda",
     "EGY": "Egipto", "CRO": "Croacia", "COD": "Rep. D. del Congo", "FRA": "Francia"
+  },
+  "admin": {
+    "results": "Resultados",
+    "load_results_title": "Carga de Resultados Reales"
   }
 }

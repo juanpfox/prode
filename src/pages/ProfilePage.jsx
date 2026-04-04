@@ -6,7 +6,7 @@ import AppShell from '../components/AppShell'
 
 export default function ProfilePage() {
   const { t } = useTranslation()
-  const { user, signOut } = useAuth()
+  const { user, refreshProfile, signOut } = useAuth()
   const [profile, setProfile] = useState(null)
   const [displayName, setDisplayName] = useState('')
   const [saving, setSaving] = useState(false)
@@ -30,6 +30,7 @@ export default function ProfilePage() {
     if (!displayName.trim()) return
     setSaving(true)
     await supabase.from('users').update({ display_name: displayName.trim() }).eq('id', user.id)
+    await refreshProfile()
     setSaving(false)
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
