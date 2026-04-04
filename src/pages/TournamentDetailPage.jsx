@@ -69,6 +69,37 @@ export default function TournamentDetailPage() {
     }
   }
 
+  async function updateApproval(requires) {
+    setUpdating(true)
+    try {
+      const { error } = await supabase
+        .from('tournaments')
+        .update({ requires_approval: requires })
+        .eq('id', id)
+      if (error) throw error
+      setTournament(prev => ({ ...prev, requires_approval: requires }))
+    } catch (err) {
+      alert(t('common.error_generic'))
+    } finally {
+      setUpdating(false)
+    }
+  }
+
+  async function approveAllPlayers() {
+    setUpdating(true)
+    try {
+      const { error } = await supabase.from('tournament_players')
+        .update({ status: 'approved' })
+        .eq('tournament_id', id).eq('status', 'pending')
+      if (error) throw error
+      loadTournament()
+    } catch (err) {
+      alert(t('common.error_generic'))
+    } finally {
+      setUpdating(false)
+    }
+  }
+
   async function approvePlayer(userId) {
     await supabase.from('tournament_players')
       .update({ status: 'approved' })
@@ -87,7 +118,12 @@ export default function TournamentDetailPage() {
     setUpdating(true)
     try {
       const { error } = await supabase.from('tournament_players')
-        .insert({ tournament_id: id, user_id: user.id, role: 'player', status: 'pending' })
+        .insert({
+          tournament_id: id,
+          user_id: user.id,
+          role: 'player',
+          status: tournament.requires_approval ? 'pending' : 'approved'
+        })
       if (error) throw error
       loadTournament()
     } catch (err) {
@@ -239,9 +275,14 @@ export default function TournamentDetailPage() {
                 {/* Pending approvals (admin only) */}
                 {myRole === 'admin' && pending.length > 0 && (
                   <div style={{ marginBottom: '1.25rem' }}>
-                    <h4 style={{ fontWeight: 700, fontSize: '0.8rem', marginBottom: '0.625rem', color: 'var(--warning)', opacity: 0.9, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      ⏳ {t('tournaments.pending_approval')} ({pending.length})
-                    </h4>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.625rem' }}>
+                      <h4 style={{ fontWeight: 700, fontSize: '0.8rem', color: 'var(--warning)', opacity: 0.9, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                        ⏳ {t('tournaments.pending_approval')} ({pending.length})
+                      </h4>
+                      <button className="btn btn-ghost btn-sm" onClick={approveAllPlayers} disabled={updating}>
+                        {t('tournaments.approve_all')}
+                      </button>
+                    </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                       {pending.map(p => (
                         <div key={p.user_id} className="card card-sm"
@@ -300,6 +341,31 @@ export default function TournamentDetailPage() {
                         </p>
                         <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>
                           {t(v ? 'tournaments.public_desc' : 'tournaments.private_desc')}
+                        </p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="card card-sm" style={{ marginTop: '1rem' }}>
+                  <h3 style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '1rem' }}>{t('tournaments.join_method')}</h3>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                    {[false, true].map(v => (
+                      <button
+                        key={String(v)}
+                        disabled={updating}
+                        onClick={() => updateApproval(v)}
+                        style={{
+                          padding: '1rem', borderRadius: 'var(--r-md)', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s',
+                          border: tournament.requires_approval === v ? '2px solid var(--primary)' : '1px solid var(--border)',
+                          background: tournament.requires_approval === v ? 'var(--primary-subtle)' : 'var(--surface-2)'
+                        }}
+                      >
+                        <p style={{ fontWeight: 800, fontSize: '0.9rem', color: tournament.requires_approval === v ? 'var(--primary)' : 'var(--text)', marginBottom: '0.25rem' }}>
+                          {v ? '✋' : '✅'} {t(v ? 'tournaments.approval_required' : 'tournaments.auto_join')}
+                        </p>
+                        <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>
+                          {t(v ? 'tournaments.approval_required_desc' : 'tournaments.auto_join_desc')}
                         </p>
                       </button>
                     ))}

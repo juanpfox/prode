@@ -23,7 +23,8 @@ export default function TournamentsPage() {
     name: '',
     competition_id: searchParams.get('comp') ?? '',
     mode: '',
-    is_public: false
+    is_public: false,
+    requires_approval: false
   })
   const [creating, setCreating] = useState(false)
   const [competitions, setCompetitions] = useState([])
@@ -91,12 +92,13 @@ export default function TournamentsPage() {
           competition_id: createForm.competition_id,
           created_by: user.id,
           mode: effectiveMode,
-          is_public: createForm.is_public
+          is_public: createForm.is_public,
+          requires_approval: createForm.requires_approval
         })
         .select('id').single()
       if (err) throw err
       setShowCreate(false)
-      setCreateForm({ name: '', competition_id: '', mode: '', is_public: false })
+      setCreateForm({ name: '', competition_id: '', mode: '', is_public: false, requires_approval: false })
       await loadData()
       navigate(`/torneo/${data.id}`)
     } catch (err) {
@@ -114,7 +116,7 @@ export default function TournamentsPage() {
     setJoinMsg(null)
     try {
       const { data: tournament, error: tErr } = await supabase
-        .from('tournaments').select('id, name')
+        .from('tournaments').select('id, name, requires_approval')
         .eq('invite_code', joinCode.trim().toUpperCase()).single()
       if (tErr || !tournament) throw new Error(t('tournaments.invalid_code'))
 
@@ -134,9 +136,20 @@ export default function TournamentsPage() {
       }
 
       const { error: pErr } = await supabase.from('tournament_players')
-        .insert({ tournament_id: tournament.id, user_id: user.id, role: 'player', status: 'pending' })
+        .insert({
+          tournament_id: tournament.id,
+          user_id: user.id,
+          role: 'player',
+          status: tournament.requires_approval ? 'pending' : 'approved'
+        })
       if (pErr) throw pErr
-      setJoinMsg(t('tournaments.join_requested', { name: tournament.name }))
+      setJoinMsg(tournament.requires_approval
+        ? t('tournaments.join_requested', { name: tournament.name })
+        : t('tournaments.joined_success', { name: tournament.name })
+      )
+      if (!tournament.requires_approval) {
+        setTimeout(() => navigate(`/torneo/${tournament.id}`), 1500)
+      }
       setJoinCode('')
       await loadData()
     } catch (err) {
@@ -231,46 +244,90 @@ export default function TournamentsPage() {
                   </div>
                 </div>
               )}
- 
-              {/* Visibility selector */}
-              <div>
-                <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '0.625rem', fontWeight: 600 }}>
-                  {t('tournaments.visibility')}
-                </p>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.625rem' }}>
-                  {[false, true].map(v => (
-                    <button
-                      key={String(v)}
-                      type="button"
-                      onClick={() => setCreateForm(f => ({ ...f, is_public: v }))}
-                      style={{
-                        padding: '0.875rem 0.75rem',
-                        borderRadius: 'var(--r-md)',
-                        border: createForm.is_public === v
-                          ? '2px solid var(--primary)'
-                          : '2px solid var(--border)',
-                        background: createForm.is_public === v
-                          ? 'var(--primary-subtle)'
-                          : 'var(--surface-2)',
-                        cursor: 'pointer',
-                        textAlign: 'left',
-                        transition: 'all 0.15s ease',
-                        outline: 'none'
-                      }}
-                    >
-                      <p style={{
-                        fontWeight: 700,
-                        fontSize: '0.875rem',
-                        color: createForm.is_public === v ? 'var(--primary)' : 'var(--text)',
-                        marginBottom: '0.25rem'
-                      }}>
-                        {v ? '🌐' : '🔒'} {t(v ? 'tournaments.public' : 'tournaments.private')}
-                      </p>
-                      <p style={{ fontSize: '0.725rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>
-                        {t(v ? 'tournaments.public_desc' : 'tournaments.private_desc')}
-                      </p>
-                    </button>
-                  ))}
+              {/* Visibility and Approval selectors */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.25rem' }}>
+                {/* Visibility selector */}
+                <div>
+                  <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '0.625rem', fontWeight: 600 }}>
+                    {t('tournaments.visibility')}
+                  </p>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.625rem' }}>
+                    {[false, true].map(v => (
+                      <button
+                        key={String(v)}
+                        type="button"
+                        onClick={() => setCreateForm(f => ({ ...f, is_public: v }))}
+                        style={{
+                          padding: '0.875rem 0.75rem',
+                          borderRadius: 'var(--r-md)',
+                          border: createForm.is_public === v
+                            ? '2px solid var(--primary)'
+                            : '2px solid var(--border)',
+                          background: createForm.is_public === v
+                            ? 'var(--primary-subtle)'
+                            : 'var(--surface-2)',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                          transition: 'all 0.15s ease',
+                          outline: 'none'
+                        }}
+                      >
+                        <p style={{
+                          fontWeight: 700,
+                          fontSize: '0.875rem',
+                          color: createForm.is_public === v ? 'var(--primary)' : 'var(--text)',
+                          marginBottom: '0.25rem'
+                        }}>
+                          {v ? '🌐' : '🔒'} {t(v ? 'tournaments.public' : 'tournaments.private')}
+                        </p>
+                        <p style={{ fontSize: '0.725rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>
+                          {t(v ? 'tournaments.public_desc' : 'tournaments.private_desc')}
+                        </p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Approval selector */}
+                <div>
+                  <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '0.625rem', fontWeight: 600 }}>
+                    {t('tournaments.join_method')}
+                  </p>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.625rem' }}>
+                    {[false, true].map(v => (
+                      <button
+                        key={String(v)}
+                        type="button"
+                        onClick={() => setCreateForm(f => ({ ...f, requires_approval: v }))}
+                        style={{
+                          padding: '0.875rem 0.75rem',
+                          borderRadius: 'var(--r-md)',
+                          border: createForm.requires_approval === v
+                            ? '2px solid var(--primary)'
+                            : '2px solid var(--border)',
+                          background: createForm.requires_approval === v
+                            ? 'var(--primary-subtle)'
+                            : 'var(--surface-2)',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                          transition: 'all 0.15s ease',
+                          outline: 'none'
+                        }}
+                      >
+                        <p style={{
+                          fontWeight: 700,
+                          fontSize: '0.875rem',
+                          color: createForm.requires_approval === v ? 'var(--primary)' : 'var(--text)',
+                          marginBottom: '0.25rem'
+                        }}>
+                          {v ? '✋' : '✅'} {t(v ? 'tournaments.approval_required' : 'tournaments.auto_join')}
+                        </p>
+                        <p style={{ fontSize: '0.725rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>
+                          {t(v ? 'tournaments.approval_required_desc' : 'tournaments.auto_join_desc')}
+                        </p>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 

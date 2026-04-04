@@ -60,6 +60,7 @@
     "tab_public": "Todos",
     "already_requested": "Ya enviaste una solicitud a este torneo",
     "join_requested": "Solicitud enviada a \"{{name}}\". Esperá la aprobación del admin.",
+    "joined_success": "¡Te uniste con éxito a \"{{name}}\"!",
     "not_found": "Torneo no encontrado",
     "select_mode": "Elegí el modo de juego",
     "mode_required": "Tenés que elegir un modo para continuar",
@@ -67,7 +68,13 @@
     "public": "Público",
     "public_desc": "Cualquier usuario puede verlo y unirse",
     "private": "Privado",
-    "private_desc": "Solo usuarios con código pueden unirse"
+    "private_desc": "Solo usuarios con código pueden unirse",
+    "join_method": "Método de ingreso",
+    "approval_required": "Referir (Manual)",
+    "approval_required_desc": "Tenés que aprobar a cada jugador",
+    "auto_join": "Libre (Auto)",
+    "auto_join_desc": "Se unen directo con el código/link",
+    "approve_all": "Aprobar todos"
   },
   "nav": {
     "home": "Inicio",

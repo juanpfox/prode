@@ -60,6 +60,7 @@
     "tab_public": "All",
     "already_requested": "You already sent a request to this tournament",
     "join_requested": "Request sent to \"{{name}}\". Wait for admin approval.",
+    "joined_success": "Successfully joined \"{{name}}\"!",
     "not_found": "Tournament not found",
     "select_mode": "Choose a game mode",
     "mode_required": "You need to choose a mode to continue",
@@ -67,7 +68,13 @@
     "public": "Public",
     "public_desc": "Anyone can see and join",
     "private": "Private",
-    "private_desc": "Only users with the invite code can join"
+    "private_desc": "Only users with the invite code can join",
+    "join_method": "Join method",
+    "approval_required": "Referral (Manual)",
+    "approval_required_desc": "You need to approve each player",
+    "auto_join": "Open (Auto)",
+    "auto_join_desc": "Anyone with the code joins directly",
+    "approve_all": "Approve all"
   },
   "nav": {
     "home": "Home",
