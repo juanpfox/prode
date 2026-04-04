@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabase'
 import AppShell from '../components/AppShell'
+import TournamentCard from '../components/TournamentCard'
 
 export default function HomePage() {
   const { t } = useTranslation()
@@ -17,9 +18,22 @@ export default function HomePage() {
       .then(({ data }) => setCompetitions(data ?? []))
 
     supabase.from('tournament_players')
-      .select('tournaments(id, name, invite_code, competitions(name))')
+      .select(`
+        role, 
+        tournaments(
+          id, name, invite_code, mode, competition_id,
+          competitions(name), 
+          creator:users!tournaments_created_by_fkey(display_name),
+          participants:tournament_players(count)
+        )
+      `)
       .eq('user_id', user.id).eq('status', 'approved')
-      .then(({ data }) => setMyTournaments(data?.map(tp => tp.tournaments).filter(Boolean) ?? []))
+      .then(({ data }) => setMyTournaments(data?.map(tp => ({ 
+        ...tp.tournaments, 
+        role: tp.role,
+        creator_name: tp.tournaments.creator?.display_name,
+        participants_count: tp.tournaments.participants?.[0]?.count ?? 0
+      })).filter(Boolean) ?? []))
   }, [user])
 
   const EMOJI = { world_cup: '🏆', champions_league: '⭐', other: '🏟️' }
@@ -32,19 +46,21 @@ export default function HomePage() {
         <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>{user?.email}</p>
       </div>
 
-      <div className="home-competitions animate-slide-up" style={{ marginTop: '1.25rem' }}>
-        {competitions.map(comp => (
-          <CompetitionCard
-            key={comp.id}
-            emoji={EMOJI[comp.type] ?? '🏆'}
-            name={comp.name}
-            modes={comp.available_modes}
-            status={comp.status}
-            flag={FLAG[comp.type] ?? '🌍'}
-            onCreateTournament={() => navigate(`/torneos?comp=${comp.id}`)}
-          />
-        ))}
-      </div>
+      {myTournaments.length === 0 && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+          {competitions.map(comp => (
+            <CompetitionCard
+              key={comp.id}
+              emoji={EMOJI[comp.type] ?? '🏆'}
+              name={comp.name}
+              modes={comp.available_modes}
+              status={comp.status}
+              flag={FLAG[comp.type] ?? '🌍'}
+              onCreateTournament={() => navigate(`/torneos?comp=${comp.id}`)}
+            />
+          ))}
+        </div>
+      )}
 
       <section style={{ marginTop: '2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
@@ -64,16 +80,11 @@ export default function HomePage() {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             {myTournaments.map(tr => (
-              <button key={tr.id} className="card card-sm"
-                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  width: '100%', textAlign: 'left', cursor: 'pointer' }}
-                onClick={() => navigate(`/torneo/${tr.id}`)}>
-                <div>
-                  <p style={{ fontWeight: 700 }}>{tr.name}</p>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>{tr.competitions?.name}</p>
-                </div>
-                <span style={{ color: 'var(--text-subtle)', fontSize: '1.25rem' }}>›</span>
-              </button>
+              <TournamentCard
+                key={tr.id}
+                tournament={tr}
+                onDeleteSuccess={(id) => setMyTournaments(prev => prev.filter(t => t.id !== id))}
+              />
             ))}
           </div>
         )}

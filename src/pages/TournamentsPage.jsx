@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabase'
 import AppShell from '../components/AppShell'
+import TournamentCard from '../components/TournamentCard'
 
 export default function TournamentsPage() {
   const { t } = useTranslation()
@@ -35,15 +36,37 @@ export default function TournamentsPage() {
     try {
       const [{ data: myData }, { data: pubData }, { data: comps }] = await Promise.all([
         supabase.from('tournament_players')
-          .select('role, status, tournaments(id, name, invite_code, competitions(name, type))')
+          .select(`
+            role, 
+            tournaments(
+              id, name, mode, invite_code, competition_id,
+              competitions(name, type),
+              creator:users!tournaments_created_by_fkey(display_name),
+              participants:tournament_players(count)
+            )
+          `)
           .eq('user_id', user.id).eq('status', 'approved'),
         supabase.from('tournaments')
-          .select('id, name, invite_code, competitions(name, type)')
+          .select(`
+            id, name, mode, invite_code, competition_id,
+            competitions(name, type),
+            creator:users!tournaments_created_by_fkey(display_name),
+            participants:tournament_players(count)
+          `)
           .order('created_at', { ascending: false }).limit(30),
         supabase.from('competitions').select('id, name, type, status').order('name'),
       ])
-      setMyTournaments(myData?.map(tp => ({ ...tp.tournaments, role: tp.role })) ?? [])
-      setPublicTournaments(pubData ?? [])
+      setMyTournaments(myData?.map(tp => ({ 
+        ...tp.tournaments, 
+        role: tp.role,
+        creator_name: tp.tournaments.creator?.display_name,
+        participants_count: tp.tournaments.participants?.[0]?.count ?? 0
+      })) ?? [])
+      setPublicTournaments(pubData?.map(tr => ({
+        ...tr,
+        creator_name: tr.creator?.display_name,
+        participants_count: tr.participants?.[0]?.count ?? 0
+      })) ?? [])
       setCompetitions(comps ?? [])
     } finally {
       setLoading(false)
@@ -254,14 +277,26 @@ export default function TournamentsPage() {
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              {myTournaments.map(tr => <TournamentRow key={tr.id} tournament={tr} navigate={navigate} />)}
+              {myTournaments.map(tr => (
+                <TournamentCard
+                  key={tr.id}
+                  tournament={tr}
+                  onDeleteSuccess={() => loadData()}
+                />
+              ))}
             </div>
           )
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             {publicTournaments.length === 0
               ? <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '2rem' }}>—</p>
-              : publicTournaments.map(tr => <TournamentRow key={tr.id} tournament={tr} navigate={navigate} />)
+              : publicTournaments.map(tr => (
+                  <TournamentCard
+                    key={tr.id}
+                    tournament={tr}
+                    onDeleteSuccess={() => loadData()}
+                  />
+                ))
             }
           </div>
         )}
@@ -270,25 +305,4 @@ export default function TournamentsPage() {
   )
 }
 
-function TournamentRow({ tournament, navigate }) {
-  return (
-    <button className="card card-sm"
-      style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        width: '100%', textAlign: 'left', cursor: 'pointer' }}
-      onClick={() => navigate(`/torneo/${tournament.id}`)}>
-      <div>
-        <p style={{ fontWeight: 700, fontSize: '0.9375rem' }}>{tournament.name}</p>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginTop: '0.2rem' }}>
-          {tournament.competitions?.name}
-          {tournament.invite_code && (
-            <span style={{ marginLeft: '0.5rem', fontFamily: 'monospace',
-                background: 'var(--surface-3)', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>
-              {tournament.invite_code}
-            </span>
-          )}
-        </p>
-      </div>
-      <span style={{ color: 'var(--text-subtle)', fontSize: '1.25rem' }}>›</span>
-    </button>
-  )
-}
+

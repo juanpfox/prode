@@ -89,7 +89,7 @@ export default function TournamentDetailPage() {
 
         {/* Header */}
         <div className="card card-sm" style={{ marginBottom: '1.25rem' }}>
-          <h2 style={{ fontWeight: 800, fontSize: '1.125rem' }}>{tournament.name}</h2>
+          <h2 style={{ fontWeight: 800, fontSize: '1.125rem', color: 'var(--text)' }}>{tournament.name}</h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginTop: '0.25rem' }}>
             {tournament.competitions?.name}
             {tournament.mode && (
@@ -98,7 +98,7 @@ export default function TournamentDetailPage() {
                 background: 'var(--primary-subtle)', color: 'var(--primary)',
                 borderRadius: '4px', padding: '0.1rem 0.4rem'
               }}>
-                {tournament.mode === 'posiciones' ? '🏆 Posiciones' : '⚽ Partidos'}
+                {tournament.mode === 'posiciones' ? `🏆 ${t('modes.posiciones_full')}` : `⚽ ${t('modes.partidos_full')}`}
               </span>
             )}
           </p>

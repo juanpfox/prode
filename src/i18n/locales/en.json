@@ -27,8 +27,10 @@
   },
   "modes": {
     "posiciones": "Standings",
+    "posiciones_full": "Fixture standings",
     "posiciones_desc": "Predict each team's group position and the final podium",
     "partidos": "Matches",
+    "partidos_full": "Match results",
     "partidos_desc": "Predict the exact result of each match"
   },
   "competitions": {
@@ -102,5 +104,12 @@
     "group": "Group",
     "podium": "World podium",
     "pick_team": "Pick a team"
+  },
+  "actions": {
+    "copy_code": "Copy code",
+    "settings": "Settings",
+    "delete": "Delete",
+    "delete_confirm": "Are you sure you want to delete this tournament? This action cannot be undone.",
+    "cancel": "Cancel"
   }
 }

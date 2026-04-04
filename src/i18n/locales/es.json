@@ -27,8 +27,10 @@
   },
   "modes": {
     "posiciones": "Posiciones",
+    "posiciones_full": "Posiciones del fixture",
     "posiciones_desc": "Pronosticá la posición de cada equipo en su grupo y el podio",
     "partidos": "Partidos",
+    "partidos_full": "Resultados de partidos",
     "partidos_desc": "Pronosticá el resultado exacto de cada partido"
   },
   "competitions": {
@@ -102,5 +104,12 @@
     "group": "Grupo",
     "podium": "Podio mundial",
     "pick_team": "Elegí un equipo"
+  },
+  "actions": {
+    "copy_code": "Copiar código",
+    "settings": "Configuración",
+    "delete": "Eliminar",
+    "delete_confirm": "¿Estás seguro que querés eliminar este torneo? Esta acción no se puede deshacer.",
+    "cancel": "Cancelar"
   }
 }
