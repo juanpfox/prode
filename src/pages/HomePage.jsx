@@ -77,56 +77,89 @@ export default function HomePage() {
         <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '3rem' }}>{t('common.loading')}</p>
       ) : (
         <>
-          {/* Section: My Tournaments */}
-          <section style={{ marginBottom: '2.5rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.125rem' }}>
-              <h3 style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--text)' }}>
-                {t('tournaments.title')} {myTournaments.length > 0 && `(${myTournaments.length})`}
-              </h3>
-              <button className="btn btn-primary btn-sm" onClick={() => navigate('/torneos')}>
-                {myTournaments.length === 0 ? t('tournaments.create') : `+ ${t('tournaments.create')}`}
-              </button>
-            </div>
+          {myTournaments.length === 0 ? (
+            <>
+              {/* Section: Public Tournaments (shown first if no user tournaments) */}
+              {publicTournaments.length > 0 && (
+                <section className="animate-slide-up" style={{ marginBottom: '2.5rem' }}>
+                  <h3 style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--text)', marginBottom: '1.25rem', opacity: 0.9 }}>
+                    {t('tournaments.tab_public')}
+                  </h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
+                    {publicTournaments.map(tr => (
+                      <TournamentCard
+                        key={tr.id}
+                        tournament={tr}
+                      />
+                    ))}
+                  </div>
+                </section>
+              )}
 
-            {myTournaments.length === 0 ? (
-              <div className="home-empty card card-sm" style={{ background: 'var(--surface-2)', border: '1px dashed var(--border)' }}>
-                <span style={{ fontSize: '2.25rem', marginBottom: '0.5rem' }}>🏟️</span>
-                <p style={{ color: 'var(--text-muted)', fontWeight: 500, fontSize: '0.9375rem' }}>{t('tournaments.empty')}</p>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', opacity: 0.8, marginBottom: '1rem' }}>
-                  {t('tournaments.enter_code_label')}
-                </p>
-                <button className="btn btn-ghost btn-sm" onClick={() => navigate('/torneos')}>
-                  🔍 {t('tournaments.join')}
-                </button>
-              </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
-                {myTournaments.map(tr => (
-                  <TournamentCard
-                    key={tr.id}
-                    tournament={tr}
-                    onDeleteSuccess={(id) => setMyTournaments(prev => prev.filter(t => t.id !== id))}
-                  />
-                ))}
-              </div>
-            )}
-          </section>
+              {/* Section: My Tournaments (Empty State shown after) */}
+              <section style={{ marginBottom: '2.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.125rem' }}>
+                  <h3 style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--text)' }}>
+                    {t('tournaments.title')}
+                  </h3>
+                  <button className="btn btn-primary btn-sm" onClick={() => navigate('/torneos')}>
+                    {t('tournaments.create')}
+                  </button>
+                </div>
 
-          {/* Section: Public Tournaments (only if user hasn't joined or if there are public ones) */}
-          {publicTournaments.length > 0 && (
-            <section className="animate-slide-up">
-              <h3 style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--text)', marginBottom: '1.25rem', opacity: 0.9 }}>
-                {t('tournaments.tab_public')}
-              </h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
-                {publicTournaments.map(tr => (
-                  <TournamentCard
-                    key={tr.id}
-                    tournament={tr}
-                  />
-                ))}
-              </div>
-            </section>
+                <div className="home-empty card card-sm" style={{ background: 'var(--surface-2)', border: '1px dashed var(--border)' }}>
+                  <span style={{ fontSize: '2.25rem', marginBottom: '0.5rem' }}>🏟️</span>
+                  <p style={{ color: 'var(--text-muted)', fontWeight: 500, fontSize: '0.9375rem' }}>{t('tournaments.empty')}</p>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', opacity: 0.8, marginBottom: '1rem' }}>
+                    {t('tournaments.enter_code_label')}
+                  </p>
+                  <button className="btn btn-ghost btn-sm" onClick={() => navigate('/torneos')}>
+                    🔍 {t('tournaments.join')}
+                  </button>
+                </div>
+              </section>
+            </>
+          ) : (
+            <>
+              {/* Section: My Tournaments */}
+              <section style={{ marginBottom: '2.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.125rem' }}>
+                  <h3 style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--text)' }}>
+                    {t('tournaments.title')} ({myTournaments.length})
+                  </h3>
+                  <button className="btn btn-primary btn-sm" onClick={() => navigate('/torneos')}>
+                    + {t('tournaments.create')}
+                  </button>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
+                  {myTournaments.map(tr => (
+                    <TournamentCard
+                      key={tr.id}
+                      tournament={tr}
+                      onDeleteSuccess={(id) => setMyTournaments(prev => prev.filter(t => t.id !== id))}
+                    />
+                  ))}
+                </div>
+              </section>
+
+              {/* Section: Public Tournaments */}
+              {publicTournaments.length > 0 && (
+                <section className="animate-slide-up">
+                  <h3 style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--text)', marginBottom: '1.25rem', opacity: 0.9 }}>
+                    {t('tournaments.tab_public')}
+                  </h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
+                    {publicTournaments.map(tr => (
+                      <TournamentCard
+                        key={tr.id}
+                        tournament={tr}
+                      />
+                    ))}
+                  </div>
+                </section>
+              )}
+            </>
           )}
         </>
       )}
