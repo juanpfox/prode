@@ -102,7 +102,7 @@ export default function HomePage() {
                   <h3 style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--text)' }}>
                     {t('tournaments.title')}
                   </h3>
-                  <button className="btn btn-primary btn-sm" onClick={() => navigate('/torneos')}>
+                  <button className="btn btn-primary btn-sm" onClick={() => navigate('/torneos?new=1')}>
                     {t('tournaments.create')}
                   </button>
                 </div>
@@ -127,7 +127,7 @@ export default function HomePage() {
                   <h3 style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--text)' }}>
                     {t('tournaments.title')} ({myTournaments.length})
                   </h3>
-                  <button className="btn btn-primary btn-sm" onClick={() => navigate('/torneos')}>
+                  <button className="btn btn-primary btn-sm" onClick={() => navigate('/torneos?new=1')}>
                     + {t('tournaments.create')}
                   </button>
                 </div>

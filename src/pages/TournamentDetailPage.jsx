@@ -20,6 +20,7 @@ export default function TournamentDetailPage() {
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
   const [updating, setUpdating] = useState(false)
+  const [editName, setEditName] = useState('')
 
   useEffect(() => { loadTournament() }, [id])
 
@@ -31,6 +32,7 @@ export default function TournamentDetailPage() {
         .select('*, competitions(name, type, status, available_modes)')
         .eq('id', id).single()
       setTournament(tr)
+      setEditName(tr?.name ?? '')
 
       const { data: pls } = await supabase
         .from('tournament_players')
@@ -74,6 +76,23 @@ export default function TournamentDetailPage() {
         .eq('id', id)
       if (error) throw error
       setTournament(prev => ({ ...prev, is_public: isPublic }))
+    } catch (err) {
+      alert(t('common.error_generic'))
+    } finally {
+      setUpdating(false)
+    }
+  }
+  
+  async function updateName() {
+    if (!editName.trim() || editName === tournament.name) return
+    setUpdating(true)
+    try {
+      const { error } = await supabase
+        .from('tournaments')
+        .update({ name: editName.trim() })
+        .eq('id', id)
+      if (error) throw error
+      setTournament(prev => ({ ...prev, name: editName.trim() }))
     } catch (err) {
       alert(t('common.error_generic'))
     } finally {
@@ -345,6 +364,26 @@ export default function TournamentDetailPage() {
 
             {tab === 'settings' && myRole === 'admin' && (
               <section className="animate-slide-up">
+                <div className="card card-sm" style={{ marginBottom: '1rem' }}>
+                  <h3 style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '1rem' }}>{t('tournaments.tournament_name')}</h3>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <input 
+                      className="input" 
+                      value={editName} 
+                      onChange={e => setEditName(e.target.value)}
+                      placeholder={t('tournaments.name_placeholder')}
+                      style={{ flex: 1 }}
+                    />
+                    <button 
+                      className="btn btn-primary btn-sm" 
+                      onClick={updateName}
+                      disabled={updating || !editName.trim() || editName === tournament.name}
+                    >
+                      {updating ? '…' : t('common.save')}
+                    </button>
+                  </div>
+                </div>
+
                 <div className="card card-sm">
                   <h3 style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '1rem' }}>{t('tournaments.visibility')}</h3>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
