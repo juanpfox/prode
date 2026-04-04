@@ -131,39 +131,14 @@ export default function PosicionesPredictionsPage({ tournament }) {
 
   // ── Drag helpers ──────────────────────────────────────────
   function onDragStart(e, group, fromIdx) {
-    if (e.dataTransfer && e.currentTarget) {
+    if (e.dataTransfer) {
       e.dataTransfer.effectAllowed = 'move'
-      try {
-        const target = e.currentTarget
-        const clone = target.cloneNode(true)
-        const computed = window.getComputedStyle(target)
-        
-        clone.style.backgroundColor = computed.backgroundColor || '#1a2d1f'
-        clone.style.border = computed.border
-        clone.style.borderRadius = computed.borderRadius
-        clone.style.width = computed.width
-        clone.style.height = computed.height
-        clone.style.boxSizing = 'border-box'
-        clone.style.position = 'absolute'
-        clone.style.top = '-10000px'
-        clone.style.left = '-10000px'
-        clone.style.zIndex = '9999'
-        clone.style.opacity = '1'
-        clone.style.transform = 'none'
-
-        document.body.appendChild(clone)
-        e.dataTransfer.setDragImage(clone, target.offsetWidth / 2, target.offsetHeight / 2)
-        
-        setTimeout(() => {
-          if (document.body.contains(clone)) document.body.removeChild(clone)
-          setDragState({ group, fromIdx })
-        }, 10)
-      } catch (err) {
-        setDragState({ group, fromIdx })
-      }
-    } else {
-      setDragState({ group, fromIdx })
+      // Hide the browser's native semi-transparent ghost with a 1×1 transparent GIF
+      const ghost = new Image()
+      ghost.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
+      e.dataTransfer.setDragImage(ghost, 0, 0)
     }
+    setDragState({ group, fromIdx })
   }
 
   function onDragEnd() {
@@ -276,11 +251,12 @@ export default function PosicionesPredictionsPage({ tournament }) {
                         borderRadius: 'var(--r-md)',
                         background: 'var(--surface-2)',
                         border: '1.5px solid var(--border)',
-                        cursor: locked ? 'default' : 'grab',
+                        cursor: locked ? 'default' : (dragState?.group === group && dragState?.fromIdx === idx ? 'grabbing' : 'grab'),
                         userSelect: 'none',
-                        transition: 'all 0.2s',
-                        opacity: dragState?.group === group && dragState?.fromIdx === idx ? 0.4 : 1,
-                        transform: dragState?.group === group && dragState?.fromIdx === idx ? 'scale(0.98)' : 'none',
+                        transition: 'box-shadow 0.15s, border-color 0.15s',
+                        opacity: 1,
+                        boxShadow: dragState?.group === group && dragState?.fromIdx === idx ? '0 6px 20px rgba(0,0,0,0.45)' : 'none',
+                        borderColor: dragState?.group === group && dragState?.fromIdx === idx ? 'var(--primary)' : 'var(--border)',
                       }}
                     >
                       <span style={{ 
