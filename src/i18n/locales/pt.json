@@ -43,5 +43,18 @@
     "tournaments": "Torneios",
     "leaderboard": "Ranking",
     "profile": "Perfil"
+  },
+  "predictions": {
+    "title": "Meus Prognósticos",
+    "go_predict": "Digitar prognósticos",
+    "lock_info": "Bloqueado 1 hora antes de cada partida",
+    "locked": "Bloqueado",
+    "finished": "Finalizado",
+    "views": {
+      "title": "Visualizar",
+      "dates": "Todos os jogos",
+      "groups": "Grupos",
+      "playoffs": "Fase Final"
+    }
   }
 }

@@ -41,7 +41,20 @@
   "nav": {
     "home": "होम",
     "tournaments": "टूर्नामेंट",
-    "leaderboard": "रैंकिंग",
+    "leaderboard": "लीडरबोर्ड",
     "profile": "प्रोफ़ाइल"
+  },
+  "predictions": {
+    "title": "मेरी भविष्यवाणी",
+    "go_predict": "भविष्यवाणी दर्ज करें",
+    "lock_info": "मैच से 1 घंटा पहले बंद",
+    "locked": "बंद",
+    "finished": "समाप्त",
+    "views": {
+      "title": "व्यू मोड",
+      "dates": "सभी मैच",
+      "groups": "ग्रुप",
+      "playoffs": "प्लेऑफ़"
+    }
   }
 }

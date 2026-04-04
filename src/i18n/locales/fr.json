@@ -43,5 +43,18 @@
     "tournaments": "Tournois",
     "leaderboard": "Classement",
     "profile": "Profil"
+  },
+  "predictions": {
+    "title": "Mes Pronostics",
+    "go_predict": "Saisir mes pronostics",
+    "lock_info": "Gelé 1 heure avant chaque match",
+    "locked": "Fermé",
+    "finished": "Terminé",
+    "views": {
+      "title": "Vues",
+      "dates": "Tous les matchs",
+      "groups": "Groupes",
+      "playoffs": "Matchs à élimination directe"
+    }
   }
 }

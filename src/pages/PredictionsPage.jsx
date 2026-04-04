@@ -271,7 +271,6 @@ export default function PredictionsPage() {
           </div>
           
           <div style={{ textAlign: 'right' }}>
-             <p style={{ fontSize: '0.65rem', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 800 }}>{t('predictions.views.title')}</p>
              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.25rem' }}>
                 <button className={`btn btn-sm ${view === 'groups' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setView('groups')} style={{ fontSize: '0.75rem', padding: '0.35rem 0.6rem' }}>
                   {t('predictions.views.groups')}
@@ -386,7 +385,7 @@ export default function PredictionsPage() {
                       display: 'flex', 
                       flexDirection: 'column',
                       position: 'relative',
-                      minHeight: stage === 'sf' && byStage['third_place']?.length > 0 ? '420px' : undefined
+                      minHeight: byStage['third_place']?.length > 0 ? '500px' : undefined
                     }}>
                       {byStage[stage].map(match => (
                         <div key={match.id} className="bracket-match-cell">
@@ -394,14 +393,13 @@ export default function PredictionsPage() {
                         </div>
                       ))}
                       
-                      {/* Third Place Match - absolutely positioned between Semi-finals */}
-                      {stage === 'sf' && byStage['third_place'] && byStage['third_place'].length > 0 && (
+                      {/* Third Place Match - absolutely positioned under the final */}
+                      {stage === 'final' && byStage['third_place'] && byStage['third_place'].length > 0 && (
                         <div style={{
                           position: 'absolute',
-                          top: '50%',
+                          top: 'calc(50% + 95px)',
                           left: 0,
                           right: 0,
-                          transform: 'translateY(-50%)',
                           zIndex: 10
                         }}>
                           <h3 style={{ fontWeight: 800, fontSize: '0.70rem', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.5rem', textAlign: 'center' }}>

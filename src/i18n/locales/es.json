@@ -114,8 +114,8 @@
     "all_changes_saved": "Todos los cambios guardados",
     "views": {
       "title": "Vistas",
-      "dates": "Por Fechas",
-      "groups": "Por Grupo",
+      "dates": "Todos los Partidos",
+      "groups": "Grupos",
       "playoffs": "PlayOffs",
       "new": "NUEVO"
     },

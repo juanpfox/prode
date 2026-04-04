@@ -112,6 +112,13 @@
     "miss": "Missed",
     "saving_changes": "Saving changes...",
     "all_changes_saved": "All changes saved",
+    "views": {
+      "title": "Views",
+      "dates": "All Matches",
+      "groups": "Groups",
+      "playoffs": "PlayOffs",
+      "new": "NEW"
+    },
     "table": {
       "team": "Team",
       "pj": "P",
@@ -133,7 +140,7 @@
   },
   "posiciones": {
     "hint": "Drag teams to rank them within each group. Then pick the world podium.",
-    "group": "Group",
+    "groups": "Groups",
     "podium": "World podium",
     "pick_team": "Pick a team"
   },
