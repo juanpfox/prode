@@ -27,6 +27,7 @@ function TeamFlag({ code, size = 20 }) {
     <img 
       src={`https://flagcdn.com/w40/${iso2}.png`} 
       alt={code} 
+      draggable={false}
       style={{ 
         width: `${size}px`, 
         height: 'auto', 
@@ -129,8 +130,44 @@ export default function PosicionesPredictionsPage({ tournament }) {
   }
 
   // ── Drag helpers ──────────────────────────────────────────
-  function onDragStart(group, fromIdx) {
-    setDragState({ group, fromIdx })
+  function onDragStart(e, group, fromIdx) {
+    if (e.dataTransfer && e.currentTarget) {
+      e.dataTransfer.effectAllowed = 'move'
+      try {
+        const target = e.currentTarget
+        const clone = target.cloneNode(true)
+        const computed = window.getComputedStyle(target)
+        
+        clone.style.backgroundColor = computed.backgroundColor || '#1a2d1f'
+        clone.style.border = computed.border
+        clone.style.borderRadius = computed.borderRadius
+        clone.style.width = computed.width
+        clone.style.height = computed.height
+        clone.style.boxSizing = 'border-box'
+        clone.style.position = 'absolute'
+        clone.style.top = '-10000px'
+        clone.style.left = '-10000px'
+        clone.style.zIndex = '9999'
+        clone.style.opacity = '1'
+        clone.style.transform = 'none'
+
+        document.body.appendChild(clone)
+        e.dataTransfer.setDragImage(clone, target.offsetWidth / 2, target.offsetHeight / 2)
+        
+        setTimeout(() => {
+          if (document.body.contains(clone)) document.body.removeChild(clone)
+          setDragState({ group, fromIdx })
+        }, 10)
+      } catch (err) {
+        setDragState({ group, fromIdx })
+      }
+    } else {
+      setDragState({ group, fromIdx })
+    }
+  }
+
+  function onDragEnd() {
+    setDragState(null)
   }
   function onDragOver(group, toIdx) {
     if (!dragState || dragState.group !== group || dragState.fromIdx === toIdx) return
@@ -212,80 +249,86 @@ export default function PosicionesPredictionsPage({ tournament }) {
         </p>
 
         {/* Groups */}
-        {GROUP_LABELS.filter(g => teamsByGroup[g]?.length > 0).map(group => (
-          <section key={group} style={{ marginBottom: '1.25rem' }}>
-            <h3 style={{
-              fontWeight: 700, fontSize: '0.75rem', letterSpacing: '0.07em',
-              textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.5rem'
-            }}>
-              {t('posiciones.group')} {group}
-            </h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
-              {(groupRanks[group] ?? []).map((teamId, idx) => {
-                const team = teamsByGroup[group].find(t => t.id === teamId)
-                if (!team) return null
-                return (
-                  <div
-                    key={teamId}
-                    draggable={!locked}
-                    onDragStart={() => onDragStart(group, idx)}
-                    onDragOver={e => { e.preventDefault(); onDragOver(group, idx) }}
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: '0.75rem',
-                      padding: '0.55rem 0.875rem',
-                      borderRadius: 'var(--r-md)',
-                      background: 'var(--surface-2)',
-                      border: '1.5px solid var(--border)',
-                      cursor: locked ? 'default' : 'grab',
-                      userSelect: 'none',
-                      transition: 'all 0.2s',
-                    }}
-                  >
-                    <span style={{ 
-                      fontSize: '0.9rem', 
-                      fontWeight: 800, 
-                      minWidth: '1.25rem', 
-                      color: 'var(--text-muted)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      background: 'var(--surface-3)',
-                      height: '24px',
-                      width: '24px',
-                      borderRadius: '50%',
-                    }}>{idx + 1}</span>
-                    
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', flex: 1 }}>
-                      <TeamFlag code={team.code} />
-                      <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>
-                        {t(`teams.${team.code}`, { defaultValue: team.name })}
-                      </span>
-                    </div>
-
-                    {!locked && (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
-                        <button
-                          style={{ background: 'none', border: 'none', cursor: 'pointer',
-                            fontSize: '0.7rem', color: 'var(--text-muted)', lineHeight: 1,
-                            padding: '1px 4px' }}
-                          onClick={() => moveTeam(group, idx, -1)}
-                          disabled={idx === 0}
-                        >▲</button>
-                        <button
-                          style={{ background: 'none', border: 'none', cursor: 'pointer',
-                            fontSize: '0.7rem', color: 'var(--text-muted)', lineHeight: 1,
-                            padding: '1px 4px' }}
-                          onClick={() => moveTeam(group, idx, 1)}
-                          disabled={idx === 3}
-                        >▼</button>
+        <div className="posiciones-groups-grid" style={{ marginBottom: '1.5rem' }}>
+          {GROUP_LABELS.filter(g => teamsByGroup[g]?.length > 0).map(group => (
+            <section key={group}>
+              <h3 style={{
+                fontWeight: 700, fontSize: '0.75rem', letterSpacing: '0.07em',
+                textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.5rem'
+              }}>
+                {t('posiciones.group')} {group}
+              </h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                {(groupRanks[group] ?? []).map((teamId, idx) => {
+                  const team = teamsByGroup[group].find(t => t.id === teamId)
+                  if (!team) return null
+                  return (
+                    <div
+                      key={teamId}
+                      draggable={!locked}
+                      onDragStart={(e) => onDragStart(e, group, idx)}
+                      onDragEnd={onDragEnd}
+                      onDrop={onDragEnd}
+                      onDragOver={e => { e.preventDefault(); onDragOver(group, idx) }}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: '0.75rem',
+                        padding: '0.55rem 0.875rem',
+                        borderRadius: 'var(--r-md)',
+                        background: 'var(--surface-2)',
+                        border: '1.5px solid var(--border)',
+                        cursor: locked ? 'default' : 'grab',
+                        userSelect: 'none',
+                        transition: 'all 0.2s',
+                        opacity: dragState?.group === group && dragState?.fromIdx === idx ? 0.4 : 1,
+                        transform: dragState?.group === group && dragState?.fromIdx === idx ? 'scale(0.98)' : 'none',
+                      }}
+                    >
+                      <span style={{ 
+                        fontSize: '0.9rem', 
+                        fontWeight: 800, 
+                        minWidth: '1.25rem', 
+                        color: 'var(--text-muted)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: 'var(--surface-3)',
+                        height: '24px',
+                        width: '24px',
+                        borderRadius: '50%',
+                      }}>{idx + 1}</span>
+                      
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', flex: 1 }}>
+                        <TeamFlag code={team.code} />
+                        <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>
+                          {t(`teams.${team.code}`, { defaultValue: team.name })}
+                        </span>
                       </div>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
-          </section>
-        ))}
+
+                      {!locked && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
+                          <button
+                            style={{ background: 'none', border: 'none', cursor: 'pointer',
+                              fontSize: '0.7rem', color: 'var(--text-muted)', lineHeight: 1,
+                              padding: '1px 4px' }}
+                            onClick={() => moveTeam(group, idx, -1)}
+                            disabled={idx === 0}
+                          >▲</button>
+                          <button
+                            style={{ background: 'none', border: 'none', cursor: 'pointer',
+                              fontSize: '0.7rem', color: 'var(--text-muted)', lineHeight: 1,
+                              padding: '1px 4px' }}
+                            onClick={() => moveTeam(group, idx, 1)}
+                            disabled={idx === 3}
+                          >▼</button>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </section>
+          ))}
+        </div>
 
         {/* Podium */}
         <section style={{ marginBottom: '1.5rem' }}>
