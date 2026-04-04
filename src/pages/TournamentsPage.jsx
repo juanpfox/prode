@@ -22,7 +22,8 @@ export default function TournamentsPage() {
   const [createForm, setCreateForm] = useState({
     name: '',
     competition_id: searchParams.get('comp') ?? '',
-    mode: ''
+    mode: '',
+    is_public: false
   })
   const [creating, setCreating] = useState(false)
   const [competitions, setCompetitions] = useState([])
@@ -48,11 +49,12 @@ export default function TournamentsPage() {
           .eq('user_id', user.id).eq('status', 'approved'),
         supabase.from('tournaments')
           .select(`
-            id, name, mode, invite_code, competition_id,
+            id, name, mode, invite_code, competition_id, is_public,
             competitions(name, type),
             creator:users!tournaments_created_by_fkey(display_name),
             participants:tournament_players(count)
           `)
+          .eq('is_public', true)
           .order('created_at', { ascending: false }).limit(30),
         supabase.from('competitions').select('id, name, type, status').order('name'),
       ])
@@ -88,12 +90,13 @@ export default function TournamentsPage() {
           name: createForm.name.trim(),
           competition_id: createForm.competition_id,
           created_by: user.id,
-          mode: effectiveMode
+          mode: effectiveMode,
+          is_public: createForm.is_public
         })
         .select('id').single()
       if (err) throw err
       setShowCreate(false)
-      setCreateForm({ name: '', competition_id: '', mode: '' })
+      setCreateForm({ name: '', competition_id: '', mode: '', is_public: false })
       await loadData()
       navigate(`/torneo/${data.id}`)
     } catch (err) {
@@ -228,6 +231,48 @@ export default function TournamentsPage() {
                   </div>
                 </div>
               )}
+ 
+              {/* Visibility selector */}
+              <div>
+                <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '0.625rem', fontWeight: 600 }}>
+                  {t('tournaments.visibility')}
+                </p>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.625rem' }}>
+                  {[false, true].map(v => (
+                    <button
+                      key={String(v)}
+                      type="button"
+                      onClick={() => setCreateForm(f => ({ ...f, is_public: v }))}
+                      style={{
+                        padding: '0.875rem 0.75rem',
+                        borderRadius: 'var(--r-md)',
+                        border: createForm.is_public === v
+                          ? '2px solid var(--primary)'
+                          : '2px solid var(--border)',
+                        background: createForm.is_public === v
+                          ? 'var(--primary-subtle)'
+                          : 'var(--surface-2)',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        transition: 'all 0.15s ease',
+                        outline: 'none'
+                      }}
+                    >
+                      <p style={{
+                        fontWeight: 700,
+                        fontSize: '0.875rem',
+                        color: createForm.is_public === v ? 'var(--primary)' : 'var(--text)',
+                        marginBottom: '0.25rem'
+                      }}>
+                        {v ? '🌐' : '🔒'} {t(v ? 'tournaments.public' : 'tournaments.private')}
+                      </p>
+                      <p style={{ fontSize: '0.725rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>
+                        {t(v ? 'tournaments.public_desc' : 'tournaments.private_desc')}
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              </div>
 
               <button
                 className="btn btn-primary"

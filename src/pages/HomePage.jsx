@@ -10,30 +10,58 @@ export default function HomePage() {
   const { t } = useTranslation()
   const { user } = useAuth()
   const navigate = useNavigate()
-  const [competitions, setCompetitions] = useState([])
   const [myTournaments, setMyTournaments] = useState([])
+  const [publicTournaments, setPublicTournaments] = useState([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    supabase.from('competitions').select('*').order('created_at')
-      .then(({ data }) => setCompetitions(data ?? []))
+    async function loadHome() {
+      setLoading(true)
+      try {
+        const [{ data: myData }, { data: pubData }] = await Promise.all([
+          supabase.from('tournament_players')
+            .select(`
+              role, 
+              tournaments(
+                id, name, invite_code, mode, competition_id, is_public,
+                competitions(name, type), 
+                creator:users!tournaments_created_by_fkey(display_name),
+                participants:tournament_players(count)
+              )
+            `)
+            .eq('user_id', user.id).eq('status', 'approved'),
+          supabase.from('tournaments')
+            .select(`
+              id, name, invite_code, mode, competition_id, is_public,
+              competitions(name, type),
+              creator:users!tournaments_created_by_fkey(display_name),
+              participants:tournament_players(count)
+            `)
+            .eq('is_public', true)
+            .order('created_at', { ascending: false }).limit(20)
+        ])
 
-    supabase.from('tournament_players')
-      .select(`
-        role, 
-        tournaments(
-          id, name, invite_code, mode, competition_id,
-          competitions(name), 
-          creator:users!tournaments_created_by_fkey(display_name),
-          participants:tournament_players(count)
-        )
-      `)
-      .eq('user_id', user.id).eq('status', 'approved')
-      .then(({ data }) => setMyTournaments(data?.map(tp => ({ 
-        ...tp.tournaments, 
-        role: tp.role,
-        creator_name: tp.tournaments.creator?.display_name,
-        participants_count: tp.tournaments.participants?.[0]?.count ?? 0
-      })).filter(Boolean) ?? []))
+        const myTs = myData?.map(tp => ({ 
+          ...tp.tournaments, 
+          role: tp.role,
+          creator_name: tp.tournaments.creator?.display_name,
+          participants_count: tp.tournaments.participants?.[0]?.count ?? 0
+        })).filter(Boolean) ?? []
+        
+        setMyTournaments(myTs)
+
+        // Filter public ones I'm not in
+        const myIds = new Set(myTs.map(t => t.id))
+        setPublicTournaments(pubData?.filter(t => !myIds.has(t.id)).map(t => ({
+          ...t,
+          creator_name: t.creator?.display_name,
+          participants_count: t.participants?.[0]?.count ?? 0
+        })) ?? [])
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadHome()
   }, [user])
 
   const EMOJI = { world_cup: '🏆', champions_league: '⭐', other: '🏟️' }
@@ -41,54 +69,67 @@ export default function HomePage() {
 
   return (
     <AppShell>
-      <div className="home-welcome animate-fade-in">
-        <h2 className="home-section-title">{t('home.competitions')}</h2>
+      <div style={{ marginTop: '0.4rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.625rem', marginBottom: '1.5rem' }}>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>{user?.email}</p>
       </div>
 
-      {myTournaments.length === 0 && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
-          {competitions.map(comp => (
-            <CompetitionCard
-              key={comp.id}
-              emoji={EMOJI[comp.type] ?? '🏆'}
-              name={comp.name}
-              modes={comp.available_modes}
-              status={comp.status}
-              flag={FLAG[comp.type] ?? '🌍'}
-              onCreateTournament={() => navigate(`/torneos?comp=${comp.id}`)}
-            />
-          ))}
-        </div>
-      )}
+      {loading ? (
+        <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '3rem' }}>{t('common.loading')}</p>
+      ) : (
+        <>
+          {/* Section: My Tournaments */}
+          <section style={{ marginBottom: '2.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.125rem' }}>
+              <h3 style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--text)' }}>
+                {t('tournaments.title')} {myTournaments.length > 0 && `(${myTournaments.length})`}
+              </h3>
+              <button className="btn btn-primary btn-sm" onClick={() => navigate('/torneos')}>
+                {myTournaments.length === 0 ? t('tournaments.create') : `+ ${t('tournaments.create')}`}
+              </button>
+            </div>
 
-      <section style={{ marginTop: '2rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-          <h3 style={{ fontWeight: 700, fontSize: '1rem' }}>{t('tournaments.title')}</h3>
-          <button className="btn btn-primary btn-sm" onClick={() => navigate('/torneos')}>
-            {t('tournaments.create')}
-          </button>
-        </div>
-        {myTournaments.length === 0 ? (
-          <div className="home-empty card card-sm">
-            <span style={{ fontSize: '2rem' }}>🏟️</span>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.9375rem' }}>{t('tournaments.empty')}</p>
-            <button className="btn btn-ghost btn-sm" onClick={() => navigate('/torneos')}>
-              {t('tournaments.join')}
-            </button>
-          </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            {myTournaments.map(tr => (
-              <TournamentCard
-                key={tr.id}
-                tournament={tr}
-                onDeleteSuccess={(id) => setMyTournaments(prev => prev.filter(t => t.id !== id))}
-              />
-            ))}
-          </div>
-        )}
-      </section>
+            {myTournaments.length === 0 ? (
+              <div className="home-empty card card-sm" style={{ background: 'var(--surface-2)', border: '1px dashed var(--border)' }}>
+                <span style={{ fontSize: '2.25rem', marginBottom: '0.5rem' }}>🏟️</span>
+                <p style={{ color: 'var(--text-muted)', fontWeight: 500, fontSize: '0.9375rem' }}>{t('tournaments.empty')}</p>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', opacity: 0.8, marginBottom: '1rem' }}>
+                  {t('tournaments.enter_code_label')}
+                </p>
+                <button className="btn btn-ghost btn-sm" onClick={() => navigate('/torneos')}>
+                  🔍 {t('tournaments.join')}
+                </button>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
+                {myTournaments.map(tr => (
+                  <TournamentCard
+                    key={tr.id}
+                    tournament={tr}
+                    onDeleteSuccess={(id) => setMyTournaments(prev => prev.filter(t => t.id !== id))}
+                  />
+                ))}
+              </div>
+            )}
+          </section>
+
+          {/* Section: Public Tournaments (only if user hasn't joined or if there are public ones) */}
+          {publicTournaments.length > 0 && (
+            <section className="animate-slide-up">
+              <h3 style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--text)', marginBottom: '1.25rem', opacity: 0.9 }}>
+                {t('tournaments.tab_public')}
+              </h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
+                {publicTournaments.map(tr => (
+                  <TournamentCard
+                    key={tr.id}
+                    tournament={tr}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+        </>
+      )}
     </AppShell>
   )
 }

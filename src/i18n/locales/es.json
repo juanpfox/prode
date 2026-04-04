@@ -62,7 +62,12 @@
     "join_requested": "Solicitud enviada a \"{{name}}\". Esperá la aprobación del admin.",
     "not_found": "Torneo no encontrado",
     "select_mode": "Elegí el modo de juego",
-    "mode_required": "Tenés que elegir un modo para continuar"
+    "mode_required": "Tenés que elegir un modo para continuar",
+    "visibility": "Visibilidad",
+    "public": "Público",
+    "public_desc": "Cualquier usuario puede verlo y unirse",
+    "private": "Privado",
+    "private_desc": "Solo usuarios con código pueden unirse"
   },
   "nav": {
     "home": "Inicio",

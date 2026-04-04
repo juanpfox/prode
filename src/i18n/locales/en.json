@@ -62,7 +62,12 @@
     "join_requested": "Request sent to \"{{name}}\". Wait for admin approval.",
     "not_found": "Tournament not found",
     "select_mode": "Choose a game mode",
-    "mode_required": "You need to choose a mode to continue"
+    "mode_required": "You need to choose a mode to continue",
+    "visibility": "Visibility",
+    "public": "Public",
+    "public_desc": "Anyone can see and join",
+    "private": "Private",
+    "private_desc": "Only users with the invite code can join"
   },
   "nav": {
     "home": "Home",
