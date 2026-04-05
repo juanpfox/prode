@@ -4,6 +4,8 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabase'
 import AppShell from '../components/AppShell'
+import ConfigTab from '../components/ConfigTab'
+import RulesPage from '../components/RulesPage'
 
 export default function TournamentDetailPage() {
   const { t } = useTranslation()
@@ -266,15 +268,15 @@ export default function TournamentDetailPage() {
         {isApproved && (
           <>
             <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '1px solid var(--border)', marginBottom: '1.25rem', paddingBottom: '0.25rem' }}>
-              {['leaderboard', 'players', ...(myRole === 'admin' ? ['settings'] : [])].map(tId => (
+              {['leaderboard', 'players', 'rules', ...(myRole === 'admin' ? ['config', 'settings'] : [])].map(tId => (
                 <button
                   key={tId}
                   className={`btn btn-sm ${tab === tId ? 'btn-primary' : 'btn-ghost'}`}
                   style={{ borderBottom: tab === tId ? '2px solid var(--primary)' : 'none', borderRadius: 0 }}
                   onClick={() => setTab(tId)}
                 >
-                  {tId === 'leaderboard' ? '📊' : tId === 'players' ? '👥' : '⚙️'} 
-                  <span style={{ marginLeft: '0.4rem' }}>{tId === 'leaderboard' ? t('nav.leaderboard') : tId === 'players' ? t('tournaments.tab_mine') : t('actions.settings')}</span>
+                  {tId === 'leaderboard' ? '📊' : tId === 'players' ? '👥' : tId === 'rules' ? '📖' : tId === 'config' ? '🎛️' : '⚙️'} 
+                  <span style={{ marginLeft: '0.4rem' }}>{tId === 'leaderboard' ? t('nav.leaderboard') : tId === 'players' ? t('tournaments.tab_mine') : tId === 'rules' ? t('config.tab_rules') : tId === 'config' ? t('config.tab_config') : t('actions.settings')}</span>
                 </button>
               ))}
             </div>
@@ -359,6 +361,18 @@ export default function TournamentDetailPage() {
                     </div>
                   ))}
                 </div>
+              </section>
+            )}
+
+            {tab === 'rules' && (
+              <section className="animate-slide-up">
+                <RulesPage tournamentId={id} mode={tournament.mode} />
+              </section>
+            )}
+
+            {tab === 'config' && myRole === 'admin' && (
+              <section className="animate-slide-up">
+                <ConfigTab tournamentId={id} isAdmin={true} mode={tournament.mode} />
               </section>
             )}
 
