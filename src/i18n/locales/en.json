@@ -155,7 +155,7 @@
     "cancel": "Cancel"
   },
   "teams": {
-    "PAN": "Panama", "RSA": "South Africa", "POR": "Portugal", "BIH": "Bosnia and Herzegovina", "LIV": "Liverpool",
+    "PAN": "Panama", "RSA": "South Africa", "POR": "Portugal", "BIH": "Bosnia", "LIV": "Liverpool",
     "PAR": "Paraguay", "NOR": "Norway", "BEL": "Belgium", "COL": "Colombia", "LEV": "Bayer Leverkusen",
     "JPN": "Japan", "BVB": "Borussia Dortmund", "USA": "United States", "ENG": "England", "CUW": "Curacao",
     "GER": "Germany", "SWE": "Sweden", "MEX": "Mexico", "INT": "Inter Milan", "AUT": "Austria",
@@ -166,7 +166,7 @@
     "MCI": "Manchester City", "ESP": "Spain", "NED": "Netherlands", "ALG": "Algeria", "RMA": "Real Madrid",
     "BRA": "Brazil", "QAT": "Qatar", "JOR": "Jordan", "SCO": "Scotland", "IRQ": "Iraq", "ECU": "Ecuador",
     "SEN": "Senegal", "KSA": "Saudi Arabia", "CIV": "Ivory Coast", "ARG": "Argentina", "NZL": "New Zealand",
-    "EGY": "Egypt", "CRO": "Croatia", "COD": "DR Congo", "FRA": "France"
+    "EGY": "Egypt", "CRO": "Croatia", "COD": "Congo", "FRA": "France"
   },
   "admin": {
     "results": "Results",
