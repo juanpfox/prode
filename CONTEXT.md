@@ -47,9 +47,53 @@ El usuario pronostica la **posición final de cada equipo en su grupo** (1°-4°
 **UI:** Grid responsivo con drag & drop y tablas dinámicas de posiciones.
 
 ### Modo Partidos (Mundial + Champions)
-El usuario pronostica el **resultado exacto**.
+El usuario pronostica el **resultado exacto** de cada partido (goles de cada equipo con desplegables). En fase eliminatoria, si pronostica empate, se habilitan 2 desplegables extra para elegir ganador por penales.
 - **Vistas:** Por Fecha (Date-based), Por Grupo (Group-based) y Playoffs (Bracket interactivo).
 - **Auto-save:** Debounced saving al escribir resultados.
+
+**Sistema de puntos** (editables por torneo):
+
+| Situación | Default | Configurable |
+|-----------|---------|:------------:|
+| Ganador correcto | 0 | ✅ |
+| Pronosticaste empate y acertás | 0 | ✅ |
+| Pronosticaste empate y no acertás | 0 (sin penalidad) | — |
+| Ganador incorrecto (no empate) | 0 (sin penalidad) | — |
+| Resultado exacto (ambos goles) | +3 | ✅ |
+| Goles exactos de un equipo | +1 por equipo (máx +2) | ✅ |
+| Diferencia de goles correcta (legacy) | 0 | ✅ |
+| Diferencia de goles incorrecta (legacy) | 0 | ✅ |
+| **Bonus cercanía dif. de gol** | **+3** | ✅ |
+| Victoria por penales correcta | ×2 al total del partido | ✅ |
+| Derrota por penales | equivale a empate | — |
+
+**Bonus cercanía diferencia de gol (nueva regla):**
+```
+bonus = points_goal_diff_proximity - abs(dif_pronosticada - dif_real)
+```
+Donde `dif = goles_local - goles_visitante` (con signo). Sin piso negativo.
+
+Ejemplo: Resultado real Argentina 3 - Argelia 1 (dif_real = +2), base = 3:
+- Pronóstico 2-0 o 3-1 (dif +2) → distancia 0 → **+3 pts**
+- Pronóstico 1-0 (dif +1) → distancia 1 → **+2 pts**
+- Pronóstico 4-0 (dif +4) o 2-2 (dif 0) → distancia 2 → **+1 pt**
+- Pronóstico Argelia 1-0 (dif -1) → distancia 3 → **0 pts**
+- Pronóstico Argelia 3-0 (dif -3) → distancia 5 → **-2 pts**
+
+> Las reglas legacy de diferencia (+1/-1 por gol) se mantienen en 0 por defecto pero el owner puede activarlas. Ambas reglas se suman.
+
+**Multiplicadores por fase** (editables):
+| Fase | Mult. default |
+|------|--------------|
+| Fase de grupos | ×1 |
+| 16avos | ×2 |
+| 8avos | ×3 |
+| Cuartos | ×4 |
+| Semis | ×5 |
+| Final | ×6 |
+| 3°/4° puesto | ×1 (sin multiplicador) |
+
+**Bloqueo:** 1 hora antes de **cada partido** individualmente. Los pronósticos de ese partido se vuelven visibles para todos a partir del kickoff.
 
 ---
 
