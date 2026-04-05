@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
@@ -57,7 +58,9 @@ export default function PosicionesPredictionsPage({ tournament }) {
   const [podium, setPodium] = useState({ champion: null, runner_up: null, third: null, fourth: null })
   const [loading, setLoading] = useState(true)
   const [saveStatus, setSaveStatus] = useState(null) // 'saving' | 'saved' | null
-  const [dragState, setDragState] = useState(null) // { group, fromIdx }
+  // dragging: { group, fromIdx, currentIdx, cloneTop, cloneLeft, cloneWidth, itemHeight, teamId }
+  const [dragging, setDragging] = useState(null)
+  const dragRef = useRef(null)   // mutable data, no re-render on every pointermove
   const timeoutRef = useRef(null)
 
   const locked = tournament.locked_at && new Date(tournament.locked_at) <= new Date()
@@ -129,31 +132,78 @@ export default function PosicionesPredictionsPage({ tournament }) {
     }
   }
 
-  // ── Drag helpers ──────────────────────────────────────────
-  function onDragStart(e, group, fromIdx) {
-    if (e.dataTransfer) {
-      e.dataTransfer.effectAllowed = 'move'
-      // Hide the browser's native semi-transparent ghost with a 1×1 transparent GIF
-      const ghost = new Image()
-      ghost.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
-      e.dataTransfer.setDragImage(ghost, 0, 0)
+  // ── Pointer-based drag (mouse + touch, Android-style) ────────────────
+  const ITEM_GAP = 6 // px — matches gap: '0.375rem' at 16px base
+
+  function startDrag(e, group, idx) {
+    if (locked) return
+    if (e.pointerType === 'mouse' && e.button !== 0) return
+    e.preventDefault()
+
+    const el = e.currentTarget
+    const rect = el.getBoundingClientRect()
+    const count = groupRanks[group]?.length ?? 4
+    const teamId = groupRanks[group][idx]
+
+    el.setPointerCapture(e.pointerId)
+
+    dragRef.current = {
+      group, fromIdx: idx, count,
+      startClientY: e.clientY,
+      itemHeight: rect.height,
+      cloneInitialTop: rect.top,
+      cloneLeft: rect.left,
+      cloneWidth: rect.width,
     }
-    setDragState({ group, fromIdx })
+
+    setDragging({
+      group, fromIdx: idx, currentIdx: idx, teamId,
+      cloneTop: rect.top,
+      cloneLeft: rect.left,
+      cloneWidth: rect.width,
+      itemHeight: rect.height,
+    })
   }
 
-  function onDragEnd() {
-    setDragState(null)
+  function moveDrag(e) {
+    const d = dragRef.current
+    if (!d) return
+    const delta = e.clientY - d.startClientY
+    const step = d.itemHeight + ITEM_GAP
+    const newIdx = Math.max(0, Math.min(d.count - 1, Math.round(d.fromIdx + delta / step)))
+    d.currentIdx = newIdx  // keep ref in sync so endDrag always reads the latest value
+    setDragging(prev => prev ? { ...prev, currentIdx: newIdx, cloneTop: d.cloneInitialTop + delta } : null)
   }
-  function onDragOver(group, toIdx) {
-    if (!dragState || dragState.group !== group || dragState.fromIdx === toIdx) return
-    setGroupRanks(prev => {
-      const arr = [...prev[group]]
-      const [moved] = arr.splice(dragState.fromIdx, 1)
-      arr.splice(toIdx, 0, moved)
-      return { ...prev, [group]: arr }
-    })
-    setDragState({ group, fromIdx: toIdx })
-    triggerAutoSave()
+
+  function endDrag() {
+    const d = dragRef.current
+    if (!d) return
+    dragRef.current = null
+
+    // Read final position from the ref (never stale) before clearing
+    const finalIdx = d.currentIdx ?? d.fromIdx
+    setDragging(null)
+
+    if (finalIdx !== d.fromIdx) {
+      setGroupRanks(ranks => {
+        const arr = [...ranks[d.group]]
+        const [moved] = arr.splice(d.fromIdx, 1)
+        arr.splice(finalIdx, 0, moved)
+        return { ...ranks, [d.group]: arr }
+      })
+      triggerAutoSave()
+    }
+  }
+
+  // Compute how much each item should shift vertically during drag
+  function getItemTranslateY(group, idx) {
+    if (!dragging || dragging.group !== group) return 0
+    const { fromIdx, currentIdx, itemHeight } = dragging
+    const step = itemHeight + ITEM_GAP
+    if (idx === fromIdx) return 0
+    if (currentIdx > fromIdx && idx > fromIdx && idx <= currentIdx) return -step
+    if (currentIdx < fromIdx && idx >= currentIdx && idx < fromIdx) return step
+    return 0
   }
 
   // ── Touch reorder (tap arrows) ───────────────────────────
@@ -260,26 +310,28 @@ export default function PosicionesPredictionsPage({ tournament }) {
                 {(groupRanks[group] ?? []).map((teamId, idx) => {
                   const team = teamsByGroup[group].find(t => t.id === teamId)
                   if (!team) return null
+                  const isBeingDragged = dragging?.group === group && dragging?.fromIdx === idx
+                  const translateY = getItemTranslateY(group, idx)
                   return (
                     <div
                       key={teamId}
-                      draggable={!locked}
-                      onDragStart={(e) => onDragStart(e, group, idx)}
-                      onDragEnd={onDragEnd}
-                      onDrop={onDragEnd}
-                      onDragOver={e => { e.preventDefault(); onDragOver(group, idx) }}
+                      onPointerDown={locked ? undefined : (e) => startDrag(e, group, idx)}
+                      onPointerMove={locked ? undefined : moveDrag}
+                      onPointerUp={locked ? undefined : endDrag}
+                      onPointerCancel={locked ? undefined : endDrag}
                       style={{
                         display: 'flex', alignItems: 'center', gap: '0.75rem',
                         padding: '0.55rem 0.875rem',
                         borderRadius: 'var(--r-md)',
                         background: 'var(--surface-2)',
                         border: '1.5px solid var(--border)',
-                        cursor: locked ? 'default' : (dragState?.group === group && dragState?.fromIdx === idx ? 'grabbing' : 'grab'),
+                        cursor: locked ? 'default' : 'grab',
                         userSelect: 'none',
-                        transition: 'box-shadow 0.15s, border-color 0.15s',
-                        opacity: 1,
-                        boxShadow: dragState?.group === group && dragState?.fromIdx === idx ? '0 6px 20px rgba(0,0,0,0.45)' : 'none',
-                        borderColor: dragState?.group === group && dragState?.fromIdx === idx ? 'var(--primary)' : 'var(--border)',
+                        touchAction: 'none',
+                        opacity: isBeingDragged ? 0 : 1,
+                        transform: `translateY(${translateY}px)`,
+                        transition: isBeingDragged ? 'none' : 'transform 0.15s ease',
+                        willChange: 'transform',
                       }}
                     >
                       <span style={{ 
@@ -394,6 +446,44 @@ export default function PosicionesPredictionsPage({ tournament }) {
 
         {/* Manual save button removed for auto-save */}
       </div>
+
+      {/* Floating drag clone — follows pointer, always solid */}
+      {dragging && (() => {
+        const team = teamsByGroup[dragging.group]?.find(tm => tm.id === dragging.teamId)
+        if (!team) return null
+        return createPortal(
+          <div style={{
+            position: 'fixed',
+            top: dragging.cloneTop,
+            left: dragging.cloneLeft,
+            width: dragging.cloneWidth,
+            zIndex: 9999,
+            pointerEvents: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.75rem',
+            padding: '0.55rem 0.875rem',
+            borderRadius: 'var(--r-md)',
+            background: 'var(--surface-2)',
+            border: '1.5px solid var(--primary)',
+            boxShadow: '0 8px 28px rgba(0,0,0,0.55)',
+            boxSizing: 'border-box',
+          }}>
+            <span style={{
+              fontSize: '0.9rem', fontWeight: 800, color: 'var(--text-muted)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: 'var(--surface-3)', height: '24px', width: '24px', borderRadius: '50%',
+            }}>{dragging.fromIdx + 1}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', flex: 1 }}>
+              <TeamFlag code={team.code} />
+              <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>
+                {t(`teams.${team.code}`, { defaultValue: team.name })}
+              </span>
+            </div>
+          </div>,
+          document.body
+        )
+      })()}
     </AppShell>
   )
 }
