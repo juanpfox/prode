@@ -103,7 +103,7 @@ export default function PredictionsPage() {
       if (tr?.mode === 'partidos') {
         const { data: ms } = await supabase
           .from('matches')
-          .select('*, home_team:teams!home_team_id(name, code, group_name), away_team:teams!away_team_id(name, code, group_name)')
+          .select('*, home_team:teams!home_team_id(name, code, group_name, initial_position), away_team:teams!away_team_id(name, code, group_name, initial_position)')
           .eq('competition_id', tr?.competition_id)
           .order('kickoff_at')
         setMatches(ms ?? [])
@@ -240,10 +240,10 @@ export default function PredictionsPage() {
     groupMatches.forEach(m => {
       // Initialize rows if they don't exist
       if (m.home_team && !table[m.home_team_id]) {
-        table[m.home_team_id] = { id: m.home_team_id, code: m.home_team.code, name: m.home_team.name, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0, pts: 0 }
+        table[m.home_team_id] = { id: m.home_team_id, code: m.home_team.code, name: m.home_team.name, initial_position: m.home_team.initial_position, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0, pts: 0 }
       }
       if (m.away_team && !table[m.away_team_id]) {
-        table[m.away_team_id] = { id: m.away_team_id, code: m.away_team.code, name: m.away_team.name, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0, pts: 0 }
+        table[m.away_team_id] = { id: m.away_team_id, code: m.away_team.code, name: m.away_team.name, initial_position: m.away_team.initial_position, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0, pts: 0 }
       }
 
       const p = preds[m.id]
@@ -259,7 +259,7 @@ export default function PredictionsPage() {
       }
     })
     return Object.values(table).map(t => ({ ...t, dg: t.gf - t.gc }))
-      .sort((a,b) => b.pts - a.pts || b.dg - a.dg || b.gf - a.gf)
+      .sort((a,b) => b.pts - a.pts || b.dg - a.dg || b.gf - a.gf || (a.initial_position - b.initial_position))
   }
 
   const groupMatches = matches.filter(m => m.stage === 'group')

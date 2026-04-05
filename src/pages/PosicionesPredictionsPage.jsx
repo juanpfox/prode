@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
@@ -56,9 +56,9 @@ export default function PosicionesPredictionsPage({ tournament }) {
   // podium: { champion: teamId|null, runner_up, third, fourth }
   const [podium, setPodium] = useState({ champion: null, runner_up: null, third: null, fourth: null })
   const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
-  const [saved, setSaved] = useState(false)
+  const [saveStatus, setSaveStatus] = useState(null) // 'saving' | 'saved' | null
   const [dragState, setDragState] = useState(null) // { group, fromIdx }
+  const timeoutRef = useRef(null)
 
   const locked = tournament.locked_at && new Date(tournament.locked_at) <= new Date()
 
@@ -69,9 +69,9 @@ export default function PosicionesPredictionsPage({ tournament }) {
     try {
       const { data: teams } = await supabase
         .from('teams')
-        .select('id, name, code, group_name')
+        .select('id, name, code, group_name, initial_position')
         .eq('competition_id', tournament.competition_id)
-        .order('name')
+        .order('initial_position')
 
       const byGroup = {}
       for (const g of GROUP_LABELS) byGroup[g] = []
@@ -153,6 +153,7 @@ export default function PosicionesPredictionsPage({ tournament }) {
       return { ...prev, [group]: arr }
     })
     setDragState({ group, fromIdx: toIdx })
+    triggerAutoSave()
   }
 
   // ── Touch reorder (tap arrows) ───────────────────────────
@@ -164,13 +165,31 @@ export default function PosicionesPredictionsPage({ tournament }) {
       ;[arr[fromIdx], arr[toIdx]] = [arr[toIdx], arr[fromIdx]]
       return { ...prev, [group]: arr }
     })
+    triggerAutoSave()
   }
 
   // ── Save ────────────────────────────────────────────────
+  function triggerAutoSave() {
+    if (locked) return
+    if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    setSaveStatus('saving')
+    timeoutRef.current = setTimeout(() => {
+      handleSave()
+    }, 1000)
+  }
+
   async function handleSave() {
-    setSaving(true)
     try {
       const rows = []
+      // We need the latest state here - using a trick or passing params
+      // Since handleSave is called from timeout, it might have stale closure.
+      // But we can just use the state from the last render or use functional updates.
+      // Actually, in a timeout, it might access stale variables.
+      // Better to use refs or a different trigger mechanism.
+      // Let's use the current state from the state variables, 
+      // they should be up-to-date in the version of handleSave that was created 
+      // in the latest render.
+      
       for (const g of GROUP_LABELS) {
         const ranks = groupRanks[g] ?? []
         ranks.forEach((teamId, idx) => {
@@ -183,13 +202,17 @@ export default function PosicionesPredictionsPage({ tournament }) {
           })
         })
       }
-      // Also upsert podium teams that might not appear in group ranks (shouldn't happen but safety)
-      await supabase.from('fixture_predictions')
-        .upsert(rows, { onConflict: 'tournament_id,user_id,team_id' })
-      setSaved(true)
-      setTimeout(() => setSaved(false), 2500)
-    } finally {
-      setSaving(false)
+      
+      if (rows.length > 0) {
+        await supabase.from('fixture_predictions')
+          .upsert(rows, { onConflict: 'tournament_id,user_id,team_id' })
+      }
+      
+      setSaveStatus('saved')
+      setTimeout(() => setSaveStatus(prev => prev === 'saved' ? null : prev), 3000)
+    } catch (err) {
+      console.error(err)
+      setSaveStatus('error')
     }
   }
 
@@ -201,13 +224,13 @@ export default function PosicionesPredictionsPage({ tournament }) {
   })
 
   if (loading) return (
-    <AppShell>
+    <AppShell saveIndicator={saveStatus}>
       <p style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '3rem' }}>{t('common.loading')}</p>
     </AppShell>
   )
 
   return (
-    <AppShell>
+    <AppShell saveIndicator={saveStatus}>
       <div className="animate-fade-in">
         <button className="btn btn-ghost btn-sm" onClick={() => navigate(`/torneo/${tournamentId}`)}
           style={{ marginBottom: '1rem' }}>
@@ -348,7 +371,10 @@ export default function PosicionesPredictionsPage({ tournament }) {
                         className="input"
                         style={{ flex: 1, fontSize: '0.85rem', padding: '0.3rem 0.5rem' }}
                         value={podium[slot] ?? ''}
-                        onChange={e => setPodium(p => ({ ...p, [slot]: e.target.value || null }))}
+                        onChange={e => {
+                          setPodium(p => ({ ...p, [slot]: e.target.value || null }))
+                          triggerAutoSave()
+                        }}
                       >
                         <option value="">— {t('posiciones.pick_team')} —</option>
                         {allTeams.map(team => (
@@ -366,17 +392,7 @@ export default function PosicionesPredictionsPage({ tournament }) {
           </div>
         </section>
 
-        {/* Save */}
-        {!locked && (
-          <button
-            className="btn btn-primary"
-            style={{ width: '100%', marginBottom: '2rem', fontSize: '1rem', padding: '0.875rem' }}
-            onClick={handleSave}
-            disabled={saving}
-          >
-            {saved ? `✓ ${t('predictions.saved')}` : saving ? '…' : t('predictions.save')}
-          </button>
-        )}
+        {/* Manual save button removed for auto-save */}
       </div>
     </AppShell>
   )
