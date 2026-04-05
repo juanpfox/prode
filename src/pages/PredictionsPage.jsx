@@ -619,7 +619,8 @@ function MatchCard({ match, pred, locked, saving, saved, onChange, onSave, t }) 
   )
 }
 
-function GoalInput({ val, onChange }) {
+function GoalInput({ val, onChange, matchId, side }) {
+  const inputRef = useRef(null)
   const num = val === '' ? null : parseInt(val)
   const inc = () => onChange(String(num === null ? 1 : Math.min(20, num + 1)))
   const dec = () => {
@@ -627,13 +628,63 @@ function GoalInput({ val, onChange }) {
     else if (num > 0) onChange(String(num - 1))
   }
 
+  const getAllInputs = () => Array.from(document.querySelectorAll('.goal-input-field'))
+
+  const handleKeyDown = (e) => {
+    const inputs = getAllInputs()
+    const idx = inputs.indexOf(inputRef.current)
+    if (idx === -1) return
+
+    let targetIdx = -1
+
+    if (e.key === 'ArrowRight' || (e.key === 'Tab' && !e.shiftKey)) {
+      e.preventDefault()
+      targetIdx = idx + 1
+    } else if (e.key === 'ArrowLeft' || (e.key === 'Tab' && e.shiftKey)) {
+      e.preventDefault()
+      targetIdx = idx - 1
+    } else if (e.key === 'ArrowDown' || e.key === 'Enter') {
+      e.preventDefault()
+      // Jump 2 positions down (same column: home→home or away→away)
+      targetIdx = idx + 2
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      targetIdx = idx - 2
+    } else {
+      return
+    }
+
+    if (targetIdx >= 0 && targetIdx < inputs.length) {
+      inputs[targetIdx].focus()
+      inputs[targetIdx].select()
+    }
+  }
+
+  const handleChange = (e) => {
+    const raw = e.target.value.replace(/[^0-9]/g, '')
+    if (raw === '') {
+      onChange('')
+    } else {
+      const n = Math.min(20, parseInt(raw))
+      onChange(String(n))
+    }
+  }
+
   return (
     <div className="goal-input-wrapper">
-      <button className="goal-input-btn" onClick={dec}>−</button>
-      <div className="goal-input-val">
-        {num !== null ? num : ''}
-      </div>
-      <button className="goal-input-btn" onClick={inc}>+</button>
+      <button className="goal-input-btn" tabIndex={-1} onClick={dec}>−</button>
+      <input
+        ref={inputRef}
+        type="text"
+        inputMode="numeric"
+        className="goal-input-val goal-input-field"
+        value={num !== null ? num : ''}
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
+        onFocus={(e) => e.target.select()}
+        autoComplete="off"
+      />
+      <button className="goal-input-btn" tabIndex={-1} onClick={inc}>+</button>
     </div>
   )
 }
