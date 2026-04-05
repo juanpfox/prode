@@ -638,11 +638,13 @@ body {
   display: grid;
   grid-template-columns: 1fr;
   gap: 1.25rem;
+  padding-inline: 1.25rem;
 }
 
 @media (min-width: 640px) {
   .posiciones-groups-grid {
     grid-template-columns: repeat(2, 1fr);
+    padding-inline: 0;
   }
 }
 
