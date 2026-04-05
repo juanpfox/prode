@@ -439,8 +439,26 @@ body {
   background: var(--surface-3);
   border-left: 1px solid var(--border);
   border-right: 1px solid var(--border);
+  border-top: none;
+  border-bottom: none;
   min-width: 2rem;
+  max-width: 2.5rem;
   line-height: 1.8rem;
+  outline: none;
+  font-family: inherit;
+  -moz-appearance: textfield;
+}
+.goal-input-val::-webkit-outer-spin-button,
+.goal-input-val::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.goal-input-val:focus {
+  background: var(--surface);
+  box-shadow: 0 0 0 2px var(--primary);
+  border-color: var(--primary);
+  position: relative;
+  z-index: 1;
 }
 
 @media (max-width: 480px) {
