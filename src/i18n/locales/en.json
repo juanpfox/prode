@@ -89,7 +89,8 @@
     "leave_tournament": "Leave tournament",
     "confirm_leave": "Are you sure you want to leave this tournament?",
     "leave_confirm_btn": "Yes, leave",
-    "invite_btn": "Invite"
+    "invite_btn": "Invite",
+    "prize_placeholder": "🏅 Prize for the winner (optional)"
   },
   "nav": {
     "home": "Home",
