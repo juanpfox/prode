@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase'
 import AppShell from '../components/AppShell'
 import TournamentCard from '../components/TournamentCard'
 import ConfigTab from '../components/ConfigTab'
+import '../components/config-rules.css'
 
 export default function TournamentsPage() {
   const { t } = useTranslation()
