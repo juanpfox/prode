@@ -88,26 +88,32 @@ function MatchRules({ config, t }) {
         </div>
       )}
 
-      {/* Example */}
-      <div className="rules-section">
-        <h3>{t('rules.example_title')}</h3>
-        <div className="rules-example">
-          <p>
-            <strong>{t('rules.example_match_label')}</strong> Argentina 2-1 Brasil ({t('rules.phase_qf')})
-          </p>
-          <p>
-            <strong>{t('rules.example_prediction_label')}</strong> Argentina 3-1 Brasil
-          </p>
-          <p style={{ marginTop: '0.5rem' }}>
-            {t('rules.example_correct_winner')}: <span className="highlight">+{c.pts_win}</span><br />
-            {t('rules.example_exact_one')}: <span className="highlight">+{c.pts_exact_one}</span> (Brasil: 1)<br />
-            {t('rules.example_diff')}: {t('rules.example_diff_detail', { predicted: 2, actual: 1, pts: c.pts_diff_wrong })}<br />
-            {t('rules.example_subtotal')}: <span className="highlight">{c.pts_win + c.pts_exact_one + c.pts_diff_wrong}</span><br />
-            {t('rules.example_multiplier')}: ×{c.mult_qf}<br />
-            <strong>{t('rules.example_total')}: <span className="highlight">{(c.pts_win + c.pts_exact_one + c.pts_diff_wrong) * c.mult_qf} pts</span></strong>
-          </p>
-        </div>
-      </div>
+      {/* Example — only shown if at least one scoring rule is non-zero */}
+      {scoringRows.length > 0 && (() => {
+        const subtotal = (c.pts_win ?? 0) + (c.pts_exact_one ?? 0) + (c.pts_diff_wrong ?? 0)
+        const mult = c.mult_qf > 1 ? c.mult_qf : 1
+        return (
+          <div className="rules-section">
+            <h3>{t('rules.example_title')}</h3>
+            <div className="rules-example">
+              <p>
+                <strong>{t('rules.example_match_label')}</strong> Argentina 2-1 Brasil ({t('rules.phase_qf')})
+              </p>
+              <p>
+                <strong>{t('rules.example_prediction_label')}</strong> Argentina 3-1 Brasil
+              </p>
+              <p style={{ marginTop: '0.5rem' }}>
+                {c.pts_win > 0 && <>{t('rules.example_correct_winner')}: <span className="highlight">+{c.pts_win}</span><br /></>}
+                {c.pts_exact_one > 0 && <>{t('rules.example_exact_one')}: <span className="highlight">+{c.pts_exact_one}</span> (Brasil: 1)<br /></>}
+                {c.pts_diff_wrong !== 0 && <>{t('rules.example_diff')}: {t('rules.example_diff_detail', { predicted: 2, actual: 1, pts: c.pts_diff_wrong })}<br /></>}
+                {t('rules.example_subtotal')}: <span className="highlight">{subtotal}</span><br />
+                {mult > 1 && <>{t('rules.example_multiplier')}: ×{mult}<br /></>}
+                <strong>{t('rules.example_total')}: <span className="highlight">{subtotal * mult} pts</span></strong>
+              </p>
+            </div>
+          </div>
+        )
+      })()}
     </>
   )
 }
