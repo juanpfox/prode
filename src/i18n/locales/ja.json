@@ -49,7 +49,8 @@
     "leave_tournament": "トーナメントを退出",
     "confirm_leave": "このトーナメントを退出してもよろしいですか？",
     "leave_confirm_btn": "はい、退出する",
-    "invite_btn": "招待"
+    "invite_btn": "招待",
+    "prize_placeholder": "🏅 優勝者への賞品（任意）"
   },
   "nav": {
     "home": "ホーム",
