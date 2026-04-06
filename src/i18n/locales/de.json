@@ -17,7 +17,8 @@
     "loading": "Laden...",
     "sign_out": "Abmelden",
     "error_generic": "Etwas ist schiefgelaufen, bitte versuche es erneut",
-    "cancel": "Abbrechen"
+    "cancel": "Abbrechen",
+    "close": "Schließen"
   },
   "modes": {
     "posiciones": "Tabellen",
@@ -47,7 +48,8 @@
     "reinvite_player": "Erneut einladen",
     "leave_tournament": "Turnier verlassen",
     "confirm_leave": "Möchtest du dieses Turnier wirklich verlassen?",
-    "leave_confirm_btn": "Ja, verlassen"
+    "leave_confirm_btn": "Ja, verlassen",
+    "invite_btn": "Einladen"
   },
   "nav": {
     "home": "Start",
