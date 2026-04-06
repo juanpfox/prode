@@ -30,6 +30,24 @@ export default function RulesPage({ tournamentId, mode, config: propConfig }) {
 
 function MatchRules({ config, t }) {
   const c = config
+
+  // Rows filtered to non-zero values
+  const scoringRows = [
+    { label: t('rules.match_correct_winner'),  value: c.pts_win,          fmt: v => `+${v}` },
+    { label: t('rules.match_draw_correct'),    value: c.pts_win,          fmt: v => `+${v}` },
+    { label: t('rules.match_exact_both'),      value: c.pts_exact_both,   fmt: v => `+${v}` },
+    { label: t('rules.match_exact_one'),       value: c.pts_exact_one,    fmt: v => `+${v} ${t('rules.per_team')}` },
+    { label: t('rules.match_diff_correct'),    value: c.pts_diff_correct, fmt: v => `+${v} ${t('rules.per_goal')}` },
+    { label: t('rules.match_diff_wrong'),      value: c.pts_diff_wrong,   fmt: v => `${v} ${t('rules.per_goal')}` },
+  ].filter(r => r.value !== 0 && r.value !== null && r.value !== undefined)
+
+  const multRows = [
+    { label: t('rules.phase_r16'),   value: c.mult_r16 },
+    { label: t('rules.phase_qf'),    value: c.mult_qf },
+    { label: t('rules.phase_sf'),    value: c.mult_sf },
+    { label: t('rules.phase_final'), value: c.mult_final },
+  ].filter(r => r.value && r.value !== 1)
+
   return (
     <>
       {/* Points table */}
@@ -43,38 +61,32 @@ function MatchRules({ config, t }) {
             </tr>
           </thead>
           <tbody>
-            <tr><td>{t('rules.match_correct_winner')}</td><td>+{c.pts_win}</td></tr>
-            <tr><td>{t('rules.match_draw_correct')}</td><td>+{c.pts_win}</td></tr>
-            <tr><td>{t('rules.match_draw_wrong')}</td><td>0</td></tr>
-            <tr><td>{t('rules.match_wrong_winner')}</td><td>0</td></tr>
-            <tr><td>{t('rules.match_exact_both')}</td><td>+{c.pts_exact_both}</td></tr>
-            <tr><td>{t('rules.match_exact_one')}</td><td>+{c.pts_exact_one} {t('rules.per_team')}</td></tr>
-            <tr><td>{t('rules.match_diff_correct')}</td><td>+{c.pts_diff_correct} {t('rules.per_goal')}</td></tr>
-            <tr><td>{t('rules.match_diff_wrong')}</td><td>{c.pts_diff_wrong} {t('rules.per_goal')}</td></tr>
+            {scoringRows.map((r, i) => (
+              <tr key={i}><td>{r.label}</td><td>{r.fmt(r.value)}</td></tr>
+            ))}
           </tbody>
         </table>
       </div>
 
-      {/* Phase multipliers */}
-      <div className="rules-section">
-        <h3>{t('rules.multipliers_title')}</h3>
-        <table className="rules-table">
-          <thead>
-            <tr>
-              <th>{t('rules.phase')}</th>
-              <th>{t('rules.multiplier')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td>{t('rules.phase_group')}</td><td>×1</td></tr>
-            <tr><td>{t('rules.phase_r16')}</td><td>×{c.mult_r16}</td></tr>
-            <tr><td>{t('rules.phase_qf')}</td><td>×{c.mult_qf}</td></tr>
-            <tr><td>{t('rules.phase_sf')}</td><td>×{c.mult_sf}</td></tr>
-            <tr><td>{t('rules.phase_final')}</td><td>×{c.mult_final}</td></tr>
-            <tr><td>{t('rules.phase_third')}</td><td>×1</td></tr>
-          </tbody>
-        </table>
-      </div>
+      {/* Phase multipliers — only show if any differ from ×1 */}
+      {multRows.length > 0 && (
+        <div className="rules-section">
+          <h3>{t('rules.multipliers_title')}</h3>
+          <table className="rules-table">
+            <thead>
+              <tr>
+                <th>{t('rules.phase')}</th>
+                <th>{t('rules.multiplier')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {multRows.map((r, i) => (
+                <tr key={i}><td>{r.label}</td><td>×{r.value}</td></tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {/* Example */}
       <div className="rules-section">
@@ -102,84 +114,85 @@ function MatchRules({ config, t }) {
 
 function PosicionesRules({ config, t }) {
   const c = config
+
+  const groupRows = [
+    { label: t('rules.pos_1st'), value: c.mult_group_1st },
+    { label: t('rules.pos_2nd'), value: c.mult_group_2nd },
+    { label: t('rules.pos_3rd'), value: c.mult_group_3rd },
+  ].filter(r => r.value !== 0 && r.value !== null && r.value !== undefined)
+
+  const worldRows = [
+    { label: `🥇 ${t('rules.pos_champion')}`,    value: c.mult_world_1st },
+    { label: `🥈 ${t('rules.pos_runner_up')}`,   value: c.mult_world_2nd },
+    { label: `🥉 ${t('rules.pos_third_place')}`, value: c.mult_world_3rd },
+    { label: `4° ${t('rules.pos_fourth')}`,       value: c.mult_world_4th },
+  ].filter(r => r.value !== 0 && r.value !== null && r.value !== undefined)
+
+  const matchRows = [
+    { label: t('rules.pos_win'),     value: c.pts_win },
+    { label: t('rules.pos_win_pen'), value: c.pts_win_pen },
+    { label: t('rules.pos_draw'),    value: c.pts_draw },
+  ].filter(r => r.value !== 0 && r.value !== null && r.value !== undefined)
+
+  const bonusRows = [
+    { label: t('rules.pos_exact_position'),  value: c.pts_position_exact },
+    { label: t('rules.pos_semifinalist'),    value: c.pts_semifinalist },
+    { label: t('rules.pos_finalist'),        value: c.pts_finalist },
+    { label: t('rules.pos_champion_bonus'),  value: c.pts_champion_bonus },
+  ].filter(r => r.value !== 0 && r.value !== null && r.value !== undefined)
+
   return (
     <>
-      {/* Group multipliers */}
-      <div className="rules-section">
-        <h3>{t('rules.pos_group_mult_title')}</h3>
-        <table className="rules-table">
-          <thead>
-            <tr>
-              <th>{t('rules.position')}</th>
-              <th>{t('rules.multiplier')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td>{t('rules.pos_1st')}</td><td>×{c.mult_group_1st}</td></tr>
-            <tr><td>{t('rules.pos_2nd')}</td><td>×{c.mult_group_2nd}</td></tr>
-            <tr><td>{t('rules.pos_3rd')}</td><td>×{c.mult_group_3rd}</td></tr>
-          </tbody>
-        </table>
-      </div>
+      {groupRows.length > 0 && (
+        <div className="rules-section">
+          <h3>{t('rules.pos_group_mult_title')}</h3>
+          <table className="rules-table">
+            <thead><tr><th>{t('rules.position')}</th><th>{t('rules.multiplier')}</th></tr></thead>
+            <tbody>
+              {groupRows.map((r, i) => <tr key={i}><td>{r.label}</td><td>×{r.value}</td></tr>)}
+            </tbody>
+          </table>
+        </div>
+      )}
 
-      {/* World multipliers */}
-      <div className="rules-section">
-        <h3>{t('rules.pos_world_mult_title')}</h3>
-        <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
-          {t('rules.pos_world_mult_note')}
-        </p>
-        <table className="rules-table">
-          <thead>
-            <tr>
-              <th>{t('rules.position')}</th>
-              <th>{t('rules.multiplier')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td>🥇 {t('rules.pos_champion')}</td><td>×{c.mult_world_1st}</td></tr>
-            <tr><td>🥈 {t('rules.pos_runner_up')}</td><td>×{c.mult_world_2nd}</td></tr>
-            <tr><td>🥉 {t('rules.pos_third_place')}</td><td>×{c.mult_world_3rd}</td></tr>
-            <tr><td>4° {t('rules.pos_fourth')}</td><td>×{c.mult_world_4th}</td></tr>
-          </tbody>
-        </table>
-      </div>
+      {worldRows.length > 0 && (
+        <div className="rules-section">
+          <h3>{t('rules.pos_world_mult_title')}</h3>
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
+            {t('rules.pos_world_mult_note')}
+          </p>
+          <table className="rules-table">
+            <thead><tr><th>{t('rules.position')}</th><th>{t('rules.multiplier')}</th></tr></thead>
+            <tbody>
+              {worldRows.map((r, i) => <tr key={i}><td>{r.label}</td><td>×{r.value}</td></tr>)}
+            </tbody>
+          </table>
+        </div>
+      )}
 
-      {/* Match points within posiciones mode */}
-      <div className="rules-section">
-        <h3>{t('rules.pos_match_points_title')}</h3>
-        <table className="rules-table">
-          <thead>
-            <tr>
-              <th>{t('rules.result')}</th>
-              <th>{t('rules.points')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td>{t('rules.pos_win')}</td><td>+{c.pts_win}</td></tr>
-            <tr><td>{t('rules.pos_win_pen')}</td><td>+{c.pts_win_pen}</td></tr>
-            <tr><td>{t('rules.pos_draw')}</td><td>+{c.pts_draw}</td></tr>
-          </tbody>
-        </table>
-      </div>
+      {matchRows.length > 0 && (
+        <div className="rules-section">
+          <h3>{t('rules.pos_match_points_title')}</h3>
+          <table className="rules-table">
+            <thead><tr><th>{t('rules.result')}</th><th>{t('rules.points')}</th></tr></thead>
+            <tbody>
+              {matchRows.map((r, i) => <tr key={i}><td>{r.label}</td><td>+{r.value}</td></tr>)}
+            </tbody>
+          </table>
+        </div>
+      )}
 
-      {/* Bonus points */}
-      <div className="rules-section">
-        <h3>{t('rules.pos_bonus_title')}</h3>
-        <table className="rules-table">
-          <thead>
-            <tr>
-              <th>{t('rules.achievement')}</th>
-              <th>{t('rules.points')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td>{t('rules.pos_exact_position')}</td><td>+{c.pts_position_exact}</td></tr>
-            <tr><td>{t('rules.pos_semifinalist')}</td><td>+{c.pts_semifinalist}</td></tr>
-            <tr><td>{t('rules.pos_finalist')}</td><td>+{c.pts_finalist}</td></tr>
-            <tr><td>{t('rules.pos_champion_bonus')}</td><td>+{c.pts_champion_bonus}</td></tr>
-          </tbody>
-        </table>
-      </div>
+      {bonusRows.length > 0 && (
+        <div className="rules-section">
+          <h3>{t('rules.pos_bonus_title')}</h3>
+          <table className="rules-table">
+            <thead><tr><th>{t('rules.achievement')}</th><th>{t('rules.points')}</th></tr></thead>
+            <tbody>
+              {bonusRows.map((r, i) => <tr key={i}><td>{r.label}</td><td>+{r.value}</td></tr>)}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {/* Example */}
       <div className="rules-section">
