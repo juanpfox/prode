@@ -22,7 +22,8 @@
     "approve": "Aprobar",
     "save": "Guardar",
     "you": "vos",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "close": "Cerrar"
   },
   "home": {
     "competitions": "Competiciones"
@@ -87,7 +88,8 @@
     "reinvite_player": "Reinvitar",
     "leave_tournament": "Salir del torneo",
     "confirm_leave": "¿Estás seguro que querés salir de este torneo?",
-    "leave_confirm_btn": "Sí, salir"
+    "leave_confirm_btn": "Sí, salir",
+    "invite_btn": "Invitar"
   },
   "nav": {
     "home": "Inicio",
