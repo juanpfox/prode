@@ -16,7 +16,8 @@
   "common": {
     "loading": "Carregando...",
     "sign_out": "Sair",
-    "error_generic": "Algo deu errado, tente novamente"
+    "error_generic": "Algo deu errado, tente novamente",
+    "cancel": "Cancelar"
   },
   "modes": {
     "posiciones": "Posições",
@@ -36,7 +37,17 @@
     "join": "Entrar em um torneio",
     "empty": "Você não participa de nenhum torneio ainda",
     "players": "{{count}} jogador",
-    "players_plural": "{{count}} jogadores"
+    "players_plural": "{{count}} jogadores",
+    "ban_player": "Remover do torneio",
+    "confirm_ban": "Remover este jogador? Ele não poderá ver nem entrar no torneio (você pode desbloquear depois).",
+    "banned_msg": "Você foi removido deste torneio.",
+    "banned_list": "Bloqueados",
+    "no_banned": "Nenhum usuário bloqueado.",
+    "unban_player": "Desbloquear",
+    "reinvite_player": "Reconvidar",
+    "leave_tournament": "Sair do torneio",
+    "confirm_leave": "Tem certeza que quer sair deste torneio?",
+    "leave_confirm_btn": "Sim, sair"
   },
   "nav": {
     "home": "Início",
