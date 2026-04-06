@@ -24,6 +24,7 @@ export default function TournamentDetailPage() {
   const [showInviteCode, setShowInviteCode] = useState(false)
   const [updating, setUpdating] = useState(false)
   const [editName, setEditName] = useState('')
+  const [editPrize, setEditPrize] = useState('')
   const [showBanned, setShowBanned] = useState(false)
   const [confirmLeave, setConfirmLeave] = useState(false)
 
@@ -38,6 +39,7 @@ export default function TournamentDetailPage() {
         .eq('id', id).single()
       setTournament(tr)
       setEditName(tr?.name ?? '')
+      setEditPrize(tr?.prize ?? '')
 
       const { data: pls } = await supabase
         .from('tournament_players')
@@ -97,6 +99,24 @@ export default function TournamentDetailPage() {
         .eq('id', id)
       if (error) throw error
       setTournament(prev => ({ ...prev, name: editName.trim() }))
+    } catch {
+      alert(t('common.error_generic'))
+    } finally {
+      setUpdating(false)
+    }
+  }
+
+  async function updatePrize() {
+    const trimmed = editPrize.trim()
+    if (trimmed === (tournament.prize ?? '')) return
+    setUpdating(true)
+    try {
+      const { error } = await supabase
+        .from('tournaments')
+        .update({ prize: trimmed || null })
+        .eq('id', id)
+      if (error) throw error
+      setTournament(prev => ({ ...prev, prize: trimmed || null }))
     } catch {
       alert(t('common.error_generic'))
     } finally {
@@ -424,7 +444,7 @@ export default function TournamentDetailPage() {
                 {/* Tournament settings */}
                 <div className="card card-sm" style={{ marginTop: '1rem' }}>
                   <h3 style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '1rem' }}>{t('tournaments.tournament_name')}</h3>
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem' }}>
                     <input
                       className="input"
                       value={editName}
@@ -440,6 +460,28 @@ export default function TournamentDetailPage() {
                       {updating ? '…' : t('common.save')}
                     </button>
                   </div>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <input
+                      className="input"
+                      value={editPrize}
+                      onChange={e => setEditPrize(e.target.value.slice(0, 100))}
+                      placeholder={t('tournaments.prize_placeholder')}
+                      maxLength={100}
+                      style={{ flex: 1, fontSize: '0.9rem' }}
+                    />
+                    <button
+                      className="btn btn-primary btn-sm"
+                      onClick={updatePrize}
+                      disabled={updating || editPrize.trim() === (tournament.prize ?? '')}
+                    >
+                      {updating ? '…' : t('common.save')}
+                    </button>
+                  </div>
+                  {editPrize.trim() && (
+                    <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.3rem', textAlign: 'right' }}>
+                      {editPrize.trim().length}/100
+                    </p>
+                  )}
                 </div>
 
                 <div className="card card-sm" style={{ marginTop: '1rem' }}>
