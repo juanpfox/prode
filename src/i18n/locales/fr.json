@@ -16,7 +16,8 @@
   "common": {
     "loading": "Chargement...",
     "sign_out": "Déconnexion",
-    "error_generic": "Une erreur s'est produite, veuillez réessayer"
+    "error_generic": "Une erreur s'est produite, veuillez réessayer",
+    "cancel": "Annuler"
   },
   "modes": {
     "posiciones": "Classements",
@@ -36,7 +37,17 @@
     "join": "Rejoindre un tournoi",
     "empty": "Vous ne participez à aucun tournoi pour l'instant",
     "players": "{{count}} joueur",
-    "players_plural": "{{count}} joueurs"
+    "players_plural": "{{count}} joueurs",
+    "ban_player": "Retirer du tournoi",
+    "confirm_ban": "Retirer ce joueur ? Il ne pourra plus voir ni rejoindre le tournoi (vous pouvez le débloquer plus tard).",
+    "banned_msg": "Vous avez été retiré de ce tournoi.",
+    "banned_list": "Bloqués",
+    "no_banned": "Aucun utilisateur bloqué.",
+    "unban_player": "Débloquer",
+    "reinvite_player": "Réinviter",
+    "leave_tournament": "Quitter le tournoi",
+    "confirm_leave": "Êtes-vous sûr de vouloir quitter ce tournoi ?",
+    "leave_confirm_btn": "Oui, quitter"
   },
   "nav": {
     "home": "Accueil",
