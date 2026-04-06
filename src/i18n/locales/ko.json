@@ -17,7 +17,8 @@
     "loading": "로딩 중...",
     "sign_out": "로그아웃",
     "error_generic": "오류가 발생했습니다. 다시 시도해 주세요",
-    "cancel": "취소"
+    "cancel": "취소",
+    "close": "닫기"
   },
   "modes": {
     "posiciones": "순위표",
@@ -47,7 +48,8 @@
     "reinvite_player": "재초대",
     "leave_tournament": "토너먼트 나가기",
     "confirm_leave": "정말 이 토너먼트에서 나가시겠습니까?",
-    "leave_confirm_btn": "네, 나가기"
+    "leave_confirm_btn": "네, 나가기",
+    "invite_btn": "초대"
   },
   "nav": {
     "home": "홈",
