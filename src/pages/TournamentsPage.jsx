@@ -21,6 +21,7 @@ export default function TournamentsPage() {
   const [joining, setJoining] = useState(false)
   const [createForm, setCreateForm] = useState({
     name: '',
+    prize: '',
     competition_id: searchParams.get('comp') ?? '',
     mode: '',
     is_public: false,
@@ -89,6 +90,7 @@ export default function TournamentsPage() {
         .from('tournaments')
         .insert({
           name: createForm.name.trim(),
+          prize: createForm.prize.trim() || null,
           competition_id: createForm.competition_id,
           created_by: user.id,
           mode: effectiveMode,
@@ -98,7 +100,7 @@ export default function TournamentsPage() {
         .select('id').single()
       if (err) throw err
       setShowCreate(false)
-      setCreateForm({ name: '', competition_id: '', mode: '', is_public: false, requires_approval: false })
+      setCreateForm({ name: '', prize: '', competition_id: '', mode: '', is_public: false, requires_approval: false })
       await loadData()
       navigate(`/torneo/${data.id}`)
     } catch (err) {
@@ -189,6 +191,10 @@ export default function TournamentsPage() {
               <input className="input" placeholder={t('tournaments.name_placeholder')}
                 value={createForm.name} required
                 onChange={e => setCreateForm(f => ({ ...f, name: e.target.value }))} />
+              <input className="input" placeholder={t('tournaments.prize_placeholder')}
+                value={createForm.prize} maxLength={100}
+                onChange={e => setCreateForm(f => ({ ...f, prize: e.target.value }))}
+                style={{ fontSize: '0.9rem' }} />
               <select className="input" value={createForm.competition_id} required
                 onChange={e => setCreateForm(f => ({
                   ...f,
