@@ -17,7 +17,8 @@
     "loading": "Chargement...",
     "sign_out": "Déconnexion",
     "error_generic": "Une erreur s'est produite, veuillez réessayer",
-    "cancel": "Annuler"
+    "cancel": "Annuler",
+    "close": "Fermer"
   },
   "modes": {
     "posiciones": "Classements",
@@ -47,7 +48,8 @@
     "reinvite_player": "Réinviter",
     "leave_tournament": "Quitter le tournoi",
     "confirm_leave": "Êtes-vous sûr de vouloir quitter ce tournoi ?",
-    "leave_confirm_btn": "Oui, quitter"
+    "leave_confirm_btn": "Oui, quitter",
+    "invite_btn": "Inviter"
   },
   "nav": {
     "home": "Accueil",
