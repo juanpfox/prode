@@ -32,14 +32,15 @@ function MatchRules({ config, t }) {
   const c = config
 
   // Rows filtered to non-zero values
+  const isNonZero = v => v !== 0 && v !== null && v !== undefined
   const scoringRows = [
-    { label: t('rules.match_correct_winner'),  value: c.pts_win,          fmt: v => `+${v}` },
-    { label: t('rules.match_draw_correct'),    value: c.pts_win,          fmt: v => `+${v}` },
-    { label: t('rules.match_exact_both'),      value: c.pts_exact_both,   fmt: v => `+${v}` },
-    { label: t('rules.match_exact_one'),       value: c.pts_exact_one,    fmt: v => `+${v} ${t('rules.per_team')}` },
-    { label: t('rules.match_diff_correct'),    value: c.pts_diff_correct, fmt: v => `+${v} ${t('rules.per_goal')}` },
-    { label: t('rules.match_diff_wrong'),      value: c.pts_diff_wrong,   fmt: v => `${v} ${t('rules.per_goal')}` },
-  ].filter(r => r.value !== 0 && r.value !== null && r.value !== undefined)
+    { label: t('rules.match_correct_winner'),  value: c.pts_win,                       fmt: v => `+${v}` },
+    { label: t('rules.match_draw_correct'),    value: c.pts_draw_correct ?? c.pts_win, fmt: v => `+${v}` },
+    { label: t('rules.match_exact_both'),      value: c.pts_exact_both,                fmt: v => `+${v}` },
+    { label: t('rules.match_exact_one'),       value: c.pts_exact_one,                 fmt: v => `+${v} ${t('rules.per_team')}` },
+    { label: t('rules.match_diff_correct'),    value: c.pts_diff_correct,              fmt: v => `+${v} ${t('rules.per_goal')}` },
+    { label: t('rules.match_diff_wrong'),      value: c.pts_diff_wrong,                fmt: v => `${v} ${t('rules.per_goal')}` },
+  ].filter(r => isNonZero(r.value))
 
   const multRows = [
     { label: t('rules.phase_r16'),   value: c.mult_r16 },
@@ -120,32 +121,33 @@ function MatchRules({ config, t }) {
 
 function PosicionesRules({ config, t }) {
   const c = config
+  const isNonZero = v => v !== 0 && v !== null && v !== undefined
 
   const groupRows = [
     { label: t('rules.pos_1st'), value: c.mult_group_1st },
     { label: t('rules.pos_2nd'), value: c.mult_group_2nd },
     { label: t('rules.pos_3rd'), value: c.mult_group_3rd },
-  ].filter(r => r.value !== 0 && r.value !== null && r.value !== undefined)
+  ].filter(r => isNonZero(r.value))
 
   const worldRows = [
     { label: `🥇 ${t('rules.pos_champion')}`,    value: c.mult_world_1st },
     { label: `🥈 ${t('rules.pos_runner_up')}`,   value: c.mult_world_2nd },
     { label: `🥉 ${t('rules.pos_third_place')}`, value: c.mult_world_3rd },
     { label: `4° ${t('rules.pos_fourth')}`,       value: c.mult_world_4th },
-  ].filter(r => r.value !== 0 && r.value !== null && r.value !== undefined)
+  ].filter(r => isNonZero(r.value))
 
   const matchRows = [
     { label: t('rules.pos_win'),     value: c.pts_win },
     { label: t('rules.pos_win_pen'), value: c.pts_win_pen },
     { label: t('rules.pos_draw'),    value: c.pts_draw },
-  ].filter(r => r.value !== 0 && r.value !== null && r.value !== undefined)
+  ].filter(r => isNonZero(r.value))
 
   const bonusRows = [
     { label: t('rules.pos_exact_position'),  value: c.pts_position_exact },
     { label: t('rules.pos_semifinalist'),    value: c.pts_semifinalist },
     { label: t('rules.pos_finalist'),        value: c.pts_finalist },
     { label: t('rules.pos_champion_bonus'),  value: c.pts_champion_bonus },
-  ].filter(r => r.value !== 0 && r.value !== null && r.value !== undefined)
+  ].filter(r => isNonZero(r.value))
 
   return (
     <>
