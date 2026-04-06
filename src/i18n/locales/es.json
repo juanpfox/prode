@@ -21,7 +21,8 @@
     "back": "Volver",
     "approve": "Aprobar",
     "save": "Guardar",
-    "you": "vos"
+    "you": "vos",
+    "cancel": "Cancelar"
   },
   "home": {
     "competitions": "Competiciones"
@@ -76,7 +77,17 @@
     "approval_required_desc": "Tenés que aprobar a cada jugador",
     "auto_join": "Libre (Auto)",
     "auto_join_desc": "Se unen directo con el código/link",
-    "approve_all": "Aprobar todos"
+    "approve_all": "Aprobar todos",
+    "ban_player": "Eliminar del torneo",
+    "confirm_ban": "¿Eliminás a este jugador del torneo? No podrá verlo ni unirse de nuevo (podés desbloquearlo después).",
+    "banned_msg": "Fuiste removido de este torneo.",
+    "banned_list": "Bloqueados",
+    "no_banned": "No hay usuarios bloqueados.",
+    "unban_player": "Desbloquear",
+    "reinvite_player": "Reinvitar",
+    "leave_tournament": "Salir del torneo",
+    "confirm_leave": "¿Estás seguro que querés salir de este torneo?",
+    "leave_confirm_btn": "Sí, salir"
   },
   "nav": {
     "home": "Inicio",
