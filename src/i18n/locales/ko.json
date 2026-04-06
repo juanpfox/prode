@@ -16,7 +16,8 @@
   "common": {
     "loading": "로딩 중...",
     "sign_out": "로그아웃",
-    "error_generic": "오류가 발생했습니다. 다시 시도해 주세요"
+    "error_generic": "오류가 발생했습니다. 다시 시도해 주세요",
+    "cancel": "취소"
   },
   "modes": {
     "posiciones": "순위표",
@@ -36,7 +37,17 @@
     "join": "토너먼트 참여",
     "empty": "아직 참여 중인 토너먼트가 없습니다",
     "players": "{{count}}명",
-    "players_plural": "{{count}}명"
+    "players_plural": "{{count}}명",
+    "ban_player": "토너먼트에서 제거",
+    "confirm_ban": "이 플레이어를 제거하시겠습니까? 나중에 차단 해제할 수 있습니다.",
+    "banned_msg": "이 토너먼트에서 제거되었습니다.",
+    "banned_list": "차단된 사용자",
+    "no_banned": "차단된 사용자가 없습니다.",
+    "unban_player": "차단 해제",
+    "reinvite_player": "재초대",
+    "leave_tournament": "토너먼트 나가기",
+    "confirm_leave": "정말 이 토너먼트에서 나가시겠습니까?",
+    "leave_confirm_btn": "네, 나가기"
   },
   "nav": {
     "home": "홈",
