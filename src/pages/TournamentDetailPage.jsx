@@ -295,9 +295,10 @@ export default function TournamentDetailPage() {
                 className="btn btn-ghost btn-sm"
                 onClick={() => setShowInviteCode(v => !v)}
                 title={t('tournaments.invite_code')}
-                style={{ fontSize: '1.2rem', padding: '0.25rem 0.5rem' }}
+                style={{ fontSize: '0.85rem', padding: '0.3rem 0.6rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
               >
-                {showInviteCode ? '✕' : '📨'}
+                <span>📨</span>
+                <span>{showInviteCode ? t('common.close') : t('tournaments.invite_btn')}</span>
               </button>
             )}
           </div>
