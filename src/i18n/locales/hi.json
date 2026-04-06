@@ -17,7 +17,8 @@
     "loading": "लोड हो रहा है...",
     "sign_out": "साइन आउट",
     "error_generic": "कुछ गलत हो गया, फिर से कोशिश करें",
-    "cancel": "रद्द करें"
+    "cancel": "रद्द करें",
+    "close": "बंद करें"
   },
   "modes": {
     "posiciones": "स्टैंडिंग",
@@ -47,7 +48,8 @@
     "reinvite_player": "फिर से आमंत्रित करें",
     "leave_tournament": "टूर्नामेंट छोड़ें",
     "confirm_leave": "क्या आप वाकई इस टूर्नामेंट को छोड़ना चाहते हैं?",
-    "leave_confirm_btn": "हाँ, छोड़ें"
+    "leave_confirm_btn": "हाँ, छोड़ें",
+    "invite_btn": "आमंत्रित करें"
   },
   "nav": {
     "home": "होम",
