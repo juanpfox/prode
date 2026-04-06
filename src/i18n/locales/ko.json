@@ -49,7 +49,8 @@
     "leave_tournament": "토너먼트 나가기",
     "confirm_leave": "정말 이 토너먼트에서 나가시겠습니까?",
     "leave_confirm_btn": "네, 나가기",
-    "invite_btn": "초대"
+    "invite_btn": "초대",
+    "prize_placeholder": "🏅 우승자 상품 (선택)"
   },
   "nav": {
     "home": "홈",
