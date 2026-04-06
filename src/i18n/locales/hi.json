@@ -49,7 +49,8 @@
     "leave_tournament": "टूर्नामेंट छोड़ें",
     "confirm_leave": "क्या आप वाकई इस टूर्नामेंट को छोड़ना चाहते हैं?",
     "leave_confirm_btn": "हाँ, छोड़ें",
-    "invite_btn": "आमंत्रित करें"
+    "invite_btn": "आमंत्रित करें",
+    "prize_placeholder": "🏅 विजेता के लिए पुरस्कार (वैकल्पिक)"
   },
   "nav": {
     "home": "होम",
