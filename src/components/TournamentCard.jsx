@@ -96,6 +96,17 @@ export default function TournamentCard({ tournament, onDeleteSuccess }) {
             </span>
           )}
         </div>
+        {tournament.prize && (
+          <p style={{
+            fontSize: '0.75rem', marginTop: '0.15rem',
+            color: 'var(--text-muted)',
+            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+            maxWidth: '100%'
+          }}>
+            <span style={{ marginRight: '0.25rem' }}>🏅</span>
+            {tournament.prize}
+          </p>
+        )}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', marginTop: '0.4rem', flexWrap: 'wrap' }}>
           {tournament.creator_name && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: 'var(--text-subtle)', fontSize: '0.75rem' }}>
