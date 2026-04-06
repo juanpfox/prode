@@ -17,7 +17,8 @@
     "loading": "読み込み中...",
     "sign_out": "サインアウト",
     "error_generic": "エラーが発生しました。もう一度お試しください",
-    "cancel": "キャンセル"
+    "cancel": "キャンセル",
+    "close": "閉じる"
   },
   "modes": {
     "posiciones": "順位表",
@@ -47,7 +48,8 @@
     "reinvite_player": "再招待",
     "leave_tournament": "トーナメントを退出",
     "confirm_leave": "このトーナメントを退出してもよろしいですか？",
-    "leave_confirm_btn": "はい、退出する"
+    "leave_confirm_btn": "はい、退出する",
+    "invite_btn": "招待"
   },
   "nav": {
     "home": "ホーム",
