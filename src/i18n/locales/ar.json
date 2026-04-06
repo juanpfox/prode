@@ -49,7 +49,8 @@
     "leave_tournament": "مغادرة البطولة",
     "confirm_leave": "هل أنت متأكد أنك تريد مغادرة البطولة؟",
     "leave_confirm_btn": "نعم، مغادرة",
-    "invite_btn": "دعوة"
+    "invite_btn": "دعوة",
+    "prize_placeholder": "🏅 جائزة الفائز (اختياري)"
   },
   "nav": {
     "home": "الرئيسية",
