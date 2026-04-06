@@ -23,6 +23,8 @@ export default function TournamentDetailPage() {
   const [copied, setCopied] = useState(false)
   const [updating, setUpdating] = useState(false)
   const [editName, setEditName] = useState('')
+  const [showBanned, setShowBanned] = useState(false)
+  const [confirmLeave, setConfirmLeave] = useState(false)
 
   useEffect(() => { loadTournament() }, [id])
 
@@ -52,14 +54,13 @@ export default function TournamentDetailPage() {
       const me = pls?.find(p => p.user_id === user.id)
       let myCurrentStatus = me?.status ?? null
 
-      // Fix for legacy players: if pending but tournament is auto-join, auto-approve them
       if (myCurrentStatus === 'pending' && !tr.requires_approval) {
         await supabase.from('tournament_players')
           .update({ status: 'approved' })
           .eq('tournament_id', id)
           .eq('user_id', user.id)
         myCurrentStatus = 'approved'
-        me.status = 'approved' // ensure local array is also updated
+        me.status = 'approved'
       }
 
       setMyRole(me?.role ?? null)
@@ -78,13 +79,13 @@ export default function TournamentDetailPage() {
         .eq('id', id)
       if (error) throw error
       setTournament(prev => ({ ...prev, is_public: isPublic }))
-    } catch (err) {
+    } catch {
       alert(t('common.error_generic'))
     } finally {
       setUpdating(false)
     }
   }
-  
+
   async function updateName() {
     if (!editName.trim() || editName === tournament.name) return
     setUpdating(true)
@@ -95,7 +96,7 @@ export default function TournamentDetailPage() {
         .eq('id', id)
       if (error) throw error
       setTournament(prev => ({ ...prev, name: editName.trim() }))
-    } catch (err) {
+    } catch {
       alert(t('common.error_generic'))
     } finally {
       setUpdating(false)
@@ -111,18 +112,14 @@ export default function TournamentDetailPage() {
         .eq('id', id)
       if (error) throw error
       setTournament(prev => ({ ...prev, requires_approval: requires }))
-
-      // If switching to Auto (requires=false), auto-approve all pending players
       if (!requires) {
         await supabase.from('tournament_players')
           .update({ status: 'approved' })
           .eq('tournament_id', id)
           .eq('status', 'pending')
-        
-        // Reload to update UI lists
         loadTournament()
       }
-    } catch (err) {
+    } catch {
       alert(t('common.error_generic'))
     } finally {
       setUpdating(false)
@@ -137,7 +134,7 @@ export default function TournamentDetailPage() {
         .eq('tournament_id', id).eq('status', 'pending')
       if (error) throw error
       loadTournament()
-    } catch (err) {
+    } catch {
       alert(t('common.error_generic'))
     } finally {
       setUpdating(false)
@@ -158,6 +155,71 @@ export default function TournamentDetailPage() {
     loadTournament()
   }
 
+  async function banPlayer(userId) {
+    if (!window.confirm(t('tournaments.confirm_ban'))) return
+    setUpdating(true)
+    try {
+      const { error } = await supabase.rpc('ban_tournament_player', {
+        p_tournament_id: id,
+        p_user_id: userId,
+      })
+      if (error) throw error
+      loadTournament()
+    } catch {
+      alert(t('common.error_generic'))
+    } finally {
+      setUpdating(false)
+    }
+  }
+
+  async function unbanPlayer(userId) {
+    setUpdating(true)
+    try {
+      const { error } = await supabase.rpc('unban_tournament_player', {
+        p_tournament_id: id,
+        p_user_id: userId,
+      })
+      if (error) throw error
+      loadTournament()
+    } catch {
+      alert(t('common.error_generic'))
+    } finally {
+      setUpdating(false)
+    }
+  }
+
+  async function reinvitePlayer(userId) {
+    setUpdating(true)
+    try {
+      const { error } = await supabase.rpc('reinvite_tournament_player', {
+        p_tournament_id: id,
+        p_user_id: userId,
+      })
+      if (error) throw error
+      loadTournament()
+    } catch {
+      alert(t('common.error_generic'))
+    } finally {
+      setUpdating(false)
+    }
+  }
+
+  async function leaveTournament() {
+    setUpdating(true)
+    try {
+      const { error } = await supabase.rpc('leave_tournament', {
+        p_tournament_id: id,
+      })
+      if (error) throw error
+      navigate('/')
+    } catch {
+      alert(t('common.error_generic'))
+    } finally {
+      setUpdating(false)
+      setConfirmLeave(false)
+    }
+  }
+
   async function joinTournament() {
     setUpdating(true)
     try {
@@ -170,7 +232,7 @@ export default function TournamentDetailPage() {
         })
       if (error) throw error
       loadTournament()
-    } catch (err) {
+    } catch {
       alert(t('common.error_generic'))
     } finally {
       setUpdating(false)
@@ -194,11 +256,12 @@ export default function TournamentDetailPage() {
     </AppShell>
   )
 
-  const approved  = players.filter(p => p.status === 'approved')
-  const pending   = players.filter(p => p.status === 'pending')
+  const approved = players.filter(p => p.status === 'approved')
+  const pending  = players.filter(p => p.status === 'pending')
+  const banned   = players.filter(p => p.status === 'banned')
   const isApproved = myStatus === 'approved'
   const isPending  = myStatus === 'pending'
-  const modes = tournament.competitions?.available_modes ?? []
+  const isBanned   = myStatus === 'banned'
 
   return (
     <AppShell>
@@ -239,6 +302,13 @@ export default function TournamentDetailPage() {
             </div>
           )}
 
+          {isBanned && (
+            <div style={{ marginTop: '0.75rem', padding: '0.625rem', background: '#fee2e2',
+                borderRadius: 'var(--r-md)', color: '#991b1b', fontSize: '0.875rem' }}>
+              🚫 {t('tournaments.banned_msg')}
+            </div>
+          )}
+
           {isPending && (
             <div style={{ marginTop: '0.75rem', padding: '0.625rem', background: '#fef3c7',
                 borderRadius: 'var(--r-md)', color: '#92400e', fontSize: '0.875rem' }}>
@@ -246,7 +316,7 @@ export default function TournamentDetailPage() {
             </div>
           )}
 
-          {!isApproved && !isPending && (
+          {!isApproved && !isPending && !isBanned && (
             <button className="btn btn-primary" style={{ width: '100%', marginTop: '0.875rem' }}
               onClick={joinTournament} disabled={updating}>
               {updating ? '…' : t('tournaments.join_btn')}
@@ -254,7 +324,7 @@ export default function TournamentDetailPage() {
           )}
         </div>
 
-        {/* Predictions CTA — approved players only */}
+        {/* Predictions CTA */}
         {isApproved && (tournament.mode === 'partidos' || tournament.mode === 'posiciones') && (
           <button
             className="btn btn-primary"
@@ -264,23 +334,30 @@ export default function TournamentDetailPage() {
           </button>
         )}
 
-        {/* Tabs — only for approved users */}
+        {/* Tabs */}
         {isApproved && (
           <>
-            <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '1px solid var(--border)', marginBottom: '1.25rem', paddingBottom: '0.25rem' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '1px solid var(--border)', marginBottom: '1.25rem', paddingBottom: '0.25rem', overflowX: 'auto' }}>
               {['leaderboard', 'players', 'rules', ...(myRole === 'admin' ? ['config', 'settings'] : [])].map(tId => (
                 <button
                   key={tId}
                   className={`btn btn-sm ${tab === tId ? 'btn-primary' : 'btn-ghost'}`}
-                  style={{ borderBottom: tab === tId ? '2px solid var(--primary)' : 'none', borderRadius: 0 }}
+                  style={{ borderBottom: tab === tId ? '2px solid var(--primary)' : 'none', borderRadius: 0, whiteSpace: 'nowrap' }}
                   onClick={() => setTab(tId)}
                 >
-                  {tId === 'leaderboard' ? '📊' : tId === 'players' ? '👥' : tId === 'rules' ? '📖' : tId === 'config' ? '🎛️' : '⚙️'} 
-                  <span style={{ marginLeft: '0.4rem' }}>{tId === 'leaderboard' ? t('nav.leaderboard') : tId === 'players' ? t('tournaments.tab_mine') : tId === 'rules' ? t('config.tab_rules') : tId === 'config' ? t('config.tab_config') : t('actions.settings')}</span>
+                  {tId === 'leaderboard' ? '📊' : tId === 'players' ? '👥' : tId === 'rules' ? '📖' : tId === 'config' ? '🎛️' : '⚙️'}
+                  <span style={{ marginLeft: '0.4rem' }}>
+                    {tId === 'leaderboard' ? t('nav.leaderboard')
+                      : tId === 'players' ? t('tournaments.tab_mine')
+                      : tId === 'rules' ? t('config.tab_rules')
+                      : tId === 'config' ? t('config.tab_config')
+                      : t('actions.settings')}
+                  </span>
                 </button>
               ))}
             </div>
 
+            {/* LEADERBOARD TAB */}
             {tab === 'leaderboard' && (
               <section>
                 {scores.length === 0 ? (
@@ -314,6 +391,7 @@ export default function TournamentDetailPage() {
               </section>
             )}
 
+            {/* PLAYERS TAB */}
             {tab === 'players' && (
               <section>
                 {/* Pending approvals (admin only) */}
@@ -342,6 +420,7 @@ export default function TournamentDetailPage() {
                   </div>
                 )}
 
+                {/* Approved players */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   {approved.map((p, i) => (
                     <div key={p.user_id} className="card card-sm"
@@ -358,9 +437,108 @@ export default function TournamentDetailPage() {
                         )}
                       </span>
                       <span className={`badge ${p.role === 'admin' ? 'badge-green' : 'badge-gray'}`}>{p.role}</span>
+                      {/* Ban button — admin only, not on self */}
+                      {myRole === 'admin' && p.user_id !== user.id && p.role !== 'admin' && (
+                        <button
+                          className="btn btn-ghost btn-sm"
+                          onClick={() => banPlayer(p.user_id)}
+                          disabled={updating}
+                          title={t('tournaments.ban_player')}
+                          style={{ padding: '0.25rem 0.5rem', color: 'var(--error, #ef4444)' }}
+                        >
+                          🚫
+                        </button>
+                      )}
                     </div>
                   ))}
                 </div>
+
+                {/* Leave tournament — player only */}
+                {myRole !== 'admin' && (
+                  <div style={{ marginTop: '2rem' }}>
+                    {!confirmLeave ? (
+                      <button
+                        className="btn btn-ghost btn-sm"
+                        onClick={() => setConfirmLeave(true)}
+                        style={{ color: 'var(--error, #ef4444)', border: '1px solid var(--error, #ef4444)', width: '100%' }}
+                      >
+                        {t('tournaments.leave_tournament')}
+                      </button>
+                    ) : (
+                      <div className="card card-sm" style={{ border: '1px solid var(--error, #ef4444)', textAlign: 'center' }}>
+                        <p style={{ fontWeight: 600, marginBottom: '0.75rem', fontSize: '0.9rem' }}>
+                          {t('tournaments.confirm_leave')}
+                        </p>
+                        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
+                          <button className="btn btn-ghost btn-sm" onClick={() => setConfirmLeave(false)}>
+                            {t('common.cancel')}
+                          </button>
+                          <button
+                            className="btn btn-sm"
+                            onClick={leaveTournament}
+                            disabled={updating}
+                            style={{ background: 'var(--error, #ef4444)', color: '#fff', border: 'none' }}
+                          >
+                            {updating ? '…' : t('tournaments.leave_confirm_btn')}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Banned list (admin only) */}
+                {myRole === 'admin' && (
+                  <div style={{ marginTop: '2rem' }}>
+                    <button
+                      className="btn btn-ghost btn-sm"
+                      onClick={() => setShowBanned(v => !v)}
+                      style={{ width: '100%', justifyContent: 'space-between', display: 'flex', alignItems: 'center' }}
+                    >
+                      <span>🚫 {t('tournaments.banned_list')} ({banned.length})</span>
+                      <span>{showBanned ? '▲' : '▼'}</span>
+                    </button>
+
+                    {showBanned && (
+                      <div style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                        {banned.length === 0 ? (
+                          <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', textAlign: 'center', padding: '1rem' }}>
+                            {t('tournaments.no_banned')}
+                          </p>
+                        ) : (
+                          banned.map(p => (
+                            <div key={p.user_id} className="card card-sm"
+                              style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', border: '1px solid var(--error, #ef4444)', opacity: 0.85 }}>
+                              <span style={{ flex: 1, fontWeight: 600, color: 'var(--text-muted)' }}>
+                                🚫 {p.users?.display_name ?? 'Usuario'}
+                              </span>
+                              <div style={{ display: 'flex', gap: '0.4rem' }}>
+                                <button
+                                  className="btn btn-ghost btn-sm"
+                                  onClick={() => unbanPlayer(p.user_id)}
+                                  disabled={updating}
+                                  title={t('tournaments.unban_player')}
+                                  style={{ fontSize: '0.75rem' }}
+                                >
+                                  🔓 {t('tournaments.unban_player')}
+                                </button>
+                                <button
+                                  className="btn btn-primary btn-sm"
+                                  onClick={() => reinvitePlayer(p.user_id)}
+                                  disabled={updating}
+                                  title={t('tournaments.reinvite_player')}
+                                  style={{ fontSize: '0.75rem' }}
+                                >
+                                  📨 {t('tournaments.reinvite_player')}
+                                </button>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
               </section>
             )}
 
@@ -381,15 +559,15 @@ export default function TournamentDetailPage() {
                 <div className="card card-sm" style={{ marginBottom: '1rem' }}>
                   <h3 style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '1rem' }}>{t('tournaments.tournament_name')}</h3>
                   <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <input 
-                      className="input" 
-                      value={editName} 
+                    <input
+                      className="input"
+                      value={editName}
                       onChange={e => setEditName(e.target.value)}
                       placeholder={t('tournaments.name_placeholder')}
                       style={{ flex: 1 }}
                     />
-                    <button 
-                      className="btn btn-primary btn-sm" 
+                    <button
+                      className="btn btn-primary btn-sm"
                       onClick={updateName}
                       disabled={updating || !editName.trim() || editName === tournament.name}
                     >
