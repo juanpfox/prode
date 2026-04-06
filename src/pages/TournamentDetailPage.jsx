@@ -16,11 +16,12 @@ export default function TournamentDetailPage() {
   const [tournament, setTournament] = useState(null)
   const [players, setPlayers] = useState([])
   const [scores, setScores] = useState([])
-  const [tab, setTab] = useState('leaderboard') // 'leaderboard' | 'players' | 'settings'
+  const [tab, setTab] = useState('leaderboard') // 'leaderboard' | 'rules' | 'config'
   const [myRole, setMyRole] = useState(null)
   const [myStatus, setMyStatus] = useState(null)
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
+  const [showInviteCode, setShowInviteCode] = useState(false)
   const [updating, setUpdating] = useState(false)
   const [editName, setEditName] = useState('')
   const [showBanned, setShowBanned] = useState(false)
@@ -272,23 +273,40 @@ export default function TournamentDetailPage() {
 
         {/* Header */}
         <div className="card card-sm" style={{ marginBottom: '1.25rem' }}>
-          <h2 style={{ fontWeight: 800, fontSize: '1.125rem', color: 'var(--text)' }}>{tournament.name}</h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginTop: '0.25rem' }}>
-            {tournament.competitions?.name}
-            {tournament.mode && (
-              <span style={{
-                marginLeft: '0.5rem', fontSize: '0.75rem', fontWeight: 700,
-                background: 'var(--primary-subtle)', color: 'var(--primary)',
-                borderRadius: '4px', padding: '0.1rem 0.4rem'
-              }}>
-                {tournament.mode === 'posiciones' ? `🏆 ${t('modes.posiciones_full')}` : `⚽ ${t('modes.partidos_full')}`}
-              </span>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.5rem' }}>
+            <div style={{ flex: 1 }}>
+              <h2 style={{ fontWeight: 800, fontSize: '1.125rem', color: 'var(--text)' }}>{tournament.name}</h2>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginTop: '0.25rem' }}>
+                {tournament.competitions?.name}
+                {tournament.mode && (
+                  <span style={{
+                    marginLeft: '0.5rem', fontSize: '0.75rem', fontWeight: 700,
+                    background: 'var(--primary-subtle)', color: 'var(--primary)',
+                    borderRadius: '4px', padding: '0.1rem 0.4rem'
+                  }}>
+                    {tournament.mode === 'posiciones' ? `🏆 ${t('modes.posiciones_full')}` : `⚽ ${t('modes.partidos_full')}`}
+                  </span>
+                )}
+              </p>
+            </div>
+            {/* Invite code icon */}
+            {tournament.invite_code && isApproved && (
+              <button
+                className="btn btn-ghost btn-sm"
+                onClick={() => setShowInviteCode(v => !v)}
+                title={t('tournaments.invite_code')}
+                style={{ fontSize: '1.2rem', padding: '0.25rem 0.5rem' }}
+              >
+                {showInviteCode ? '✕' : '📨'}
+              </button>
             )}
-          </p>
+          </div>
 
-          {tournament.invite_code && (
+          {/* Invite code — expandible */}
+          {showInviteCode && tournament.invite_code && (
             <div style={{ marginTop: '0.875rem', display: 'flex', alignItems: 'center', gap: '0.75rem',
-                background: 'var(--surface-2)', borderRadius: 'var(--r-md)', padding: '0.625rem 0.875rem' }}>
+                background: 'var(--surface-2)', borderRadius: 'var(--r-md)', padding: '0.625rem 0.875rem',
+                animation: 'fade-in 0.15s ease both' }}>
               <div style={{ flex: 1 }}>
                 <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>
                   {t('tournaments.invite_code')}
@@ -334,23 +352,21 @@ export default function TournamentDetailPage() {
           </button>
         )}
 
-        {/* Tabs */}
+        {/* Tabs: Ranking | Reglas | Configuración (admin) */}
         {isApproved && (
           <>
             <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '1px solid var(--border)', marginBottom: '1.25rem', paddingBottom: '0.25rem', overflowX: 'auto' }}>
-              {['leaderboard', 'players', 'rules', ...(myRole === 'admin' ? ['config', 'settings'] : [])].map(tId => (
+              {['leaderboard', 'rules', ...(myRole === 'admin' ? ['config'] : [])].map(tId => (
                 <button
                   key={tId}
                   className={`btn btn-sm ${tab === tId ? 'btn-primary' : 'btn-ghost'}`}
                   style={{ borderBottom: tab === tId ? '2px solid var(--primary)' : 'none', borderRadius: 0, whiteSpace: 'nowrap' }}
                   onClick={() => setTab(tId)}
                 >
-                  {tId === 'leaderboard' ? '📊' : tId === 'players' ? '👥' : tId === 'rules' ? '📖' : tId === 'config' ? '🎛️' : '⚙️'}
+                  {tId === 'leaderboard' ? '📊' : tId === 'rules' ? '📖' : '⚙️'}
                   <span style={{ marginLeft: '0.4rem' }}>
                     {tId === 'leaderboard' ? t('nav.leaderboard')
-                      : tId === 'players' ? t('tournaments.tab_mine')
                       : tId === 'rules' ? t('config.tab_rules')
-                      : tId === 'config' ? t('config.tab_config')
                       : t('actions.settings')}
                   </span>
                 </button>
@@ -391,172 +407,21 @@ export default function TournamentDetailPage() {
               </section>
             )}
 
-            {/* PLAYERS TAB */}
-            {tab === 'players' && (
-              <section>
-                {/* Pending approvals (admin only) */}
-                {myRole === 'admin' && pending.length > 0 && (
-                  <div style={{ marginBottom: '1.25rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.625rem' }}>
-                      <h4 style={{ fontWeight: 700, fontSize: '0.8rem', color: 'var(--warning)', opacity: 0.9, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                        ⏳ {t('tournaments.pending_approval')} ({pending.length})
-                      </h4>
-                      <button className="btn btn-ghost btn-sm" onClick={approveAllPlayers} disabled={updating}>
-                        {t('tournaments.approve_all')}
-                      </button>
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                      {pending.map(p => (
-                        <div key={p.user_id} className="card card-sm"
-                          style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px dashed var(--warning)' }}>
-                          <span style={{ fontWeight: 600 }}>{p.users?.display_name ?? 'Usuario'}</span>
-                          <div style={{ display: 'flex', gap: '0.4rem' }}>
-                            <button className="btn btn-primary btn-sm" onClick={() => approvePlayer(p.user_id)} style={{ padding: '0.25rem 0.6rem' }}>✓</button>
-                            <button className="btn btn-ghost btn-sm" onClick={() => rejectPlayer(p.user_id)} style={{ padding: '0.25rem 0.6rem' }}>✕</button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Approved players */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  {approved.map((p, i) => (
-                    <div key={p.user_id} className="card card-sm"
-                      style={{ display: 'flex', alignItems: 'center', gap: '0.75rem',
-                        background: p.user_id === user.id ? 'var(--primary-subtle)' : undefined,
-                        border: p.user_id === user.id ? '1px solid var(--primary)' : undefined }}>
-                      <span style={{ color: 'var(--text-muted)', fontSize: '0.875rem', width: '1.25rem' }}>{i + 1}</span>
-                      <span style={{ flex: 1, fontWeight: 600 }}>
-                        {p.users?.display_name ?? 'Usuario'}
-                        {p.user_id === user.id && (
-                          <span style={{ marginLeft: '0.4rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                            ({t('common.you')})
-                          </span>
-                        )}
-                      </span>
-                      <span className={`badge ${p.role === 'admin' ? 'badge-green' : 'badge-gray'}`}>{p.role}</span>
-                      {/* Ban button — admin only, not on self */}
-                      {myRole === 'admin' && p.user_id !== user.id && p.role !== 'admin' && (
-                        <button
-                          className="btn btn-ghost btn-sm"
-                          onClick={() => banPlayer(p.user_id)}
-                          disabled={updating}
-                          title={t('tournaments.ban_player')}
-                          style={{ padding: '0.25rem 0.5rem', color: 'var(--error, #ef4444)' }}
-                        >
-                          🚫
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-
-                {/* Leave tournament — player only */}
-                {myRole !== 'admin' && (
-                  <div style={{ marginTop: '2rem' }}>
-                    {!confirmLeave ? (
-                      <button
-                        className="btn btn-ghost btn-sm"
-                        onClick={() => setConfirmLeave(true)}
-                        style={{ color: 'var(--error, #ef4444)', border: '1px solid var(--error, #ef4444)', width: '100%' }}
-                      >
-                        {t('tournaments.leave_tournament')}
-                      </button>
-                    ) : (
-                      <div className="card card-sm" style={{ border: '1px solid var(--error, #ef4444)', textAlign: 'center' }}>
-                        <p style={{ fontWeight: 600, marginBottom: '0.75rem', fontSize: '0.9rem' }}>
-                          {t('tournaments.confirm_leave')}
-                        </p>
-                        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
-                          <button className="btn btn-ghost btn-sm" onClick={() => setConfirmLeave(false)}>
-                            {t('common.cancel')}
-                          </button>
-                          <button
-                            className="btn btn-sm"
-                            onClick={leaveTournament}
-                            disabled={updating}
-                            style={{ background: 'var(--error, #ef4444)', color: '#fff', border: 'none' }}
-                          >
-                            {updating ? '…' : t('tournaments.leave_confirm_btn')}
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Banned list (admin only) */}
-                {myRole === 'admin' && (
-                  <div style={{ marginTop: '2rem' }}>
-                    <button
-                      className="btn btn-ghost btn-sm"
-                      onClick={() => setShowBanned(v => !v)}
-                      style={{ width: '100%', justifyContent: 'space-between', display: 'flex', alignItems: 'center' }}
-                    >
-                      <span>🚫 {t('tournaments.banned_list')} ({banned.length})</span>
-                      <span>{showBanned ? '▲' : '▼'}</span>
-                    </button>
-
-                    {showBanned && (
-                      <div style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                        {banned.length === 0 ? (
-                          <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', textAlign: 'center', padding: '1rem' }}>
-                            {t('tournaments.no_banned')}
-                          </p>
-                        ) : (
-                          banned.map(p => (
-                            <div key={p.user_id} className="card card-sm"
-                              style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', border: '1px solid var(--error, #ef4444)', opacity: 0.85 }}>
-                              <span style={{ flex: 1, fontWeight: 600, color: 'var(--text-muted)' }}>
-                                🚫 {p.users?.display_name ?? 'Usuario'}
-                              </span>
-                              <div style={{ display: 'flex', gap: '0.4rem' }}>
-                                <button
-                                  className="btn btn-ghost btn-sm"
-                                  onClick={() => unbanPlayer(p.user_id)}
-                                  disabled={updating}
-                                  title={t('tournaments.unban_player')}
-                                  style={{ fontSize: '0.75rem' }}
-                                >
-                                  🔓 {t('tournaments.unban_player')}
-                                </button>
-                                <button
-                                  className="btn btn-primary btn-sm"
-                                  onClick={() => reinvitePlayer(p.user_id)}
-                                  disabled={updating}
-                                  title={t('tournaments.reinvite_player')}
-                                  style={{ fontSize: '0.75rem' }}
-                                >
-                                  📨 {t('tournaments.reinvite_player')}
-                                </button>
-                              </div>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </section>
-            )}
-
             {tab === 'rules' && (
               <section className="animate-slide-up">
                 <RulesPage tournamentId={id} mode={tournament.mode} />
               </section>
             )}
 
+            {/* CONFIG TAB (admin only) — scoring + settings + players */}
             {tab === 'config' && myRole === 'admin' && (
               <section className="animate-slide-up">
-                <ConfigTab tournamentId={id} isAdmin={true} mode={tournament.mode} />
-              </section>
-            )}
 
-            {tab === 'settings' && myRole === 'admin' && (
-              <section className="animate-slide-up">
-                <div className="card card-sm" style={{ marginBottom: '1rem' }}>
+                {/* Scoring config */}
+                <ConfigTab tournamentId={id} isAdmin={true} mode={tournament.mode} />
+
+                {/* Tournament settings */}
+                <div className="card card-sm" style={{ marginTop: '1rem' }}>
                   <h3 style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '1rem' }}>{t('tournaments.tournament_name')}</h3>
                   <div style={{ display: 'flex', gap: '0.5rem' }}>
                     <input
@@ -576,7 +441,7 @@ export default function TournamentDetailPage() {
                   </div>
                 </div>
 
-                <div className="card card-sm">
+                <div className="card card-sm" style={{ marginTop: '1rem' }}>
                   <h3 style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '1rem' }}>{t('tournaments.visibility')}</h3>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
                     {[false, true].map(v => (
@@ -625,7 +490,153 @@ export default function TournamentDetailPage() {
                     ))}
                   </div>
                 </div>
+
+                {/* Players management */}
+                <div style={{ marginTop: '1rem' }}>
+                  {/* Pending approvals */}
+                  {pending.length > 0 && (
+                    <div className="card card-sm" style={{ marginBottom: '0.75rem', border: '1px dashed var(--warning)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.625rem' }}>
+                        <h4 style={{ fontWeight: 700, fontSize: '0.8rem', color: 'var(--warning)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                          ⏳ {t('tournaments.pending_approval')} ({pending.length})
+                        </h4>
+                        <button className="btn btn-ghost btn-sm" onClick={approveAllPlayers} disabled={updating}>
+                          {t('tournaments.approve_all')}
+                        </button>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                        {pending.map(p => (
+                          <div key={p.user_id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{p.users?.display_name ?? 'Usuario'}</span>
+                            <div style={{ display: 'flex', gap: '0.4rem' }}>
+                              <button className="btn btn-primary btn-sm" onClick={() => approvePlayer(p.user_id)} style={{ padding: '0.25rem 0.6rem' }}>✓</button>
+                              <button className="btn btn-ghost btn-sm" onClick={() => rejectPlayer(p.user_id)} style={{ padding: '0.25rem 0.6rem' }}>✕</button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Approved players */}
+                  <div className="card card-sm">
+                    <h4 style={{ fontWeight: 700, fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
+                      👥 {t('tournaments.tab_mine')} ({approved.length})
+                    </h4>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                      {approved.map((p) => (
+                        <div key={p.user_id}
+                          style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                          <span style={{ flex: 1, fontWeight: 600, fontSize: '0.9rem' }}>
+                            {p.users?.display_name ?? 'Usuario'}
+                            {p.user_id === user.id && (
+                              <span style={{ marginLeft: '0.4rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                                ({t('common.you')})
+                              </span>
+                            )}
+                          </span>
+                          <span className={`badge ${p.role === 'admin' ? 'badge-green' : 'badge-gray'}`}>{p.role}</span>
+                          {p.user_id !== user.id && p.role !== 'admin' && (
+                            <button
+                              className="btn btn-ghost btn-sm"
+                              onClick={() => banPlayer(p.user_id)}
+                              disabled={updating}
+                              title={t('tournaments.ban_player')}
+                              style={{ padding: '0.25rem 0.5rem', color: 'var(--error, #ef4444)' }}
+                            >
+                              🚫
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Banned list */}
+                  <div style={{ marginTop: '0.75rem' }}>
+                    <button
+                      className="btn btn-ghost btn-sm"
+                      onClick={() => setShowBanned(v => !v)}
+                      style={{ width: '100%', justifyContent: 'space-between', display: 'flex', alignItems: 'center' }}
+                    >
+                      <span>🚫 {t('tournaments.banned_list')} ({banned.length})</span>
+                      <span>{showBanned ? '▲' : '▼'}</span>
+                    </button>
+
+                    {showBanned && (
+                      <div style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                        {banned.length === 0 ? (
+                          <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', textAlign: 'center', padding: '1rem' }}>
+                            {t('tournaments.no_banned')}
+                          </p>
+                        ) : (
+                          banned.map(p => (
+                            <div key={p.user_id} className="card card-sm"
+                              style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', border: '1px solid var(--error, #ef4444)', opacity: 0.85 }}>
+                              <span style={{ flex: 1, fontWeight: 600, color: 'var(--text-muted)' }}>
+                                🚫 {p.users?.display_name ?? 'Usuario'}
+                              </span>
+                              <div style={{ display: 'flex', gap: '0.4rem' }}>
+                                <button
+                                  className="btn btn-ghost btn-sm"
+                                  onClick={() => unbanPlayer(p.user_id)}
+                                  disabled={updating}
+                                  style={{ fontSize: '0.75rem' }}
+                                >
+                                  🔓 {t('tournaments.unban_player')}
+                                </button>
+                                <button
+                                  className="btn btn-primary btn-sm"
+                                  onClick={() => reinvitePlayer(p.user_id)}
+                                  disabled={updating}
+                                  style={{ fontSize: '0.75rem' }}
+                                >
+                                  📨 {t('tournaments.reinvite_player')}
+                                </button>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
               </section>
+            )}
+
+            {/* Leave tournament — player only (not admin), shown below ranking */}
+            {tab === 'leaderboard' && myRole !== 'admin' && (
+              <div style={{ marginTop: '2rem' }}>
+                {!confirmLeave ? (
+                  <button
+                    className="btn btn-ghost btn-sm"
+                    onClick={() => setConfirmLeave(true)}
+                    style={{ color: 'var(--error, #ef4444)', border: '1px solid var(--error, #ef4444)', width: '100%' }}
+                  >
+                    {t('tournaments.leave_tournament')}
+                  </button>
+                ) : (
+                  <div className="card card-sm" style={{ border: '1px solid var(--error, #ef4444)', textAlign: 'center' }}>
+                    <p style={{ fontWeight: 600, marginBottom: '0.75rem', fontSize: '0.9rem' }}>
+                      {t('tournaments.confirm_leave')}
+                    </p>
+                    <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
+                      <button className="btn btn-ghost btn-sm" onClick={() => setConfirmLeave(false)}>
+                        {t('common.cancel')}
+                      </button>
+                      <button
+                        className="btn btn-sm"
+                        onClick={leaveTournament}
+                        disabled={updating}
+                        style={{ background: 'var(--error, #ef4444)', color: '#fff', border: 'none' }}
+                      >
+                        {updating ? '…' : t('tournaments.leave_confirm_btn')}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             )}
           </>
         )}
