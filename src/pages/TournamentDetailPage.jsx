@@ -434,15 +434,12 @@ export default function TournamentDetailPage() {
               </section>
             )}
 
-            {/* CONFIG TAB (admin only) — scoring + settings + players */}
+            {/* CONFIG TAB (admin only) — settings + scoring + players */}
             {tab === 'config' && myRole === 'admin' && (
               <section className="animate-slide-up">
 
-                {/* Scoring config */}
-                <ConfigTab tournamentId={id} isAdmin={true} mode={tournament.mode} />
-
-                {/* Tournament settings */}
-                <div className="card card-sm" style={{ marginTop: '1rem' }}>
+                {/* Tournament settings: name, prize, visibility, join method */}
+                <div className="card card-sm" style={{ marginBottom: '1rem' }}>
                   <h3 style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '1rem' }}>{t('tournaments.tournament_name')}</h3>
                   <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem' }}>
                     <input
@@ -484,7 +481,7 @@ export default function TournamentDetailPage() {
                   )}
                 </div>
 
-                <div className="card card-sm" style={{ marginTop: '1rem' }}>
+                <div className="card card-sm" style={{ marginBottom: '1rem' }}>
                   <h3 style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '1rem' }}>{t('tournaments.visibility')}</h3>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
                     {[false, true].map(v => (
@@ -509,7 +506,7 @@ export default function TournamentDetailPage() {
                   </div>
                 </div>
 
-                <div className="card card-sm" style={{ marginTop: '1rem' }}>
+                <div className="card card-sm" style={{ marginBottom: '1rem' }}>
                   <h3 style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '1rem' }}>{t('tournaments.join_method')}</h3>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
                     {[false, true].map(v => (
@@ -533,6 +530,9 @@ export default function TournamentDetailPage() {
                     ))}
                   </div>
                 </div>
+
+                {/* Scoring config — points & multipliers */}
+                <ConfigTab tournamentId={id} isAdmin={true} mode={tournament.mode} />
 
                 {/* Players management */}
                 <div style={{ marginTop: '1rem' }}>
