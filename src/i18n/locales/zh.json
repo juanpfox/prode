@@ -49,7 +49,8 @@
     "leave_tournament": "退出联赛",
     "confirm_leave": "确定要退出此联赛吗？",
     "leave_confirm_btn": "是，退出",
-    "invite_btn": "邀请"
+    "invite_btn": "邀请",
+    "prize_placeholder": "🏅 获胜者奖励（可选）"
   },
   "nav": {
     "home": "首页",
