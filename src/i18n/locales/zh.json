@@ -17,7 +17,8 @@
     "loading": "加载中...",
     "sign_out": "退出登录",
     "error_generic": "出现错误，请重试",
-    "cancel": "取消"
+    "cancel": "取消",
+    "close": "关闭"
   },
   "modes": {
     "posiciones": "积分榜",
@@ -47,7 +48,8 @@
     "reinvite_player": "重新邀请",
     "leave_tournament": "退出联赛",
     "confirm_leave": "确定要退出此联赛吗？",
-    "leave_confirm_btn": "是，退出"
+    "leave_confirm_btn": "是，退出",
+    "invite_btn": "邀请"
   },
   "nav": {
     "home": "首页",
