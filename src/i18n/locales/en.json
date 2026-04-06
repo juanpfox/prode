@@ -21,7 +21,8 @@
     "back": "Back",
     "approve": "Approve",
     "save": "Save",
-    "you": "you"
+    "you": "you",
+    "cancel": "Cancel"
   },
   "home": {
     "competitions": "Competitions"
@@ -76,7 +77,17 @@
     "approval_required_desc": "You need to approve each player",
     "auto_join": "Open (Auto)",
     "auto_join_desc": "Anyone with the code joins directly",
-    "approve_all": "Approve all"
+    "approve_all": "Approve all",
+    "ban_player": "Remove from tournament",
+    "confirm_ban": "Remove this player? They won't be able to see or join the tournament (you can unblock them later).",
+    "banned_msg": "You have been removed from this tournament.",
+    "banned_list": "Blocked",
+    "no_banned": "No blocked users.",
+    "unban_player": "Unblock",
+    "reinvite_player": "Reinvite",
+    "leave_tournament": "Leave tournament",
+    "confirm_leave": "Are you sure you want to leave this tournament?",
+    "leave_confirm_btn": "Yes, leave"
   },
   "nav": {
     "home": "Home",
