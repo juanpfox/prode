@@ -49,7 +49,8 @@
     "leave_tournament": "Quitter le tournoi",
     "confirm_leave": "Êtes-vous sûr de vouloir quitter ce tournoi ?",
     "leave_confirm_btn": "Oui, quitter",
-    "invite_btn": "Inviter"
+    "invite_btn": "Inviter",
+    "prize_placeholder": "🏅 Prix pour le gagnant (optionnel)"
   },
   "nav": {
     "home": "Accueil",
