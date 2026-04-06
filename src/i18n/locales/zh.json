@@ -16,7 +16,8 @@
   "common": {
     "loading": "加载中...",
     "sign_out": "退出登录",
-    "error_generic": "出现错误，请重试"
+    "error_generic": "出现错误，请重试",
+    "cancel": "取消"
   },
   "modes": {
     "posiciones": "积分榜",
@@ -36,7 +37,17 @@
     "join": "加入联赛",
     "empty": "您还没有参加任何联赛",
     "players": "{{count}}名球员",
-    "players_plural": "{{count}}名球员"
+    "players_plural": "{{count}}名球员",
+    "ban_player": "从联赛中移除",
+    "confirm_ban": "确定移除此玩家？他们将无法查看或加入联赛（您可以稍后解锁）。",
+    "banned_msg": "您已被移出此联赛。",
+    "banned_list": "已封禁",
+    "no_banned": "没有被封禁的用户。",
+    "unban_player": "解封",
+    "reinvite_player": "重新邀请",
+    "leave_tournament": "退出联赛",
+    "confirm_leave": "确定要退出此联赛吗？",
+    "leave_confirm_btn": "是，退出"
   },
   "nav": {
     "home": "首页",
