@@ -16,7 +16,8 @@
   "common": {
     "loading": "Laden...",
     "sign_out": "Abmelden",
-    "error_generic": "Etwas ist schiefgelaufen, bitte versuche es erneut"
+    "error_generic": "Etwas ist schiefgelaufen, bitte versuche es erneut",
+    "cancel": "Abbrechen"
   },
   "modes": {
     "posiciones": "Tabellen",
@@ -36,7 +37,17 @@
     "join": "Turnier beitreten",
     "empty": "Du nimmst noch an keinem Turnier teil",
     "players": "{{count}} Spieler",
-    "players_plural": "{{count}} Spieler"
+    "players_plural": "{{count}} Spieler",
+    "ban_player": "Aus Turnier entfernen",
+    "confirm_ban": "Spieler entfernen? Er kann das Turnier nicht mehr sehen oder beitreten (du kannst ihn später entsperren).",
+    "banned_msg": "Du wurdest aus diesem Turnier entfernt.",
+    "banned_list": "Gesperrt",
+    "no_banned": "Keine gesperrten Benutzer.",
+    "unban_player": "Entsperren",
+    "reinvite_player": "Erneut einladen",
+    "leave_tournament": "Turnier verlassen",
+    "confirm_leave": "Möchtest du dieses Turnier wirklich verlassen?",
+    "leave_confirm_btn": "Ja, verlassen"
   },
   "nav": {
     "home": "Start",
