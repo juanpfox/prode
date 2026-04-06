@@ -49,7 +49,8 @@
     "leave_tournament": "টুর্নামেন্ট ছেড়ে দিন",
     "confirm_leave": "আপনি কি সত্যিই এই টুর্নামেন্ট ছেড়ে দিতে চান?",
     "leave_confirm_btn": "হ্যাঁ, ছেড়ে দিন",
-    "invite_btn": "আমন্ত্রণ"
+    "invite_btn": "আমন্ত্রণ",
+    "prize_placeholder": "🏅 বিজয়ীর পুরস্কার (ঐচ্ছিক)"
   },
   "nav": {
     "home": "হোম",
