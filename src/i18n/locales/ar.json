@@ -17,7 +17,8 @@
     "loading": "جارٍ التحميل...",
     "sign_out": "تسجيل الخروج",
     "error_generic": "حدث خطأ، يرجى المحاولة مرة أخرى",
-    "cancel": "إلغاء"
+    "cancel": "إلغاء",
+    "close": "إغلاق"
   },
   "modes": {
     "posiciones": "الترتيب",
@@ -47,7 +48,8 @@
     "reinvite_player": "إعادة دعوة",
     "leave_tournament": "مغادرة البطولة",
     "confirm_leave": "هل أنت متأكد أنك تريد مغادرة البطولة؟",
-    "leave_confirm_btn": "نعم، مغادرة"
+    "leave_confirm_btn": "نعم، مغادرة",
+    "invite_btn": "دعوة"
   },
   "nav": {
     "home": "الرئيسية",
