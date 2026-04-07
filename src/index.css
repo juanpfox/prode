@@ -447,10 +447,12 @@ body {
   outline: none;
   font-family: inherit;
   -moz-appearance: textfield;
+  appearance: textfield;
 }
 .goal-input-val::-webkit-outer-spin-button,
 .goal-input-val::-webkit-inner-spin-button {
   -webkit-appearance: none;
+  appearance: none;
   margin: 0;
 }
 .goal-input-val:focus {
@@ -461,39 +463,26 @@ body {
   z-index: 1;
 }
 
+/* Mobile and Stacked styles */
 @media (max-width: 480px) {
-  .match-team-col.home {
-    flex-direction: column-reverse;
-  }
-  .match-team-col.away {
-    flex-direction: column;
-  }
-  .match-team-col.home, .match-team-col.away {
-    gap: 0.3rem;
-    justify-content: center;
-  }
-  .match-team-col.home .match-team-name, .match-team-col.away .match-team-name {
-    text-align: center;
-    font-size: 0.85rem;
-  }
-  
-  .goal-input-wrapper {
-    flex-direction: column-reverse;
-  }
-  
-  .goal-input-btn {
-    padding: 0.4rem 0.5rem;
-  }
-  
-  .goal-input-val {
-    border-left: none;
-    border-right: none;
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    width: 100%;
-    line-height: 2rem;
-  }
+  .match-team-col.home { flex-direction: column-reverse; }
+  .match-team-col.away { flex-direction: column; }
+  .match-team-col.home, .match-team-col.away { gap: 0.3rem; justify-content: center; }
+  .match-team-col.home .match-team-name, .match-team-col.away .match-team-name { text-align: center; font-size: 0.85rem; }
+  .goal-input-wrapper { flex-direction: column-reverse; }
+  .goal-input-btn { padding: 0.4rem 0.5rem; }
+  .goal-input-val { border-left: none; border-right: none; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); width: 100%; line-height: 2rem; }
 }
+
+.match-card-stacked .match-team-col.home { flex-direction: column-reverse; }
+.match-card-stacked .match-team-col.away { flex-direction: column; }
+.match-card-stacked .match-team-col.home, .match-card-stacked .match-team-col.away { gap: 0.3rem; justify-content: center; }
+.match-card-stacked .match-team-col.home .match-team-name, .match-card-stacked .match-team-col.away .match-team-name { text-align: center; font-size: 0.85rem; white-space: normal; height: 2.4rem; display: flex; align-items: center; justify-content: center; }
+.match-card-stacked .goal-input-wrapper { flex-direction: column-reverse; }
+.match-card-stacked .goal-input-btn { padding: 0.4rem 0.5rem; }
+.match-card-stacked .goal-input-val { border-left: none; border-right: none; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); width: 100%; line-height: 2rem; }
+.match-card-stacked .match-card-grid { gap: 0.25rem; }
+
 
 /* ============================================================
    GROUP TABLE

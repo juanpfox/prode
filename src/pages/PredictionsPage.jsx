@@ -415,7 +415,7 @@ export default function PredictionsPage() {
                     }}>
                       {byStage[stage].map((match, matchIndex) => (
                         <div key={match.id} className="bracket-match-cell">
-                          <MatchCard match={{ ...match, home_team: simulatedBracket[match.round]?.home_team || match.home_team, away_team: simulatedBracket[match.round]?.away_team || match.away_team }} pred={predictions[match.id] ?? {}} locked={isLocked(match)} onChange={(f,v) => updatePred(match.id,f,v)} t={t} />
+                          <MatchCard stacked={true} match={{ ...match, home_team: simulatedBracket[match.round]?.home_team || match.home_team, away_team: simulatedBracket[match.round]?.away_team || match.away_team }} pred={predictions[match.id] ?? {}} locked={isLocked(match)} onChange={(f,v) => updatePred(match.id,f,v)} t={t} />
                           
                           {/* Outbound bracket shapes (for the last visible column only) */}
                           {isLastColumn && stage !== 'final' && (
@@ -477,7 +477,7 @@ export default function PredictionsPage() {
                             {t('predictions.stages.third_place')}
                           </h3>
                           {byStage['third_place'].map(match => (
-                            <MatchCard key={match.id} match={{ ...match, home_team: simulatedBracket[match.round]?.home_team || match.home_team, away_team: simulatedBracket[match.round]?.away_team || match.away_team }} pred={predictions[match.id] ?? {}} locked={isLocked(match)} onChange={(f,v) => updatePred(match.id,f,v)} t={t} />
+                            <MatchCard stacked={true} key={match.id} match={{ ...match, home_team: simulatedBracket[match.round]?.home_team || match.home_team, away_team: simulatedBracket[match.round]?.away_team || match.away_team }} pred={predictions[match.id] ?? {}} locked={isLocked(match)} onChange={(f,v) => updatePred(match.id,f,v)} t={t} />
                           ))}
                         </div>
                       )}
@@ -531,7 +531,7 @@ function GroupTable({ rows, t }) {
   )
 }
 
-function MatchCard({ match, pred, locked, saving, saved, onChange, onSave, t }) {
+function MatchCard({ match, pred, locked, saving, saved, onChange, onSave, t, stacked }) {
   const home = t(`teams.${match.home_team?.code}`, { defaultValue: match.home_team?.name ?? '?' })
   const away = t(`teams.${match.away_team?.code}`, { defaultValue: match.away_team?.name ?? '?' })
   const kickoff = new Date(match.kickoff_at)
@@ -547,7 +547,7 @@ function MatchCard({ match, pred, locked, saving, saved, onChange, onSave, t }) 
   const predFilled = (pred.home_goals !== '' && pred.home_goals !== undefined) || (pred.away_goals !== '' && pred.away_goals !== undefined)
 
   return (
-    <div className="card card-sm" style={{
+    <div className={`card card-sm ${stacked ? 'match-card-stacked' : ''}`} style={{
       opacity: locked && !predFilled ? 0.8 : 1,
       borderColor: saved ? 'var(--primary)' : undefined,
       padding: '0.75rem 0.875rem',

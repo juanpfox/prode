@@ -236,7 +236,7 @@ export default function AdminResultsEntryPage() {
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
               {byStage[stage].map(m => (
-                <AdminMatchCard key={m.id} match={STAGE_ORDER.indexOf(stage) > 0 ? { ...m, home_team: simulatedBracket[m.round]?.home_team || m.home_team, away_team: simulatedBracket[m.round]?.away_team || m.away_team } : m} onChange={updateMatch} t={t} />
+                <AdminMatchCard stacked={true} key={m.id} match={STAGE_ORDER.indexOf(stage) > 0 ? { ...m, home_team: simulatedBracket[m.round]?.home_team || m.home_team, away_team: simulatedBracket[m.round]?.away_team || m.away_team } : m} onChange={updateMatch} t={t} />
               ))}
             </div>
           </section>
@@ -315,7 +315,7 @@ export default function AdminResultsEntryPage() {
                     }}>
                       {byStage[stage].map((match, matchIndex) => (
                         <div key={match.id} className="bracket-match-cell">
-                          <AdminMatchCard match={{ ...match, home_team: simulatedBracket[match.round]?.home_team || match.home_team, away_team: simulatedBracket[match.round]?.away_team || match.away_team }} onChange={updateMatch} t={t} />
+                          <AdminMatchCard stacked={true} match={{ ...match, home_team: simulatedBracket[match.round]?.home_team || match.home_team, away_team: simulatedBracket[match.round]?.away_team || match.away_team }} onChange={updateMatch} t={t} />
                           
                           {isLastColumn && stage !== 'final' && (
                             <>
@@ -375,7 +375,7 @@ export default function AdminResultsEntryPage() {
                             {t('predictions.stages.third_place')}
                           </h3>
                           {byStage['third_place'].map(match => (
-                            <AdminMatchCard key={match.id} match={{ ...match, home_team: simulatedBracket[match.round]?.home_team || match.home_team, away_team: simulatedBracket[match.round]?.away_team || match.away_team }} onChange={updateMatch} t={t} />
+                            <AdminMatchCard stacked={true} key={match.id} match={{ ...match, home_team: simulatedBracket[match.round]?.home_team || match.home_team, away_team: simulatedBracket[match.round]?.away_team || match.away_team }} onChange={updateMatch} t={t} />
                           ))}
                         </div>
                       )}
@@ -455,7 +455,7 @@ function calculateGroupTable(groupMatches) {
     .sort((a,b) => b.pts - a.pts || b.dg - a.dg || b.gf - a.gf || (a.initial_position - b.initial_position))
 }
 
-function AdminMatchCard({ match, onChange, t }) {
+function AdminMatchCard({ match, onChange, t, stacked }) {
   const home = t(`teams.${match.home_team?.code}`, { defaultValue: match.home_team?.name ?? '?' })
   const away = t(`teams.${match.away_team?.code}`, { defaultValue: match.away_team?.name ?? '?' })
   const kickoff = new Date(match.kickoff_at)
@@ -470,7 +470,7 @@ function AdminMatchCard({ match, onChange, t }) {
   const hasFilled = hg !== null || ag !== null
 
   return (
-    <div className="card card-sm" style={{
+    <div className={`card card-sm ${stacked ? 'match-card-stacked' : ''}`} style={{
       padding: '0.75rem 0.875rem',
       borderColor: hasFilled ? 'var(--primary)' : undefined,
       borderWidth: hasFilled ? '1.5px' : undefined,
