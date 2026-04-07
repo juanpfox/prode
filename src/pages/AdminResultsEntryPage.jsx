@@ -52,6 +52,16 @@ export default function AdminResultsEntryPage() {
   const [bracketOffset, setBracketOffset] = useState(0)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640)
 
+  const simulatedBracket = useMemo(() => {
+    if (!competition?.name?.toLowerCase().includes('world cup')) return {}
+    // We send matches as both matches and preds format
+    const predsFormat = {}
+    matches.forEach(m => {
+      predsFormat[m.id] = { home_goals: m.home_goals !== null ? m.home_goals : '', away_goals: m.away_goals !== null ? m.away_goals : '' }
+    })
+    return simulateWorldCupBracket(matches, predsFormat)
+  }, [matches, competition])
+
   const pendingChanges = useRef({})
   const timeoutRef = useRef(null)
 
@@ -166,15 +176,7 @@ export default function AdminResultsEntryPage() {
   const groupMatches = matches.filter(m => m.stage === 'group')
   const playoffStages = STAGE_ORDER.filter(s => s !== 'group' && byStage[s]?.length)
 
-  const simulatedBracket = useMemo(() => {
-    if (!competition?.name?.toLowerCase().includes('world cup')) return {}
-    // We send matches as both matches and preds format
-    const predsFormat = {}
-    matches.forEach(m => {
-      predsFormat[m.id] = { home_goals: m.home_goals !== null ? m.home_goals : '', away_goals: m.away_goals !== null ? m.away_goals : '' }
-    })
-    return simulateWorldCupBracket(matches, predsFormat)
-  }, [matches, competition])
+
 
   if (loading) return (
     <AppShell>

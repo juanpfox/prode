@@ -60,6 +60,11 @@ export default function PredictionsPage() {
   const [bracketOffset, setBracketOffset] = useState(0)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640)
 
+  const simulatedBracket = useMemo(() => {
+    if (!tournament?.competitions?.name?.toLowerCase().includes('world cup')) return {}
+    return simulateWorldCupBracket(matches, predictions)
+  }, [matches, predictions, tournament])
+
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth < 640
@@ -225,7 +230,6 @@ export default function PredictionsPage() {
       </div>
     </AppShell>
   )
-
   // ── Route to posiciones page ─────────────────────────────
   if (tournament?.mode === 'posiciones') {
     return <PosicionesPredictionsPage tournament={tournament} />
@@ -266,10 +270,6 @@ export default function PredictionsPage() {
   const groupMatches = matches.filter(m => m.stage === 'group')
   const playoffStages = STAGE_ORDER.filter(s => s !== 'group' && byStage[s]?.length)
 
-  const simulatedBracket = useMemo(() => {
-    if (!tournament?.competitions?.name?.toLowerCase().includes('world cup')) return {}
-    return simulateWorldCupBracket(matches, predictions)
-  }, [matches, predictions, tournament])
 
   return (
     <AppShell saveIndicator={saveStatus}>
