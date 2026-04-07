@@ -56,9 +56,10 @@ export default function PredictionsPage() {
   const [view, setView] = useState(() => (new Date() >= new Date('2026-06-28T00:00:00-03:00') ? 'playoffs' : 'groups')) // 'dates' | 'groups' | 'playoffs'
   const [activeGroup, setActiveGroup] = useState('A')
 
-  // Pagination logic for playoffs view
+  // Pagination + swipe for playoffs view
   const [bracketOffset, setBracketOffset] = useState(0)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640)
+  const swipeTouchStart = useRef(null)
 
   const simulatedBracket = useMemo(() => {
     if (!tournament?.competitions?.name?.toLowerCase().includes('world cup')) return {}
@@ -366,125 +367,103 @@ export default function PredictionsPage() {
         {view === 'playoffs' && (() => {
           const bracketStages = playoffStages.filter(s => s !== 'third_place')
           const visibleCount = isMobile ? 1 : 2
-          
-          // enforce bounds based on current layout
           const safeOffset = Math.min(bracketOffset, Math.max(0, bracketStages.length - visibleCount))
           const visibleStages = bracketStages.slice(safeOffset, safeOffset + visibleCount)
-          
+
+          // Swipe handlers
+          const handleTouchStart = (e) => { swipeTouchStart.current = e.touches[0].clientX }
+          const handleTouchEnd = (e) => {
+            if (swipeTouchStart.current === null) return
+            const delta = swipeTouchStart.current - e.changedTouches[0].clientX
+            if (delta > 50) setBracketOffset(v => Math.min(v + 1, Math.max(0, bracketStages.length - visibleCount)))
+            else if (delta < -50) setBracketOffset(v => Math.max(0, v - 1))
+            swipeTouchStart.current = null
+          }
+
           return (
             <div style={{ paddingBottom: '2rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem 1rem', background: 'var(--surface-2)', borderRadius: 'var(--r-md)', marginBottom: '1.5rem', border: '1px solid var(--border)' }}>
-                <button 
-                  className="btn btn-icon" 
-                  onClick={() => setBracketOffset(v => Math.max(0, v - 1))} 
-                  disabled={safeOffset === 0}
-                  style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '0.2rem 0.6rem' }}
-                >
-                  &lt;
-                </button>
-                
-                <div style={{ display: 'flex', gap: '2.5rem', flex: 1, justifyContent: 'center', minWidth: 0 }}>
+              {/* Stage title */}
+              <div style={{ padding: '0.75rem 1rem', background: 'var(--surface-2)', borderRadius: 'var(--r-md)', marginBottom: '1.5rem', border: '1px solid var(--border)', textAlign: 'center' }}>
+                <div style={{ display: 'flex', gap: '2.5rem', justifyContent: 'center' }}>
                   {visibleStages.map(stage => (
                     <h3 key={stage} style={{ width: isMobile ? 'auto' : '320px', flex: isMobile ? 1 : 'none', fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--text)', margin: 0, textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {t(`predictions.stages.${stage}`)}
                     </h3>
                   ))}
                 </div>
-
-                <button 
-                  className="btn btn-icon" 
-                  onClick={() => setBracketOffset(v => Math.min(bracketStages.length - visibleCount, v + 1))} 
-                  disabled={safeOffset >= bracketStages.length - visibleCount || bracketStages.length <= visibleCount}
-                  style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '0.2rem 0.6rem' }}
-                >
-                  &gt;
-                </button>
               </div>
 
-              <div className={`playoff-bracket ${isMobile ? 'is-mobile' : ''}`} style={{ justifyContent: 'center', marginBottom: byStage['third_place']?.length > 0 ? '6rem' : 0 }}>
-                {visibleStages.map((stage, index) => {
-                  const isLastColumn = index === visibleStages.length - 1;
-                  return (
-                  <div key={stage} className={`bracket-column ${index === 0 && bracketOffset > 0 ? 'is-shifted-first' : ''}`}>
-                    <div style={{ 
-                      flex: 1, 
-                      display: 'flex', 
-                      flexDirection: 'column',
-                      position: 'relative',
-                      minHeight: undefined
-                    }}>
-                      {byStage[stage].map((match, matchIndex) => (
-                        <div key={match.id} className="bracket-match-cell">
-                          <MatchCard stacked={true} match={{ ...match, home_team: simulatedBracket[match.round]?.home_team || match.home_team, away_team: simulatedBracket[match.round]?.away_team || match.away_team }} pred={predictions[match.id] ?? {}} locked={isLocked(match)} onChange={(f,v) => updatePred(match.id,f,v)} t={t} />
-                          
-                          {/* Outbound bracket shapes (for the last visible column only) */}
-                          {isLastColumn && stage !== 'final' && (
-                            <>
-                              {matchIndex % 2 === 0 && (
-                                <div style={{
-                                  position: 'absolute',
-                                  right: '-1.25rem',
-                                  top: '50%',
-                                  width: '1.25rem',
-                                  height: '50%',
-                                  borderTop: '2px solid var(--border-strong)',
-                                  borderRight: '2px solid var(--border-strong)',
-                                  borderTopRightRadius: '6px',
-                                  pointerEvents: 'none',
-                                  zIndex: 0
-                                }} />
-                              )}
-                              {matchIndex % 2 === 1 && (
-                                <>
-                                  <div style={{
-                                    position: 'absolute',
-                                    right: '-1.25rem',
-                                    bottom: '50%',
-                                    width: '1.25rem',
-                                    height: '50%',
-                                    borderBottom: '2px solid var(--border-strong)',
-                                    borderRight: '2px solid var(--border-strong)',
-                                    borderBottomRightRadius: '6px',
-                                    pointerEvents: 'none',
-                                    zIndex: 0
-                                  }} />
-                                  <div style={{
-                                    position: 'absolute',
-                                    right: '-2.5rem',
-                                    top: '-1px',
-                                    width: '1.25rem',
-                                    borderTop: '2px solid var(--border-strong)',
-                                    pointerEvents: 'none',
-                                    zIndex: 0
-                                  }} />
-                                </>
-                              )}
-                            </>
-                          )}
-                        </div>
-                      ))}
-                      
-                      {/* Third Place Match - absolutely positioned under the final */}
-                      {stage === 'final' && byStage['third_place'] && byStage['third_place'].length > 0 && (
-                        <div style={{
-                          position: 'absolute',
-                          top: 'calc(50% + 85px)',
-                          left: 0,
-                          right: 0,
-                          zIndex: 10
-                        }}>
-                          <h3 style={{ fontWeight: 800, fontSize: '0.70rem', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.5rem', textAlign: 'center' }}>
-                            {t('predictions.stages.third_place')}
-                          </h3>
-                          {byStage['third_place'].map(match => (
-                            <MatchCard stacked={true} key={match.id} match={{ ...match, home_team: simulatedBracket[match.round]?.home_team || match.home_team, away_team: simulatedBracket[match.round]?.away_team || match.away_team }} pred={predictions[match.id] ?? {}} locked={isLocked(match)} onChange={(f,v) => updatePred(match.id,f,v)} t={t} />
-                          ))}
-                        </div>
-                      )}
+              {/* Swipeable bracket */}
+              <div
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
+                style={{ touchAction: 'pan-y' }}
+              >
+                <div className={`playoff-bracket ${isMobile ? 'is-mobile' : ''}`} style={{ justifyContent: 'center', marginBottom: byStage['third_place']?.length > 0 ? '6rem' : 0 }}>
+                  {visibleStages.map((stage, index) => {
+                    const isLastColumn = index === visibleStages.length - 1;
+                    return (
+                    <div key={stage} className={`bracket-column ${index === 0 && safeOffset > 0 ? 'is-shifted-first' : ''}`}>
+                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative' }}>
+                        {byStage[stage].map((match, matchIndex) => (
+                          <div key={match.id} className="bracket-match-cell">
+                            <MatchCard stacked={true} match={{ ...match, home_team: simulatedBracket[match.round]?.home_team || match.home_team, away_team: simulatedBracket[match.round]?.away_team || match.away_team }} pred={predictions[match.id] ?? {}} locked={isLocked(match)} onChange={(f,v) => updatePred(match.id,f,v)} t={t} />
+                            
+                            {/* Outbound bracket shapes */}
+                            {isLastColumn && stage !== 'final' && (
+                              <>
+                                {matchIndex % 2 === 0 && (
+                                  <div style={{ position: 'absolute', right: '-1.25rem', top: '50%', width: '1.25rem', height: '50%', borderTop: '2px solid var(--border-strong)', borderRight: '2px solid var(--border-strong)', borderTopRightRadius: '6px', pointerEvents: 'none', zIndex: 0 }} />
+                                )}
+                                {matchIndex % 2 === 1 && (
+                                  <>
+                                    <div style={{ position: 'absolute', right: '-1.25rem', bottom: '50%', width: '1.25rem', height: '50%', borderBottom: '2px solid var(--border-strong)', borderRight: '2px solid var(--border-strong)', borderBottomRightRadius: '6px', pointerEvents: 'none', zIndex: 0 }} />
+                                    <div style={{ position: 'absolute', right: '-2.5rem', top: '-1px', width: '1.25rem', borderTop: '2px solid var(--border-strong)', pointerEvents: 'none', zIndex: 0 }} />
+                                  </>
+                                )}
+                              </>
+                            )}
+                          </div>
+                        ))}
+                        
+                        {/* Third Place Match */}
+                        {stage === 'final' && byStage['third_place']?.length > 0 && (
+                          <div style={{ position: 'absolute', top: 'calc(50% + 85px)', left: 0, right: 0, zIndex: 10 }}>
+                            <h3 style={{ fontWeight: 800, fontSize: '0.70rem', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.5rem', textAlign: 'center' }}>
+                              {t('predictions.stages.third_place')}
+                            </h3>
+                            {byStage['third_place'].map(match => (
+                              <MatchCard stacked={true} key={match.id} match={{ ...match, home_team: simulatedBracket[match.round]?.home_team || match.home_team, away_team: simulatedBracket[match.round]?.away_team || match.away_team }} pred={predictions[match.id] ?? {}} locked={isLocked(match)} onChange={(f,v) => updatePred(match.id,f,v)} t={t} />
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                )})}
+                  )})}
+                </div>
               </div>
+
+              {/* Dots indicator */}
+              {bracketStages.length > visibleCount && (
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', paddingTop: '1.25rem' }}>
+                  {bracketStages.slice(0, bracketStages.length - visibleCount + 1).map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setBracketOffset(i)}
+                      style={{
+                        width: i === safeOffset ? '20px' : '8px',
+                        height: '8px',
+                        borderRadius: '9999px',
+                        border: 'none',
+                        cursor: 'pointer',
+                        background: i === safeOffset ? 'var(--primary)' : 'var(--border-strong)',
+                        transition: 'all 0.2s ease',
+                        padding: 0,
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           )
         })()}
