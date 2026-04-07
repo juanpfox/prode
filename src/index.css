@@ -679,10 +679,22 @@ body {
   align-items: stretch;
 }
 
+/* When used as swipeable slider, gap is replaced by paddingLeft on columns */
+.playoff-bracket.is-slider {
+  gap: 0;
+  min-width: unset;
+  padding: 1rem 0;
+}
+
 .bracket-column {
   display: flex;
   flex-direction: column;
   width: 320px;
+}
+
+/* In slider mode columns fill their flex slot */
+.playoff-bracket.is-slider .bracket-column {
+  width: 100%;
 }
 
 .bracket-column-header {
