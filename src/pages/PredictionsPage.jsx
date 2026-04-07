@@ -5,6 +5,7 @@ import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabase'
 import AppShell from '../components/AppShell'
 import PosicionesPredictionsPage from './PosicionesPredictionsPage'
+import { simulateWorldCupBracket } from '../utils/simulatorWC2026'
  
 const FIFA_TO_ISO2 = {
   ARG: 'ar', BRA: 'br', FRA: 'fr', GER: 'de', ITA: 'it', ESP: 'es', POR: 'pt', NED: 'nl',
@@ -265,6 +266,11 @@ export default function PredictionsPage() {
   const groupMatches = matches.filter(m => m.stage === 'group')
   const playoffStages = STAGE_ORDER.filter(s => s !== 'group' && byStage[s]?.length)
 
+  const simulatedBracket = useMemo(() => {
+    if (!tournament?.competitions?.name?.toLowerCase().includes('world cup')) return {}
+    return simulateWorldCupBracket(matches, predictions)
+  }, [matches, predictions, tournament])
+
   return (
     <AppShell saveIndicator={saveStatus}>
       <div className="animate-fade-in">
@@ -409,7 +415,7 @@ export default function PredictionsPage() {
                     }}>
                       {byStage[stage].map((match, matchIndex) => (
                         <div key={match.id} className="bracket-match-cell">
-                          <MatchCard match={match} pred={predictions[match.id] ?? {}} locked={isLocked(match)} onChange={(f,v) => updatePred(match.id,f,v)} t={t} />
+                          <MatchCard match={{ ...match, home_team: simulatedBracket[match.round]?.home_team || match.home_team, away_team: simulatedBracket[match.round]?.away_team || match.away_team }} pred={predictions[match.id] ?? {}} locked={isLocked(match)} onChange={(f,v) => updatePred(match.id,f,v)} t={t} />
                           
                           {/* Outbound bracket shapes (for the last visible column only) */}
                           {isLastColumn && stage !== 'final' && (
@@ -471,7 +477,7 @@ export default function PredictionsPage() {
                             {t('predictions.stages.third_place')}
                           </h3>
                           {byStage['third_place'].map(match => (
-                            <MatchCard key={match.id} match={match} pred={predictions[match.id] ?? {}} locked={isLocked(match)} onChange={(f,v) => updatePred(match.id,f,v)} t={t} />
+                            <MatchCard key={match.id} match={{ ...match, home_team: simulatedBracket[match.round]?.home_team || match.home_team, away_team: simulatedBracket[match.round]?.away_team || match.away_team }} pred={predictions[match.id] ?? {}} locked={isLocked(match)} onChange={(f,v) => updatePred(match.id,f,v)} t={t} />
                           ))}
                         </div>
                       )}

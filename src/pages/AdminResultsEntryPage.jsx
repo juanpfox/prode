@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import AppShell from '../components/AppShell'
+import { simulateWorldCupBracket } from '../utils/simulatorWC2026'
 
 const FIFA_TO_ISO2 = {
   ARG: 'ar', BRA: 'br', FRA: 'fr', GER: 'de', ITA: 'it', ESP: 'es', POR: 'pt', NED: 'nl',
@@ -165,6 +166,16 @@ export default function AdminResultsEntryPage() {
   const groupMatches = matches.filter(m => m.stage === 'group')
   const playoffStages = STAGE_ORDER.filter(s => s !== 'group' && byStage[s]?.length)
 
+  const simulatedBracket = useMemo(() => {
+    if (!competition?.name?.toLowerCase().includes('world cup')) return {}
+    // We send matches as both matches and preds format
+    const predsFormat = {}
+    matches.forEach(m => {
+      predsFormat[m.id] = { home_goals: m.home_goals !== null ? m.home_goals : '', away_goals: m.away_goals !== null ? m.away_goals : '' }
+    })
+    return simulateWorldCupBracket(matches, predsFormat)
+  }, [matches, competition])
+
   if (loading) return (
     <AppShell>
       <p style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '3rem' }}>{t('common.loading')}</p>
@@ -223,7 +234,7 @@ export default function AdminResultsEntryPage() {
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
               {byStage[stage].map(m => (
-                <AdminMatchCard key={m.id} match={m} onChange={updateMatch} t={t} />
+                <AdminMatchCard key={m.id} match={STAGE_ORDER.indexOf(stage) > 0 ? { ...m, home_team: simulatedBracket[m.round]?.home_team || m.home_team, away_team: simulatedBracket[m.round]?.away_team || m.away_team } : m} onChange={updateMatch} t={t} />
               ))}
             </div>
           </section>
@@ -302,7 +313,7 @@ export default function AdminResultsEntryPage() {
                     }}>
                       {byStage[stage].map((match, matchIndex) => (
                         <div key={match.id} className="bracket-match-cell">
-                          <AdminMatchCard match={match} onChange={updateMatch} t={t} />
+                          <AdminMatchCard match={{ ...match, home_team: simulatedBracket[match.round]?.home_team || match.home_team, away_team: simulatedBracket[match.round]?.away_team || match.away_team }} onChange={updateMatch} t={t} />
                           
                           {isLastColumn && stage !== 'final' && (
                             <>
@@ -362,7 +373,7 @@ export default function AdminResultsEntryPage() {
                             {t('predictions.stages.third_place')}
                           </h3>
                           {byStage['third_place'].map(match => (
-                            <AdminMatchCard key={match.id} match={match} onChange={updateMatch} t={t} />
+                            <AdminMatchCard key={match.id} match={{ ...match, home_team: simulatedBracket[match.round]?.home_team || match.home_team, away_team: simulatedBracket[match.round]?.away_team || match.away_team }} onChange={updateMatch} t={t} />
                           ))}
                         </div>
                       )}
