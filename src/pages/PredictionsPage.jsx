@@ -413,60 +413,61 @@ export default function PredictionsPage() {
                 </div>
               </div>
 
-              {/* Swipeable bracket — all columns rendered, translateX for animation */}
+              {/* Swipeable bracket — bracket-column are direct children so CSS ::before/::after connectors work */}
               <div
                 onTouchStart={handleTouchStart}
                 onTouchEnd={handleTouchEnd}
                 style={{ overflow: 'hidden', touchAction: 'pan-y' }}
               >
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  transform: `translateX(${translatePct}%)`,
-                  transition: 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
-                  willChange: 'transform',
-                  marginBottom: byStage['third_place']?.length > 0 ? '6rem' : 0,
-                }}>
-                  {bracketStages.map((stage) => (
-                    <div key={stage} style={{ flex: `0 0 ${colPct}%`, width: `${colPct}%` }}>
-                      <div className={`bracket-column ${isMobile ? 'is-mobile' : ''}`} style={{ width: '100%', justifyContent: 'center' }}>
-                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative' }}>
-                          {byStage[stage].map((match, matchIndex) => {
-                            const isLastInView = bracketStages.indexOf(stage) === Math.min(safeOffset + visibleCount - 1, bracketStages.length - 1)
-                            return (
-                              <div key={match.id} className="bracket-match-cell">
-                                <MatchCard stacked={true} match={{ ...match, home_team: simulatedBracket[match.round]?.home_team || match.home_team, away_team: simulatedBracket[match.round]?.away_team || match.away_team }} pred={predictions[match.id] ?? {}} locked={isLocked(match)} onChange={(f,v) => updatePred(match.id,f,v)} t={t} />
-                                {/* Outbound bracket shapes — only on the rightmost visible column */}
-                                {isLastInView && stage !== 'final' && (
-                                  <>
-                                    {matchIndex % 2 === 0 && (
-                                      <div style={{ position: 'absolute', right: '-1.25rem', top: '50%', width: '1.25rem', height: '50%', borderTop: '2px solid var(--border-strong)', borderRight: '2px solid var(--border-strong)', borderTopRightRadius: '6px', pointerEvents: 'none', zIndex: 0 }} />
-                                    )}
-                                    {matchIndex % 2 === 1 && (
-                                      <>
-                                        <div style={{ position: 'absolute', right: '-1.25rem', bottom: '50%', width: '1.25rem', height: '50%', borderBottom: '2px solid var(--border-strong)', borderRight: '2px solid var(--border-strong)', borderBottomRightRadius: '6px', pointerEvents: 'none', zIndex: 0 }} />
-                                        <div style={{ position: 'absolute', right: '-2.5rem', top: '-1px', width: '1.25rem', borderTop: '2px solid var(--border-strong)', pointerEvents: 'none', zIndex: 0 }} />
-                                      </>
-                                    )}
-                                  </>
-                                )}
-                              </div>
-                            )
-                          })}
-
-                          {/* Third Place Match */}
-                          {stage === 'final' && byStage['third_place']?.length > 0 && (
-                            <div style={{ position: 'absolute', top: 'calc(50% + 85px)', left: 0, right: 0, zIndex: 10 }}>
-                              <h3 style={{ fontWeight: 800, fontSize: '0.70rem', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.5rem', textAlign: 'center' }}>
-                                {t('predictions.stages.third_place')}
-                              </h3>
-                              {byStage['third_place'].map(match => (
-                                <MatchCard stacked={true} key={match.id} match={{ ...match, home_team: simulatedBracket[match.round]?.home_team || match.home_team, away_team: simulatedBracket[match.round]?.away_team || match.away_team }} pred={predictions[match.id] ?? {}} locked={isLocked(match)} onChange={(f,v) => updatePred(match.id,f,v)} t={t} />
-                              ))}
-                            </div>
-                          )}
+                <div
+                  className="playoff-bracket is-slider"
+                  style={{
+                    flexWrap: 'nowrap',
+                    gap: 0,
+                    padding: '1rem 0',
+                    minWidth: 'unset',
+                    transform: `translateX(${translatePct}%)`,
+                    transition: 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+                    willChange: 'transform',
+                    marginBottom: byStage['third_place']?.length > 0 ? '6rem' : 0,
+                  }}
+                >
+                  {bracketStages.map((stage, stageIndex) => (
+                    <div
+                      key={stage}
+                      className={`bracket-column${stageIndex === 0 ? '' : ''}`}
+                      style={{
+                        flex: `0 0 ${colPct}%`,
+                        width: `${colPct}%`,
+                        // Restore gap between columns via padding so ::before left offsets still align
+                        paddingLeft: stageIndex === 0 ? 0 : '2.5rem',
+                        boxSizing: 'border-box',
+                      }}
+                    >
+                      {byStage[stage].map((match) => (
+                        <div key={match.id} className="bracket-match-cell">
+                          <MatchCard
+                            stacked={true}
+                            match={{ ...match, home_team: simulatedBracket[match.round]?.home_team || match.home_team, away_team: simulatedBracket[match.round]?.away_team || match.away_team }}
+                            pred={predictions[match.id] ?? {}}
+                            locked={isLocked(match)}
+                            onChange={(f, v) => updatePred(match.id, f, v)}
+                            t={t}
+                          />
                         </div>
-                      </div>
+                      ))}
+
+                      {/* Third Place Match */}
+                      {stage === 'final' && byStage['third_place']?.length > 0 && (
+                        <div style={{ position: 'absolute', top: 'calc(50% + 85px)', left: 0, right: 0, zIndex: 10 }}>
+                          <h3 style={{ fontWeight: 800, fontSize: '0.70rem', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.5rem', textAlign: 'center' }}>
+                            {t('predictions.stages.third_place')}
+                          </h3>
+                          {byStage['third_place'].map(match => (
+                            <MatchCard stacked={true} key={match.id} match={{ ...match, home_team: simulatedBracket[match.round]?.home_team || match.home_team, away_team: simulatedBracket[match.round]?.away_team || match.away_team }} pred={predictions[match.id] ?? {}} locked={isLocked(match)} onChange={(f, v) => updatePred(match.id, f, v)} t={t} />
+                          ))}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
