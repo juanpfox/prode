@@ -398,6 +398,9 @@ body {
 .match-team-name {
   font-weight: 700;
   font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .match-team-col.home .match-team-name { text-align: right; }
 
@@ -447,10 +450,12 @@ body {
   outline: none;
   font-family: inherit;
   -moz-appearance: textfield;
+  appearance: textfield;
 }
 .goal-input-val::-webkit-outer-spin-button,
 .goal-input-val::-webkit-inner-spin-button {
   -webkit-appearance: none;
+  appearance: none;
   margin: 0;
 }
 .goal-input-val:focus {
@@ -684,7 +689,7 @@ body {
    ============================================================ */
 .playoff-bracket {
   display: flex;
-  gap: 2.5rem;
+  gap: 3.5rem;
   padding: 1rem;
   min-width: max-content;
   align-items: stretch;
@@ -693,7 +698,13 @@ body {
 .bracket-column {
   display: flex;
   flex-direction: column;
-  width: 320px;
+  width: 310px;
+}
+
+@media (min-width: 1024px) {
+  .bracket-column {
+    width: 380px;
+  }
 }
 
 .bracket-column-header {
@@ -721,8 +732,8 @@ body {
 .bracket-column:not(:first-child) .bracket-match-cell::before {
   content: "";
   position: absolute;
-  left: -2.5rem;
-  width: 1.25rem;
+  left: -3.5rem;
+  width: 1.75rem;
   top: 25%;
   bottom: 25%;
   border-right: 2px solid var(--border-strong);
@@ -736,8 +747,8 @@ body {
 .bracket-column:not(:first-child) .bracket-match-cell::after {
   content: "";
   position: absolute;
-  left: -1.25rem;
-  width: 1.25rem;
+  left: -1.75rem;
+  width: 1.75rem;
   top: 50%;
   border-bottom: 2px solid var(--border-strong);
   pointer-events: none;
@@ -746,8 +757,8 @@ body {
 .bracket-column.is-shifted-first .bracket-match-cell::before {
   content: "";
   position: absolute;
-  left: -2.5rem;
-  width: 2.5rem;
+  left: -3.5rem;
+  width: 3.5rem;
   top: 50%;
   border-bottom: 2px solid var(--border-strong);
   pointer-events: none;

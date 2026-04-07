@@ -58,7 +58,8 @@ export default function PredictionsPage() {
 
   // Pagination logic for playoffs view
   const [bracketOffset, setBracketOffset] = useState(0)
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 640)
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth)
+  const isMobile = windowWidth < 640
 
   const simulatedBracket = useMemo(() => {
     if (!tournament?.competitions?.name?.toLowerCase().includes('world cup')) return {}
@@ -67,11 +68,8 @@ export default function PredictionsPage() {
 
   useEffect(() => {
     const handleResize = () => {
-      const mobile = window.innerWidth < 640
-      setIsMobile(mobile)
-      if (!mobile) {
-        setBracketOffset(prev => Math.max(0, prev - 1)) // try to recover second column if switching back to desktop
-      }
+      setWindowWidth(window.innerWidth)
+      if (window.innerWidth >= 640) setBracketOffset(prev => Math.max(0, prev - 1))
     }
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
@@ -365,9 +363,11 @@ export default function PredictionsPage() {
         {/* --- VIEW: PLAYOFFS --- */}
         {view === 'playoffs' && (() => {
           const bracketStages = playoffStages.filter(s => s !== 'third_place')
-          const visibleCount = isMobile ? 1 : 2
+          let visibleCount = 1
+          if (windowWidth >= 1400) visibleCount = 4
+          else if (windowWidth >= 1024) visibleCount = 3
+          else if (windowWidth >= 640) visibleCount = 2
           
-          // enforce bounds based on current layout
           const safeOffset = Math.min(bracketOffset, Math.max(0, bracketStages.length - visibleCount))
           const visibleStages = bracketStages.slice(safeOffset, safeOffset + visibleCount)
           
@@ -383,9 +383,9 @@ export default function PredictionsPage() {
                   &lt;
                 </button>
                 
-                <div style={{ display: 'flex', gap: '2.5rem', flex: 1, justifyContent: 'center', minWidth: 0 }}>
+                <div style={{ display: 'flex', gap: '3.5rem', flex: 1, justifyContent: 'center', minWidth: 0 }}>
                   {visibleStages.map(stage => (
-                    <h3 key={stage} style={{ width: isMobile ? 'auto' : '320px', flex: isMobile ? 1 : 'none', fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--text)', margin: 0, textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <h3 key={stage} style={{ width: windowWidth < 640 ? 'auto' : (windowWidth < 1024 ? '310px' : '380px'), flex: isMobile ? 1 : 'none', fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--text)', margin: 0, textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {t(`predictions.stages.${stage}`)}
                     </h3>
                   ))}
