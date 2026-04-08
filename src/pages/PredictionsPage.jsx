@@ -567,7 +567,7 @@ function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, is
         }}>
           {bracketStages.map((stage, si) => {
             const pairs  = hasRoundData ? getPairs(si) : (stageRounds[si] || []).map(r => [r])
-            const depth  = STAGE_DEPTH[stage] ?? si
+            const depth  = si  // relative depth within visible stages
             const isLast = si === bracketStages.length - 1
             const h      = getSlotH(depth, cardH)
 
