@@ -739,7 +739,7 @@ function GoalInput({ val, onChange, matchId, side }) {
 
 function ResultBubble({ val, muted }) {
   return (
-    <span style={{
+    <span className="result-bubble" style={{
       display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
       width: '2rem', height: '2rem', borderRadius: 'var(--r-md)',
       background: muted ? 'var(--surface-2)' : 'var(--surface-3)',
