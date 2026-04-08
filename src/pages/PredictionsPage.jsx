@@ -624,36 +624,27 @@ function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, is
                   {!isLast && (
                     <>
                       {pair.length === 2 ? (
-                        // Full bracket: vertical bar connecting the two cards, with horizontal stub going right
+                        // Full bracket: ╗ shape connecting two cards to one on the right
+                        // Card centers at 25% and 75% of the pair container
                         <>
-                          {/* Top arm: from center of first card */}
+                          {/* Vertical bar: from 25% to 75% with a notch at 50% going right */}
                           <div style={{
                             position: 'absolute',
                             right: -CONN,
                             top: '25%',
-                            bottom: '75%',
+                            height: '50%', // from first card center to second card center
                             width: CONN / 2,
                             borderTop: '2px solid var(--border-strong)',
-                            borderRight: '2px solid var(--border-strong)',
-                            borderTopRightRadius: 5,
-                            pointerEvents: 'none',
-                          }} />
-                          {/* Bottom arm: from center of second card */}
-                          <div style={{
-                            position: 'absolute',
-                            right: -CONN,
-                            top: '75%',
-                            bottom: '25%',
-                            width: CONN / 2,
                             borderBottom: '2px solid var(--border-strong)',
                             borderRight: '2px solid var(--border-strong)',
+                            borderTopRightRadius: 5,
                             borderBottomRightRadius: 5,
                             pointerEvents: 'none',
                           }} />
-                          {/* Horizontal stub to next column */}
+                          {/* Horizontal stub from midpoint to next column */}
                           <div style={{
                             position: 'absolute',
-                            right: -CONN,
+                            right: -(CONN),
                             top: '50%',
                             width: CONN,
                             borderBottom: '2px solid var(--border-strong)',
