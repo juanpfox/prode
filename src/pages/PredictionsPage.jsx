@@ -588,19 +588,19 @@ function MatchCard({ match, pred, locked, saving, saved, onChange, onSave, t, st
           {hasResult ? (
             <div className="match-center-col">
               <ResultBubble val={match.home_goals} />
-              <span style={{ color: 'var(--text-muted)', fontWeight: 700 }}>-</span>
+              <span className="match-vs-sep" style={{ color: 'var(--text-muted)', fontWeight: 700 }}>-</span>
               <ResultBubble val={match.away_goals} />
             </div>
           ) : locked ? (
             <div className="match-center-col">
               <ResultBubble val={pred.home_goals !== '' ? pred.home_goals : '?'} muted={pred.home_goals === ''} />
-              <span style={{ color: 'var(--text-muted)', fontWeight: 700 }}>-</span>
+              <span className="match-vs-sep" style={{ color: 'var(--text-muted)', fontWeight: 700 }}>-</span>
               <ResultBubble val={pred.away_goals !== '' ? pred.away_goals : '?'} muted={pred.away_goals === ''} />
             </div>
           ) : (
             <div className="match-center-col">
               <GoalInput val={pred.home_goals ?? ''} onChange={v => onChange('home_goals', v)} />
-              <span style={{ color: 'var(--text-muted)', fontWeight: 800, fontSize: '0.85rem' }}>vs</span>
+              <span className="match-vs-sep" style={{ color: 'var(--text-muted)', fontWeight: 800, fontSize: '0.85rem' }}>vs</span>
               <GoalInput val={pred.away_goals ?? ''} onChange={v => onChange('away_goals', v)} />
             </div>
           )}
