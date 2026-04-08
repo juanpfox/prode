@@ -475,29 +475,31 @@ const BRACKET_STAGE_ROUNDS = {
   sf:[101,102],
   final:[104],
 }
+// Absolute depth of each stage (R32=0 is the "atom" unit)
+const STAGE_DEPTH = { r32:0, r16:1, qf:2, sf:3, final:4 }
 
-// Height of one match card (px) + gap between cards in a pair
-const CARD_H = 106   // approximate rendered height of a stacked MatchCard
-const CARD_GAP = 8   // gap between two cards within a pair
-const PAIR_GAP = 8   // gap between pairs in a column
+// Height (px) of one match card in stacked mode
+const CARD_H    = 108
+const CARD_GAP  = 8   // vertical gap between the two cards inside a pair
+const PAIR_GAP  = 10  // vertical margin between pairs in a column
 
-// Height that a pair of N cards occupies in the first (leftmost) column
-// Subsequent columns: each parent pair = height of its two child pairs combined
-function pairHeightForDepth(depth) {
-  // depth 0 = R32 column: each pair has 2 cards
-  // depth 1 = R16: each pair corresponds to 2 pairs from R32
-  // depth d: each pair = 2^d cards-worth of height
-  const cards = Math.pow(2, depth)
-  return cards * CARD_H + (cards - 1) * CARD_GAP + (cards / 2 - 1) * PAIR_GAP * 2
+// Height of a single pair-slot at absolute depth d.
+// depth 0 (R32): 2 cards  →  2*CARD_H + CARD_GAP
+// depth 1 (R16): 2× that  →  4*CARD_H + 3*CARD_GAP + 2*PAIR_GAP  (= 2 R32 slots + gap between them)
+// depth d: 2^d cards total, (2^d - 1) internal gaps, (2^d/2 - 1) pair-gaps
+function slotHeight(d) {
+  const n = Math.pow(2, d) // cards in this slot
+  return n * CARD_H + (n - 1) * CARD_GAP + (n / 2 - 1) * PAIR_GAP * 2
 }
 
-function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, isLocked, updatePred, t, colPct, translatePct, offset, visibleCount }) {
+function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, isLocked, updatePred, t, colPct, translatePct }) {
   const matchByRound = {}
   Object.values(byStage).flat().forEach(m => { if (m.round) matchByRound[m.round] = m })
   const hasRoundData = Object.keys(matchByRound).some(r => parseInt(r) >= 73)
 
   const stageRounds = bracketStages.map(s => (BRACKET_STAGE_ROUNDS[s] || []).filter(r => matchByRound[r]))
 
+  // Group rounds in a stage into pairs that feed the same parent in the next stage
   function getPairs(stageIdx) {
     const rounds = stageRounds[stageIdx] || []
     if (!rounds.length) return []
@@ -528,12 +530,7 @@ function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, is
     )
   }
 
-  const CONN = 20 // px connector width
-
-  // For each column, compute the "depth" relative to the leftmost column (R32 = depth 0)
-  // This drives how tall each pair-slot is
-  const baseStage = bracketStages[0]
-  const baseRoundsPerPair = 2 // R32 always has pairs of 2 matches
+  const CONN = 20 // px — width of the connector channel
 
   return (
     <div style={{ overflowX: 'clip', overflowY: 'visible' }}>
@@ -547,19 +544,11 @@ function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, is
         alignItems: 'flex-start',
       }}>
         {bracketStages.map((stage, si) => {
-          const pairs = hasRoundData ? getPairs(si) : (stageRounds[si] || []).map(r => [r])
-          const isLast = si === bracketStages.length - 1
-          const isFirst = si === 0
-
-          // Depth relative to first bracket stage
-          // R32=0, R16=1, QF=2, SF=3, Final=4
-          // Each step doubles the pair height
-          const depth = si
-
-          // Height of a single pair-slot at this depth
-          // depth 0: 2 cards
-          // depth 1: equivalent to 2 pairs from depth 0 = 4 cards worth
-          const slotH = pairHeightForDepth(depth)
+          const pairs   = hasRoundData ? getPairs(si) : (stageRounds[si] || []).map(r => [r])
+          const isLast  = si === bracketStages.length - 1
+          // Absolute depth: how many halvings from R32
+          const depth   = STAGE_DEPTH[stage] ?? si
+          const slotH   = slotHeight(depth)
 
           return (
             <div key={stage} style={{
@@ -568,77 +557,80 @@ function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, is
               display: 'flex',
               flexDirection: 'column',
               boxSizing: 'border-box',
-              paddingRight: isLast ? 0 : CONN + 'px',
-              gap: 0,
+              paddingRight: isLast ? 0 : CONN,
+              overflow: 'visible',
             }}>
               {pairs.map((pair, pi) => {
-                // Each pair-slot has a fixed height based on depth
-                // This ensures: 2 slots at depth N == 1 slot at depth N+1
                 const isLastPair = pi === pairs.length - 1
+                // Distance between centers of first and second card within this slot
+                // first card center: CARD_H/2 from top
+                // second card center: slotH - CARD_H/2 from top
+                const connTop    = CARD_H / 2                // where bracket arm starts (top)
+                const connBottom = slotH - CARD_H / 2        // where bracket arm ends (bottom)
+                const connH      = connBottom - connTop       // bracket arm height
+                const connMid    = slotH / 2                 // horizontal stub y position
+
                 return (
                   <div key={pi} style={{
                     height: slotH,
+                    flexShrink: 0,
                     display: 'flex',
                     flexDirection: 'column',
                     position: 'relative',
-                    justifyContent: 'space-around',
+                    justifyContent: 'space-between',
                     marginBottom: isLastPair ? 0 : PAIR_GAP * 2,
                     overflow: 'visible',
                   }}>
-                    {pair.map((round, ri) => (
+                    {/* Cards — each in a fixed-height slot centered */}
+                    {pair.map((round) => (
                       <div key={round} style={{
                         height: CARD_H,
                         display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'center',
+                        alignItems: 'center',
                       }}>
                         {renderMatch(round)}
                       </div>
                     ))}
 
-                    {/* Bracket connectors */}
-                    {!isLast && (
+                    {/* ── Bracket connector to next column ── */}
+                    {!isLast && pair.length === 2 && (
                       <>
-                        {pair.length === 2 ? (
-                          <>
-                            {/* Bracket: ╡ — vertical bar from 1st card center to 2nd card center, with horizontal stub */}
-                            <div style={{
-                              position: 'absolute',
-                              right: -CONN,
-                              // Top: center of first card
-                              top: CARD_H / 2,
-                              // Height: distance between the two card centers
-                              height: slotH - CARD_H,
-                              width: CONN / 2,
-                              borderTop: '2px solid var(--border-strong)',
-                              borderBottom: '2px solid var(--border-strong)',
-                              borderRight: '2px solid var(--border-strong)',
-                              borderTopRightRadius: 5,
-                              borderBottomRightRadius: 5,
-                              pointerEvents: 'none',
-                              boxSizing: 'border-box',
-                            }} />
-                            {/* Horizontal stub from midpoint to right */}
-                            <div style={{
-                              position: 'absolute',
-                              right: -CONN,
-                              top: slotH / 2,
-                              width: CONN,
-                              borderBottom: '2px solid var(--border-strong)',
-                              pointerEvents: 'none',
-                            }} />
-                          </>
-                        ) : (
-                          <div style={{
-                            position: 'absolute',
-                            right: -CONN,
-                            top: '50%',
-                            width: CONN,
-                            borderBottom: '2px solid var(--border-strong)',
-                            pointerEvents: 'none',
-                          }} />
-                        )}
+                        {/* Vertical bar with top+bottom caps (the ╡ bracket) */}
+                        <div style={{
+                          position: 'absolute',
+                          right: -CONN,
+                          top:    connTop,
+                          height: connH,
+                          width:  CONN / 2,
+                          borderTop:    '2px solid var(--border-strong)',
+                          borderBottom: '2px solid var(--border-strong)',
+                          borderRight:  '2px solid var(--border-strong)',
+                          borderTopRightRadius:    4,
+                          borderBottomRightRadius: 4,
+                          pointerEvents: 'none',
+                          boxSizing: 'border-box',
+                        }} />
+                        {/* Horizontal stub from midpoint into next column */}
+                        <div style={{
+                          position: 'absolute',
+                          right:  -CONN,
+                          top:    connMid,
+                          width:  CONN,
+                          borderBottom: '2px solid var(--border-strong)',
+                          pointerEvents: 'none',
+                        }} />
                       </>
+                    )}
+                    {/* Single-match connector (SF→Final, Final has no connector) */}
+                    {!isLast && pair.length === 1 && (
+                      <div style={{
+                        position: 'absolute',
+                        right: -CONN,
+                        top:   '50%',
+                        width: CONN,
+                        borderBottom: '2px solid var(--border-strong)',
+                        pointerEvents: 'none',
+                      }} />
                     )}
                   </div>
                 )
