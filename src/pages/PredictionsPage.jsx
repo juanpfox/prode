@@ -39,6 +39,24 @@ function TeamFlag({ code, size = 18 }) {
 }
 
 const STAGE_ORDER = ['group', 'r32', 'r16', 'qf', 'sf', 'third_place', 'final']
+
+// Bracket-aware display order per round number.
+// Pairs of consecutive entries feed the same match in the next stage.
+// Derived from the LATER_ROUNDS tree in simulatorWC2026.js
+const BRACKET_DISPLAY_ORDER = {
+  // R32 — pairs: (73,75)→89, (74,77)→90, (76,78)→91, (79,80)→92,
+  //              (81,84)→93, (82,86)→94, (85,88)→95, (83,87)→96
+  73: 0, 75: 1, 74: 2, 77: 3, 76: 4, 78: 5, 79: 6, 80: 7,
+  81: 8, 84: 9, 82: 10, 86: 11, 85: 12, 88: 13, 83: 14, 87: 15,
+  // R16 — pairs: (89,90)→97, (91,92)→98, (93,94)→99, (95,96)→100
+  89: 0, 90: 1, 91: 2, 92: 3, 93: 4, 94: 5, 95: 6, 96: 7,
+  // QF — pairs: (97,98)→101, (99,100)→102
+  97: 0, 98: 1, 99: 2, 100: 3,
+  // SF
+  101: 0, 102: 1,
+  // Final
+  104: 0,
+}
 export default function PredictionsPage() {
   const { t, i18n } = useTranslation()
   const { id: tournamentId } = useParams()
@@ -444,7 +462,7 @@ export default function PredictionsPage() {
                         boxSizing: 'border-box',
                       }}
                     >
-                      {[...byStage[stage]].sort((a,b) => (a.round ?? 0) - (b.round ?? 0)).map((match) => (
+                      {[...byStage[stage]].sort((a,b) => (BRACKET_DISPLAY_ORDER[a.round] ?? a.round ?? 0) - (BRACKET_DISPLAY_ORDER[b.round] ?? b.round ?? 0)).map((match) => (
                         <div key={match.id} className="bracket-match-cell">
                           <MatchCard
                             stacked={true}
