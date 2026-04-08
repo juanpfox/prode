@@ -528,7 +528,7 @@ body {
   border-bottom: 1px solid var(--border);
 }
 /* ResultBubble in stacked mode: fill column */
-.match-card-stacked .match-center-col span[style] {
+.match-card-stacked .match-center-col .result-bubble {
   width: 2rem;
   height: 1.8rem;
   border-radius: var(--r-sm);
