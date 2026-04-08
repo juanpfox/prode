@@ -474,63 +474,89 @@ body {
   .goal-input-val { border-left: none; border-right: none; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); width: 100%; line-height: 2rem; }
 }
 
-/* Stacked layout (Google-style): teams stacked on left, scores on right */
+/* Stacked layout (Google-style): flag+name on left, scores on right */
+/* Grid: 2 team rows (col 1) | score column (col 2, spans both rows) */
 .match-card-stacked .match-card-grid {
+  display: grid;
   grid-template-columns: 1fr auto;
   grid-template-rows: auto auto;
   gap: 0;
   align-items: stretch;
 }
+/* Both team cols occupy column 1 */
 .match-card-stacked .match-team-col {
   grid-column: 1;
-  justify-content: flex-start;
   flex-direction: row;
-  gap: 0.35rem;
-  padding: 0.3rem 0;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0;
 }
 .match-card-stacked .match-team-col.home {
   border-bottom: 1px solid var(--border);
-  align-items: center;
-}
-.match-card-stacked .match-team-col.away {
-  align-items: center;
 }
 .match-card-stacked .match-team-col.home .match-team-name,
 .match-card-stacked .match-team-col.away .match-team-name {
   text-align: left;
-  font-size: 0.875rem;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 7rem;
 }
+/* Score column spans both rows */
 .match-card-stacked .match-center-col {
   grid-column: 2;
   grid-row: 1 / span 2;
   flex-direction: column;
-  justify-content: center;
+  justify-content: stretch;
   align-items: center;
-  padding-left: 0.75rem;
+  padding-left: 0.625rem;
   gap: 0;
   border-left: 1px solid var(--border);
-  min-width: 3rem;
+  min-width: 2.75rem;
 }
-.match-card-stacked .match-center-col .match-vs-sep { display: none; }
-/* Score items in stacked mode get a divider between them */
+/* Each score item (ResultBubble or GoalInput) fills half the height */
+.match-card-stacked .match-center-col > * {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
 .match-card-stacked .match-center-col > *:not(:last-child) {
   border-bottom: 1px solid var(--border);
-  padding-bottom: 0.25rem;
-  margin-bottom: 0.25rem;
 }
+/* ResultBubble in stacked mode: fill column */
+.match-card-stacked .match-center-col span[style] {
+  width: 2rem;
+  height: 1.8rem;
+  border-radius: var(--r-sm);
+}
+/* GoalInput in stacked mode: vertical layout */
 .match-card-stacked .match-center-col .goal-input-wrapper {
   flex-direction: column;
-  min-width: 2.5rem;
+  min-width: 2.25rem;
+  border: none;
+  background: transparent;
 }
+.match-card-stacked .match-center-col .goal-input-btn { padding: 0.2rem 0.5rem; font-size: 0.8rem; }
 .match-card-stacked .match-center-col .goal-input-val {
   border-left: none;
   border-right: none;
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
+  border-radius: 0;
   width: 100%;
-  line-height: 1.8rem;
+  min-height: 1.6rem;
+  line-height: 1.6rem;
+  font-size: 0.9rem;
 }
-.match-card-stacked .match-center-col .goal-input-btn { padding: 0.3rem 0.4rem; }
+/* bracket-match-cell height for stacked cards (2 teams = more compact) */
+.match-card-stacked ~ * .bracket-match-cell,
+.bracket-match-cell:has(.match-card-stacked) {
+  min-height: 90px;
+}
 
 
 /* ============================================================
@@ -763,7 +789,7 @@ body {
   flex-direction: column;
   justify-content: center;
   position: relative;
-  min-height: 110px;
+  min-height: 95px;
   padding: 0.5rem 0;
 }
 
