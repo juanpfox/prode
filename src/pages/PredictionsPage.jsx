@@ -583,6 +583,7 @@ function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, is
                     position: 'relative',
                     justifyContent: 'space-around',
                     marginBottom: isLastPair ? 0 : PAIR_GAP * 2,
+                    overflow: 'visible',
                   }}>
                     {pair.map((round, ri) => (
                       <div key={round} style={{
