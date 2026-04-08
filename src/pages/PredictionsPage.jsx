@@ -477,22 +477,19 @@ const BRACKET_STAGE_ROUNDS = {
 }
 const STAGE_DEPTH = { r32:0, r16:1, qf:2, sf:3, final:4 }
 
-// Layout constants (px)
-const CARD_H     = 106  // height of one stacked MatchCard
-const INNER_GAP  = 6    // gap between the two cards inside a pair
-const OUTER_GAP  = 12   // gap between separate pairs in a column
-const CONN_W     = 18   // width of connector channel (paddingRight of each column except last)
+// Layout constants (px) — tune these to match real rendered card height
+const CARD_H     = 106   // height of one stacked MatchCard
+const INNER_GAP  = 6     // gap between the 2 cards inside a pair (justifyContent:space-between handles this)
+const OUTER_GAP  = 12    // gap between separate pairs in a column (flex gap)
+const CONN_W     = 18    // width of connector channel
 
-// Compute the pixel height of a slot at depth d.
-// At depth 0: slot holds 2 cards → CARD_H + INNER_GAP + CARD_H
-// At depth d: slot holds 2^(d+1) cards with INNER_GAP between each consecutive pair,
-//             plus (2^d - 1) OUTER_GAP subdivisions between sub-pairs
-function slotH(d) {
-  const n = Math.pow(2, d + 1)           // total cards in this slot
-  const innerGaps = n - 1                // gaps between consecutive cards
-  const outerGaps = Math.pow(2, d) - 1  // extra outer gaps between sub-groups
-  return n * CARD_H + innerGaps * INNER_GAP + outerGaps * OUTER_GAP
-}
+// Recursive slot height — guarantees: slotH(d+1) = 2*slotH(d) + OUTER_GAP
+// so columns stay perfectly aligned.
+// slotH(0) = 2 cards + 1 inner gap
+// slotH(d) = 2 * slotH(d-1) + OUTER_GAP
+const _slotH = [2 * CARD_H + INNER_GAP]
+for (let i = 1; i <= 4; i++) _slotH.push(2 * _slotH[i-1] + OUTER_GAP)
+const getSlotH = (d) => _slotH[Math.min(d, 4)]
 
 function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, isLocked, updatePred, t, colPct, translatePct }) {
   const matchByRound = {}
@@ -500,12 +497,11 @@ function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, is
   const hasRoundData = Object.keys(matchByRound).some(r => parseInt(r) >= 73)
   const stageRounds  = bracketStages.map(s => (BRACKET_STAGE_ROUNDS[s] || []).filter(r => matchByRound[r]))
 
-  // Group the rounds in stage[stageIdx] into pairs that feed the same match in stage[stageIdx+1]
   function getPairs(si) {
     const rounds     = stageRounds[si] || []
     if (!rounds.length) return []
     const nextRounds = stageRounds[si + 1] || []
-    if (!nextRounds.length) return rounds.map(r => [r])   // last stage: singles
+    if (!nextRounds.length) return rounds.map(r => [r])
     const c2p = {}
     nextRounds.forEach(pr => (WC2026_CHILDREN[pr] || []).forEach(c => { c2p[c] = pr }))
     const p2c = {}
@@ -544,12 +540,13 @@ function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, is
           const pairs  = hasRoundData ? getPairs(si) : (stageRounds[si] || []).map(r => [r])
           const depth  = STAGE_DEPTH[stage] ?? si
           const isLast = si === bracketStages.length - 1
-          const h      = slotH(depth)  // px height of each pair-slot in this column
+          const h      = getSlotH(depth)
 
-          // Connector geometry (absolute positioning inside pair-div)
-          // First card center:  CARD_H / 2
-          // Second card center: h - CARD_H / 2
-          // Bracket arm:        from CARD_H/2 to (h - CARD_H/2)  →  height = h - CARD_H
+          // Connector geometry (px, relative to top of pair-div):
+          // Top card center:    CARD_H / 2
+          // Bottom card center: h - CARD_H / 2
+          // Bracket arm height: h - CARD_H
+          // Midpoint stub:      h / 2
           const armTop = CARD_H / 2
           const armH   = h - CARD_H
 
@@ -571,20 +568,20 @@ function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, is
                   position: 'relative',
                   display: 'flex',
                   flexDirection: 'column',
+                  // 2 cards → space-between puts them at top and bottom of the slot
+                  // 1 card  → center
                   justifyContent: pair.length === 2 ? 'space-between' : 'center',
                   overflow: 'visible',
                 }}>
-                  {/* Cards */}
                   {pair.map(round => (
                     <div key={round} style={{ height: CARD_H, flexShrink: 0 }}>
                       {renderCard(round)}
                     </div>
                   ))}
 
-                  {/* Connector: bracket arm + horizontal stub */}
+                  {/* Connector: vertical bracket + horizontal stub */}
                   {!isLast && pair.length === 2 && (
                     <>
-                      {/* Vertical bracket ╡ */}
                       <div style={{
                         position: 'absolute',
                         right: -CONN_W,
@@ -599,7 +596,6 @@ function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, is
                         boxSizing: 'border-box',
                         pointerEvents: 'none',
                       }} />
-                      {/* Horizontal stub to next column */}
                       <div style={{
                         position: 'absolute',
                         right: -CONN_W,
