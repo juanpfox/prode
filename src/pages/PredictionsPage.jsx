@@ -476,22 +476,24 @@ const BRACKET_STAGE_ROUNDS = {
   final:[104],
 }
 const STAGE_DEPTH = { r32:0, r16:1, qf:2, sf:3, final:4 }
-
-// Layout constants (px) — tune these to match real rendered card height
-const CARD_H     = 106   // height of one stacked MatchCard
-const INNER_GAP  = 6     // gap between the 2 cards inside a pair (justifyContent:space-between handles this)
-const OUTER_GAP  = 12    // gap between separate pairs in a column (flex gap)
-const CONN_W     = 18    // width of connector channel
-
-// Recursive slot height — guarantees: slotH(d+1) = 2*slotH(d) + OUTER_GAP
-// so columns stay perfectly aligned.
-// slotH(0) = 2 cards + 1 inner gap
-// slotH(d) = 2 * slotH(d-1) + OUTER_GAP
-const _slotH = [2 * CARD_H + INNER_GAP]
-for (let i = 1; i <= 4; i++) _slotH.push(2 * _slotH[i-1] + OUTER_GAP)
-const getSlotH = (d) => _slotH[Math.min(d, 4)]
+const CONN_W = 18   // px — connector channel width
+const PAIR_GAP = 10 // px — gap between pairs in the same column
 
 function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, isLocked, updatePred, t, colPct, translatePct }) {
+  // Measure real card height from a rendered card
+  const cardRef   = useRef(null)
+  const [cardH, setCardH] = useState(null)
+
+  useEffect(() => {
+    if (!cardRef.current) return
+    const obs = new ResizeObserver(entries => {
+      const h = entries[0]?.contentRect?.height
+      if (h && h > 0) setCardH(h)
+    })
+    obs.observe(cardRef.current)
+    return () => obs.disconnect()
+  }, [])
+
   const matchByRound = {}
   Object.values(byStage).flat().forEach(m => { if (m.round) matchByRound[m.round] = m })
   const hasRoundData = Object.keys(matchByRound).some(r => parseInt(r) >= 73)
@@ -512,116 +514,142 @@ function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, is
     return nextRounds.map(pr => p2c[pr]).filter(Boolean)
   }
 
-  const renderCard = (round) => {
+  // Recursive slot height based on measured cardH
+  // slotH(0) = 2*cardH + PAIR_GAP   (two cards separated by PAIR_GAP)
+  // slotH(d) = 2*slotH(d-1) + PAIR_GAP
+  function getSlotH(d, h) {
+    if (d === 0) return 2 * h + PAIR_GAP
+    return 2 * getSlotH(d - 1, h) + PAIR_GAP
+  }
+
+  const renderCard = (round, ref) => {
     const match = matchByRound[round]
-    if (!match) return <div style={{ height: CARD_H }} />
+    if (!match) return <div ref={ref} style={{ minHeight: 80 }} />
     const enriched = {
       ...match,
       home_team: simulatedBracket[round]?.home_team || match.home_team,
       away_team: simulatedBracket[round]?.away_team || match.away_team,
     }
-    return <MatchCard stacked={true} match={enriched}
-      pred={predictions[match.id] ?? {}} locked={isLocked(match)}
-      onChange={(f, v) => updatePred(match.id, f, v)} t={t} />
+    return (
+      <div ref={ref}>
+        <MatchCard stacked={true} match={enriched}
+          pred={predictions[match.id] ?? {}} locked={isLocked(match)}
+          onChange={(f, v) => updatePred(match.id, f, v)} t={t} />
+      </div>
+    )
   }
+
+  // Find the first available match in R32 (or any first stage) to use as the probe card
+  const firstStageRounds = stageRounds[0] || []
+  const probeRound       = firstStageRounds[0]
+  const probeMatch       = probeRound ? matchByRound[probeRound] : null
 
   return (
     <div style={{ overflowX: 'clip', overflowY: 'visible' }}>
-      <div style={{
-        display: 'flex',
-        alignItems: 'flex-start',
-        flexWrap: 'nowrap',
-        transform: `translateX(${translatePct}%)`,
-        transition: 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
-        willChange: 'transform',
-        padding: '0.75rem 0',
-      }}>
-        {bracketStages.map((stage, si) => {
-          const pairs  = hasRoundData ? getPairs(si) : (stageRounds[si] || []).map(r => [r])
-          const depth  = STAGE_DEPTH[stage] ?? si
-          const isLast = si === bracketStages.length - 1
-          const h      = getSlotH(depth)
 
-          // Connector geometry (px, relative to top of pair-div):
-          // Top card center:    CARD_H / 2
-          // Bottom card center: h - CARD_H / 2
-          // Bracket arm height: h - CARD_H
-          // Midpoint stub:      h / 2
-          const armTop = CARD_H / 2
-          const armH   = h - CARD_H
+      {/* Probe card — rendered off-screen to measure real height */}
+      {probeMatch && (
+        <div ref={cardRef} style={{ position: 'absolute', visibility: 'hidden', pointerEvents: 'none', width: `${colPct}%` }}>
+          <MatchCard stacked={true} match={probeMatch} pred={{}} locked={false} onChange={() => {}} t={t} />
+        </div>
+      )}
 
-          return (
-            <div key={stage} style={{
-              flex: `0 0 ${colPct}%`,
-              width: `${colPct}%`,
-              boxSizing: 'border-box',
-              paddingRight: isLast ? 0 : CONN_W,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: OUTER_GAP,
-              overflow: 'visible',
-            }}>
-              {pairs.map((pair, pi) => (
-                <div key={pi} style={{
-                  height: h,
-                  flexShrink: 0,
-                  position: 'relative',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  // 2 cards → space-between puts them at top and bottom of the slot
-                  // 1 card  → center
-                  justifyContent: pair.length === 2 ? 'space-between' : 'center',
-                  overflow: 'visible',
-                }}>
-                  {pair.map(round => (
-                    <div key={round} style={{ height: CARD_H, flexShrink: 0 }}>
-                      {renderCard(round)}
-                    </div>
-                  ))}
+      {/* Don't render the bracket until we have a real measurement */}
+      {cardH && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          flexWrap: 'nowrap',
+          transform: `translateX(${translatePct}%)`,
+          transition: 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+          willChange: 'transform',
+          padding: '0.75rem 0',
+        }}>
+          {bracketStages.map((stage, si) => {
+            const pairs  = hasRoundData ? getPairs(si) : (stageRounds[si] || []).map(r => [r])
+            const depth  = STAGE_DEPTH[stage] ?? si
+            const isLast = si === bracketStages.length - 1
+            const h      = getSlotH(depth, cardH)
 
-                  {/* Connector: vertical bracket + horizontal stub */}
-                  {!isLast && pair.length === 2 && (
-                    <>
+            // Connector geometry
+            // Card 1 center: cardH / 2 from top of slot
+            // Card 2 center: h - cardH / 2
+            // Arm top:    cardH / 2
+            // Arm height: h - cardH
+            const armTop = cardH / 2
+            const armH   = h - cardH
+
+            return (
+              <div key={stage} style={{
+                flex: `0 0 ${colPct}%`,
+                width: `${colPct}%`,
+                boxSizing: 'border-box',
+                paddingRight: isLast ? 0 : CONN_W,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: PAIR_GAP,
+                overflow: 'visible',
+              }}>
+                {pairs.map((pair, pi) => (
+                  <div key={pi} style={{
+                    height: h,
+                    flexShrink: 0,
+                    position: 'relative',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: pair.length === 2 ? 'space-between' : 'center',
+                    overflow: 'visible',
+                  }}>
+                    {pair.map(round => (
+                      <div key={round} style={{ height: cardH, flexShrink: 0 }}>
+                        {renderCard(round, null)}
+                      </div>
+                    ))}
+
+                    {/* Bracket connector */}
+                    {!isLast && pair.length === 2 && (
+                      <>
+                        <div style={{
+                          position: 'absolute',
+                          right: -CONN_W,
+                          top: armTop,
+                          height: armH,
+                          width: CONN_W / 2,
+                          borderTop:    '2px solid var(--border-strong)',
+                          borderRight:  '2px solid var(--border-strong)',
+                          borderBottom: '2px solid var(--border-strong)',
+                          borderTopRightRadius:    4,
+                          borderBottomRightRadius: 4,
+                          boxSizing: 'border-box',
+                          pointerEvents: 'none',
+                        }} />
+                        <div style={{
+                          position: 'absolute',
+                          right: -CONN_W,
+                          top: h / 2,
+                          width: CONN_W,
+                          borderBottom: '2px solid var(--border-strong)',
+                          pointerEvents: 'none',
+                        }} />
+                      </>
+                    )}
+                    {!isLast && pair.length === 1 && (
                       <div style={{
                         position: 'absolute',
                         right: -CONN_W,
-                        top: armTop,
-                        height: armH,
-                        width: CONN_W / 2,
-                        borderTop:    '2px solid var(--border-strong)',
-                        borderRight:  '2px solid var(--border-strong)',
-                        borderBottom: '2px solid var(--border-strong)',
-                        borderTopRightRadius:    4,
-                        borderBottomRightRadius: 4,
-                        boxSizing: 'border-box',
-                        pointerEvents: 'none',
-                      }} />
-                      <div style={{
-                        position: 'absolute',
-                        right: -CONN_W,
-                        top: h / 2,
+                        top: '50%',
                         width: CONN_W,
                         borderBottom: '2px solid var(--border-strong)',
                         pointerEvents: 'none',
                       }} />
-                    </>
-                  )}
-                  {!isLast && pair.length === 1 && (
-                    <div style={{
-                      position: 'absolute',
-                      right: -CONN_W,
-                      top: '50%',
-                      width: CONN_W,
-                      borderBottom: '2px solid var(--border-strong)',
-                      pointerEvents: 'none',
-                    }} />
-                  )}
-                </div>
-              ))}
-            </div>
-          )
-        })}
-      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }
