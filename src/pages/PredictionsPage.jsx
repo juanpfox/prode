@@ -435,7 +435,7 @@ export default function PredictionsPage() {
               <div
                 onTouchStart={handleTouchStart}
                 onTouchEnd={handleTouchEnd}
-                style={{ overflow: 'hidden', touchAction: 'pan-y' }}
+                style={{ overflowX: 'clip', overflowY: 'visible', touchAction: 'pan-y' }}
               >
                 <div
                   className="playoff-bracket is-slider"
