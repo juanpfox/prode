@@ -366,7 +366,7 @@ export default function PredictionsPage() {
         {/* --- VIEW: PLAYOFFS --- */}
         {view === 'playoffs' && (() => {
           const bracketStages = playoffStages.filter(s => s !== 'third_place')
-          const visibleCount = isMobile ? 1 : 2
+          const visibleCount = isMobile ? 2 : 4
           const safeOffset = Math.min(bracketOffset, Math.max(0, bracketStages.length - visibleCount))
           // Each column is 100/visibleCount % of the viewport width
           const colPct = 100 / visibleCount
@@ -444,7 +444,7 @@ export default function PredictionsPage() {
                         boxSizing: 'border-box',
                       }}
                     >
-                      {byStage[stage].map((match) => (
+                      {[...byStage[stage]].sort((a,b) => (a.round ?? 0) - (b.round ?? 0)).map((match) => (
                         <div key={match.id} className="bracket-match-cell">
                           <MatchCard
                             stacked={true}
@@ -580,35 +580,68 @@ function MatchCard({ match, pred, locked, saving, saved, onChange, onSave, t, st
       </div>
 
       <div className="match-card-grid">
-        <div className="match-team-col home">
-          <span className="match-team-name">{home}</span>
-          <TeamFlag code={match.home_team?.code} />
-        </div>
-        <div className="match-center-col">
-          {hasResult ? (
-            <div className="match-center-col">
-              <ResultBubble val={match.home_goals} />
-              <span className="match-vs-sep" style={{ color: 'var(--text-muted)', fontWeight: 700 }}>-</span>
-              <ResultBubble val={match.away_goals} />
+        {stacked ? (
+          <>
+            <div className="match-team-col home">
+              <TeamFlag code={match.home_team?.code} size={16} />
+              <span className="match-team-name">{home}</span>
             </div>
-          ) : locked ? (
-            <div className="match-center-col">
-              <ResultBubble val={pred.home_goals !== '' ? pred.home_goals : '?'} muted={pred.home_goals === ''} />
-              <span className="match-vs-sep" style={{ color: 'var(--text-muted)', fontWeight: 700 }}>-</span>
-              <ResultBubble val={pred.away_goals !== '' ? pred.away_goals : '?'} muted={pred.away_goals === ''} />
+            <div className="match-team-col away">
+              <TeamFlag code={match.away_team?.code} size={16} />
+              <span className="match-team-name">{away}</span>
             </div>
-          ) : (
             <div className="match-center-col">
-              <GoalInput val={pred.home_goals ?? ''} onChange={v => onChange('home_goals', v)} />
-              <span className="match-vs-sep" style={{ color: 'var(--text-muted)', fontWeight: 800, fontSize: '0.85rem' }}>vs</span>
-              <GoalInput val={pred.away_goals ?? ''} onChange={v => onChange('away_goals', v)} />
+              {hasResult ? (
+                <>
+                  <ResultBubble val={match.home_goals} />
+                  <ResultBubble val={match.away_goals} />
+                </>
+              ) : locked ? (
+                <>
+                  <ResultBubble val={pred.home_goals !== '' ? pred.home_goals : '?'} muted={pred.home_goals === ''} />
+                  <ResultBubble val={pred.away_goals !== '' ? pred.away_goals : '?'} muted={pred.away_goals === ''} />
+                </>
+              ) : (
+                <>
+                  <GoalInput val={pred.home_goals ?? ''} onChange={v => onChange('home_goals', v)} />
+                  <GoalInput val={pred.away_goals ?? ''} onChange={v => onChange('away_goals', v)} />
+                </>
+              )}
             </div>
-          )}
-        </div>
-        <div className="match-team-col away">
-          <TeamFlag code={match.away_team?.code} />
-          <span className="match-team-name">{away}</span>
-        </div>
+          </>
+        ) : (
+          <>
+            <div className="match-team-col home">
+              <span className="match-team-name">{home}</span>
+              <TeamFlag code={match.home_team?.code} />
+            </div>
+            <div className="match-center-col">
+              {hasResult ? (
+                <div className="match-center-col">
+                  <ResultBubble val={match.home_goals} />
+                  <span className="match-vs-sep" style={{ color: 'var(--text-muted)', fontWeight: 700 }}>-</span>
+                  <ResultBubble val={match.away_goals} />
+                </div>
+              ) : locked ? (
+                <div className="match-center-col">
+                  <ResultBubble val={pred.home_goals !== '' ? pred.home_goals : '?'} muted={pred.home_goals === ''} />
+                  <span className="match-vs-sep" style={{ color: 'var(--text-muted)', fontWeight: 700 }}>-</span>
+                  <ResultBubble val={pred.away_goals !== '' ? pred.away_goals : '?'} muted={pred.away_goals === ''} />
+                </div>
+              ) : (
+                <div className="match-center-col">
+                  <GoalInput val={pred.home_goals ?? ''} onChange={v => onChange('home_goals', v)} />
+                  <span className="match-vs-sep" style={{ color: 'var(--text-muted)', fontWeight: 800, fontSize: '0.85rem' }}>vs</span>
+                  <GoalInput val={pred.away_goals ?? ''} onChange={v => onChange('away_goals', v)} />
+                </div>
+              )}
+            </div>
+            <div className="match-team-col away">
+              <TeamFlag code={match.away_team?.code} />
+              <span className="match-team-name">{away}</span>
+            </div>
+          </>
+        )}
       </div>
 
       {showPens && (
