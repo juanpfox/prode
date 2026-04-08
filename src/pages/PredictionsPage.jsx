@@ -600,18 +600,19 @@ function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, is
     )
   }
 
-  // Probe card for measurement
+  // Probe card for measurement — simulate a draw so penalty row is included in height
   const probeRound = (allStageRounds[0] || [])[0]
   const probeMatch = probeRound ? matchByRound[probeRound] : null
+  const probePred = { home_goals: '1', away_goals: '1' }
 
   const trn = `top ${ANIM}, height ${ANIM}`
 
   return (
     <div style={{ overflowX: 'clip', overflowY: 'visible' }}>
-      {/* Probe card rendered off-screen to measure real height */}
+      {/* Probe card rendered off-screen to measure real height (with penalty row) */}
       {probeMatch && (
         <div ref={cardRef} style={{ position: 'absolute', visibility: 'hidden', pointerEvents: 'none', width: `${colPct}%` }}>
-          <MatchCard stacked={true} match={probeMatch} pred={{}} locked={false} onChange={() => {}} t={t} />
+          <MatchCard stacked={true} match={probeMatch} pred={probePred} locked={false} onChange={() => {}} t={t} />
         </div>
       )}
 
