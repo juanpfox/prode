@@ -386,11 +386,9 @@ export default function PredictionsPage() {
           const bracketStages = playoffStages.filter(s => s !== 'third_place')
           const visibleCount = isMobile ? 2 : 4
           const safeOffset = Math.min(bracketOffset, Math.max(0, bracketStages.length - visibleCount))
-          // Each column is 100/visibleCount % of the viewport width
           const colPct = 100 / visibleCount
           const translatePct = -(safeOffset * colPct)
 
-          // Swipe handlers
           const handleTouchStart = (e) => { swipeTouchStart.current = e.touches[0].clientX }
           const handleTouchEnd = (e) => {
             if (swipeTouchStart.current === null) return
@@ -402,8 +400,8 @@ export default function PredictionsPage() {
 
           return (
             <div style={{ paddingBottom: '2rem' }}>
-              {/* Stage titles — slide in sync with bracket */}
-              <div style={{ overflow: 'hidden', borderRadius: 'var(--r-md)', marginBottom: '1.5rem', border: '1px solid var(--border)', background: 'var(--surface-2)' }}>
+              {/* Stage titles */}
+              <div style={{ overflow: 'hidden', borderRadius: 'var(--r-md)', marginBottom: '1rem', border: '1px solid var(--border)', background: 'var(--surface-2)' }}>
                 <div style={{
                   display: 'flex',
                   transform: `translateX(${translatePct}%)`,
@@ -414,16 +412,11 @@ export default function PredictionsPage() {
                     <h3 key={stage} style={{
                       flex: `0 0 ${colPct}%`,
                       width: `${colPct}%`,
-                      fontWeight: 800,
-                      fontSize: '0.8rem',
-                      textTransform: 'uppercase',
-                      color: 'var(--text)',
-                      margin: 0,
-                      padding: '0.75rem 1rem',
-                      textAlign: 'center',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
+                      fontWeight: 800, fontSize: '0.8rem',
+                      textTransform: 'uppercase', color: 'var(--text)',
+                      margin: 0, padding: '0.75rem 1rem',
+                      textAlign: 'center', whiteSpace: 'nowrap',
+                      overflow: 'hidden', textOverflow: 'ellipsis',
                     }}>
                       {t(`predictions.stages.${stage}`)}
                     </h3>
@@ -431,84 +424,47 @@ export default function PredictionsPage() {
                 </div>
               </div>
 
-              {/* Swipeable bracket — bracket-column are direct children so CSS ::before/::after connectors work */}
-              <div
-                onTouchStart={handleTouchStart}
-                onTouchEnd={handleTouchEnd}
-                style={{ overflowX: 'clip', overflowY: 'visible', touchAction: 'pan-y' }}
-              >
-                <div
-                  className="playoff-bracket is-slider"
-                  style={{
-                    flexWrap: 'nowrap',
-                    gap: 0,
-                    padding: '1rem 0',
-                    minWidth: 'unset',
-                    transform: `translateX(${translatePct}%)`,
-                    transition: 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
-                    willChange: 'transform',
-                    marginBottom: byStage['third_place']?.length > 0 ? '6rem' : 0,
-                  }}
-                >
-                  {bracketStages.map((stage, stageIndex) => (
-                    <div
-                      key={stage}
-                      className={`bracket-column${stageIndex === 0 ? '' : ''}`}
-                      style={{
-                        flex: `0 0 ${colPct}%`,
-                        width: `${colPct}%`,
-                        // Restore gap between columns via padding so ::before left offsets still align
-                        paddingLeft: stageIndex === 0 ? 0 : '2.5rem',
-                        boxSizing: 'border-box',
-                      }}
-                    >
-                      {[...byStage[stage]].sort((a,b) => (BRACKET_DISPLAY_ORDER[a.round] ?? a.round ?? 0) - (BRACKET_DISPLAY_ORDER[b.round] ?? b.round ?? 0)).map((match) => (
-                        <div key={match.id} className="bracket-match-cell">
-                          <MatchCard
-                            stacked={true}
-                            match={{ ...match, home_team: simulatedBracket[match.round]?.home_team || match.home_team, away_team: simulatedBracket[match.round]?.away_team || match.away_team }}
-                            pred={predictions[match.id] ?? {}}
-                            locked={isLocked(match)}
-                            onChange={(f, v) => updatePred(match.id, f, v)}
-                            t={t}
-                          />
-                        </div>
-                      ))}
+              {/* Bracket */}
+              <div onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+                <BracketTree
+                  byStage={byStage}
+                  bracketStages={bracketStages}
+                  simulatedBracket={simulatedBracket}
+                  predictions={predictions}
+                  isLocked={isLocked}
+                  updatePred={updatePred}
+                  t={t}
+                  colPct={colPct}
+                  translatePct={translatePct}
+                  offset={safeOffset}
+                  visibleCount={visibleCount}
+                />
+              </div>
 
-                      {/* Third Place Match */}
-                      {stage === 'final' && byStage['third_place']?.length > 0 && (
-                        <div style={{ position: 'absolute', top: 'calc(50% + 85px)', left: 0, right: 0, zIndex: 10 }}>
-                          <h3 style={{ fontWeight: 800, fontSize: '0.70rem', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.5rem', textAlign: 'center' }}>
-                            {t('predictions.stages.third_place')}
-                          </h3>
-                          {byStage['third_place'].map(match => (
-                            <MatchCard stacked={true} key={match.id} match={{ ...match, home_team: simulatedBracket[match.round]?.home_team || match.home_team, away_team: simulatedBracket[match.round]?.away_team || match.away_team }} pred={predictions[match.id] ?? {}} locked={isLocked(match)} onChange={(f, v) => updatePred(match.id, f, v)} t={t} />
-                          ))}
-                        </div>
-                      )}
-                    </div>
+              {/* Third place */}
+              {byStage['third_place']?.length > 0 && (
+                <div style={{ marginTop: '1.5rem' }}>
+                  <h3 style={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.75rem', textAlign: 'center' }}>
+                    🥉 {t('predictions.stages.third_place')}
+                  </h3>
+                  {byStage['third_place'].map(match => (
+                    <MatchCard stacked={true} key={match.id}
+                      match={{ ...match, home_team: simulatedBracket[match.round]?.home_team || match.home_team, away_team: simulatedBracket[match.round]?.away_team || match.away_team }}
+                      pred={predictions[match.id] ?? {}} locked={isLocked(match)} onChange={(f, v) => updatePred(match.id, f, v)} t={t} />
                   ))}
                 </div>
-              </div>
+              )}
 
               {/* Dots indicator */}
               {bracketStages.length > visibleCount && (
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', paddingTop: '1.25rem' }}>
                   {bracketStages.slice(0, bracketStages.length - visibleCount + 1).map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setBracketOffset(i)}
-                      style={{
-                        width: i === safeOffset ? '20px' : '8px',
-                        height: '8px',
-                        borderRadius: '9999px',
-                        border: 'none',
-                        cursor: 'pointer',
-                        background: i === safeOffset ? 'var(--primary)' : 'var(--border-strong)',
-                        transition: 'all 0.2s ease',
-                        padding: 0,
-                      }}
-                    />
+                    <button key={i} onClick={() => setBracketOffset(i)} style={{
+                      width: i === safeOffset ? '20px' : '8px', height: '8px',
+                      borderRadius: '9999px', border: 'none', cursor: 'pointer',
+                      background: i === safeOffset ? 'var(--primary)' : 'var(--border-strong)',
+                      transition: 'all 0.2s ease', padding: 0,
+                    }} />
                   ))}
                 </div>
               )}
