@@ -371,7 +371,6 @@ export default function PredictionsPage() {
           const visibleCount = isMobile ? 2 : 4
           const safeOffset = Math.min(bracketOffset, Math.max(0, bracketStages.length - visibleCount))
           const colPct = 100 / visibleCount
-          const translatePct = -(safeOffset * colPct)
 
           const handleTouchStart = (e) => { swipeTouchStart.current = e.touches[0].clientX }
           const handleTouchEnd = (e) => {
@@ -385,27 +384,19 @@ export default function PredictionsPage() {
           return (
             <div style={{ paddingBottom: '2rem' }}>
               {/* Stage titles */}
-              <div style={{ overflow: 'hidden', borderRadius: 'var(--r-md)', marginBottom: '1rem', border: '1px solid var(--border)', background: 'var(--surface-2)' }}>
-                <div style={{
-                  display: 'flex',
-                  transform: `translateX(${translatePct}%)`,
-                  transition: 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
-                  willChange: 'transform',
-                }}>
-                  {bracketStages.map(stage => (
-                    <h3 key={stage} style={{
-                      flex: `0 0 ${colPct}%`,
-                      width: `${colPct}%`,
-                      fontWeight: 800, fontSize: '0.8rem',
-                      textTransform: 'uppercase', color: 'var(--text)',
-                      margin: 0, padding: '0.75rem 1rem',
-                      textAlign: 'center', whiteSpace: 'nowrap',
-                      overflow: 'hidden', textOverflow: 'ellipsis',
-                    }}>
-                      {t(`predictions.stages.${stage}`)}
-                    </h3>
-                  ))}
-                </div>
+              <div style={{ display: 'flex', borderRadius: 'var(--r-md)', marginBottom: '1rem', border: '1px solid var(--border)', background: 'var(--surface-2)', overflow: 'hidden' }}>
+                {bracketStages.slice(safeOffset, safeOffset + visibleCount).map(stage => (
+                  <h3 key={stage} style={{
+                    flex: `1 1 0%`,
+                    fontWeight: 800, fontSize: '0.8rem',
+                    textTransform: 'uppercase', color: 'var(--text)',
+                    margin: 0, padding: '0.75rem 1rem',
+                    textAlign: 'center', whiteSpace: 'nowrap',
+                    overflow: 'hidden', textOverflow: 'ellipsis',
+                  }}>
+                    {t(`predictions.stages.${stage}`)}
+                  </h3>
+                ))}
               </div>
 
               {/* Bracket */}
@@ -419,7 +410,6 @@ export default function PredictionsPage() {
                   updatePred={updatePred}
                   t={t}
                   colPct={colPct}
-                  translatePct={translatePct}
                   offset={safeOffset}
                   visibleCount={visibleCount}
                 />
@@ -476,9 +466,10 @@ const BRACKET_STAGE_ROUNDS = {
   final:[104],
 }
 const CONN_W = 18   // px — connector channel width
-const CARD_GAP = 10 // px — gap between consecutive cards in first column
+const CARD_GAP = 10 // px — vertical gap between cards in leftmost visible column
+const ANIM_MS = 350 // ms — transition duration
 
-function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, isLocked, updatePred, t, colPct, translatePct }) {
+function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, isLocked, updatePred, t, colPct, offset, visibleCount }) {
   const cardRef = useRef(null)
   const [cardH, setCardH] = useState(null)
 
@@ -496,40 +487,46 @@ function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, is
   const matchByRound = {}
   Object.values(byStage).flat().forEach(m => { if (m.round) matchByRound[m.round] = m })
 
-  // Ordered rounds per visible stage (keep ALL rounds, even without match data yet)
-  const stageRounds = bracketStages.map(s => BRACKET_STAGE_ROUNDS[s] || [])
+  // All rounds per stage
+  const allStageRounds = bracketStages.map(s => BRACKET_STAGE_ROUNDS[s] || [])
 
-  // ── Compute Y positions for every round ──
-  // First column: cards stacked compactly top-to-bottom
-  // Subsequent columns: each card centred between its two children
+  // Visible stages: from offset to offset + visibleCount
+  const visibleStages = bracketStages.slice(offset, offset + visibleCount)
+  const visibleRounds = visibleStages.map(s => BRACKET_STAGE_ROUNDS[s] || [])
+
+  // ── Compute Y positions: leftmost visible column is compact, rest centre on children ──
   const roundY = useMemo(() => {
-    if (!cardH) return {}
+    if (!cardH || !visibleStages.length) return {}
     const pos = {}
 
-    // First visible stage: compact stack
-    const firstRounds = stageRounds[0] || []
+    // Leftmost visible column: compact stack
+    const firstRounds = visibleRounds[0] || []
     firstRounds.forEach((r, i) => {
       pos[r] = i * (cardH + CARD_GAP)
     })
 
-    // Subsequent stages: centre between children
-    for (let si = 1; si < bracketStages.length; si++) {
-      const rounds = stageRounds[si] || []
+    // Subsequent visible columns: centre between children
+    for (let vi = 1; vi < visibleStages.length; vi++) {
+      const rounds = visibleRounds[vi] || []
       rounds.forEach((r, idx) => {
         const children = WC2026_CHILDREN[r] || []
-        const childCentres = children.map(c => pos[c] != null ? pos[c] + cardH / 2 : null).filter(y => y !== null)
+        // Children may be in a previous visible column or may have been computed already
+        const childCentres = children
+          .map(c => pos[c] != null ? pos[c] + cardH / 2 : null)
+          .filter(y => y !== null)
         if (childCentres.length === 2) {
           pos[r] = (childCentres[0] + childCentres[1]) / 2 - cardH / 2
         } else if (childCentres.length === 1) {
           pos[r] = childCentres[0] - cardH / 2
         } else {
+          // Children not visible (they are to the left of viewport) — stack compactly
           pos[r] = idx * (cardH + CARD_GAP)
         }
       })
     }
     return pos
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cardH, bracketStages.join(',')])
+  }, [cardH, offset, visibleCount, bracketStages.join(',')])
 
   // Total bracket height
   const totalH = useMemo(() => {
@@ -555,8 +552,10 @@ function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, is
   }
 
   // Probe card for measurement
-  const probeRound = (stageRounds[0] || [])[0]
+  const probeRound = (allStageRounds[0] || [])[0]
   const probeMatch = probeRound ? matchByRound[probeRound] : null
+
+  const transition = `top ${ANIM_MS}ms cubic-bezier(0.4, 0, 0.2, 1), height ${ANIM_MS}ms cubic-bezier(0.4, 0, 0.2, 1)`
 
   return (
     <div style={{ overflowX: 'clip', overflowY: 'visible' }}>
@@ -572,15 +571,14 @@ function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, is
           display: 'flex',
           alignItems: 'flex-start',
           flexWrap: 'nowrap',
-          transform: `translateX(${translatePct}%)`,
-          transition: 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
-          willChange: 'transform',
           padding: '0.75rem 0',
+          transition: `height ${ANIM_MS}ms cubic-bezier(0.4, 0, 0.2, 1)`,
         }}>
-          {bracketStages.map((stage, si) => {
-            const rounds = stageRounds[si] || []
-            const isLast = si === bracketStages.length - 1
-            const nextRounds = !isLast ? (stageRounds[si + 1] || []) : []
+          {visibleStages.map((stage, vi) => {
+            const rounds = visibleRounds[vi] || []
+            const isLast = vi === visibleStages.length - 1
+            const nextStage = visibleStages[vi + 1]
+            const nextRounds = nextStage ? (BRACKET_STAGE_ROUNDS[nextStage] || []) : []
 
             return (
               <div key={stage} style={{
@@ -591,8 +589,9 @@ function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, is
                 position: 'relative',
                 height: totalH,
                 overflow: 'visible',
+                transition: `height ${ANIM_MS}ms cubic-bezier(0.4, 0, 0.2, 1)`,
               }}>
-                {/* Render match cards */}
+                {/* Match cards */}
                 {rounds.map(round => {
                   const y = roundY[round] ?? 0
                   return (
@@ -602,34 +601,35 @@ function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, is
                       left: 0,
                       right: isLast ? 0 : CONN_W,
                       height: cardH,
+                      transition,
                     }}>
                       {renderCard(round)}
                     </div>
                   )
                 })}
 
-                {/* Draw bracket connectors: for each parent in the NEXT column, draw arms from its children in THIS column */}
+                {/* Bracket connectors */}
                 {!isLast && nextRounds.map(parentRound => {
                   const children = WC2026_CHILDREN[parentRound] || []
                   const childrenInCol = children.filter(c => rounds.includes(c))
-                  if (childrenInCol.length !== 2) {
-                    // Single child: just draw a horizontal line
-                    if (childrenInCol.length === 1) {
-                      const cy = roundY[childrenInCol[0]]
-                      if (cy == null) return null
-                      return (
-                        <div key={`conn-${parentRound}`} style={{
-                          position: 'absolute',
-                          right: 0,
-                          top: cy + cardH / 2,
-                          width: CONN_W,
-                          borderBottom: '2px solid var(--border-strong)',
-                          pointerEvents: 'none',
-                        }} />
-                      )
-                    }
-                    return null
+
+                  if (childrenInCol.length === 1) {
+                    const cy = roundY[childrenInCol[0]]
+                    if (cy == null) return null
+                    return (
+                      <div key={`conn-${parentRound}`} style={{
+                        position: 'absolute',
+                        right: 0,
+                        top: cy + cardH / 2,
+                        width: CONN_W,
+                        borderBottom: '2px solid var(--border-strong)',
+                        pointerEvents: 'none',
+                        transition,
+                      }} />
+                    )
                   }
+
+                  if (childrenInCol.length !== 2) return null
 
                   const y0 = roundY[childrenInCol[0]]
                   const y1 = roundY[childrenInCol[1]]
@@ -656,6 +656,7 @@ function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, is
                         borderBottomRightRadius: 4,
                         boxSizing: 'border-box',
                         pointerEvents: 'none',
+                        transition,
                       }} />
                       {/* Horizontal line from midpoint to next column */}
                       <div style={{
@@ -665,6 +666,7 @@ function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, is
                         width: CONN_W,
                         borderBottom: '2px solid var(--border-strong)',
                         pointerEvents: 'none',
+                        transition,
                       }} />
                     </div>
                   )
