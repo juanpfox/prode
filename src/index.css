@@ -512,6 +512,25 @@ body {
   min-width: 3rem;
 }
 .match-card-stacked .match-center-col .match-vs-sep { display: none; }
+/* Score items in stacked mode get a divider between them */
+.match-card-stacked .match-center-col > *:not(:last-child) {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+.match-card-stacked .match-center-col .goal-input-wrapper {
+  flex-direction: column;
+  min-width: 2.5rem;
+}
+.match-card-stacked .match-center-col .goal-input-val {
+  border-left: none;
+  border-right: none;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  width: 100%;
+  line-height: 1.8rem;
+}
+.match-card-stacked .match-center-col .goal-input-btn { padding: 0.3rem 0.4rem; }
 
 
 /* ============================================================
