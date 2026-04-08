@@ -502,6 +502,199 @@ export default function PredictionsPage() {
   )
 }
 
+
+// ─── WC2026 bracket: child rounds that feed each parent round ──────────────
+// Key = parent round number, value = [childA, childB]
+const WC2026_CHILDREN = {
+  89: [73, 75], 90: [74, 77], 91: [76, 78], 92: [79, 80],
+  93: [81, 84], 94: [82, 86], 95: [85, 88], 96: [83, 87],
+  97: [89, 90], 98: [91, 92], 99: [93, 94], 100: [95, 96],
+  101: [97, 98], 102: [99, 100],
+  104: [101, 102],
+}
+
+// Ordered list of stages to display (left to right)
+const BRACKET_STAGE_ROUNDS = {
+  r32:   [73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88],
+  r16:   [89,90,91,92,93,94,95,96],
+  qf:    [97,98,99,100],
+  sf:    [101,102],
+  final: [104],
+}
+
+function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, isLocked, updatePred, t, visibleCount, offset, colPct, translatePct }) {
+  // Build a map from round number → match object
+  const matchByRound = {}
+  Object.values(byStage).flat().forEach(m => {
+    if (m.round) matchByRound[m.round] = m
+  })
+
+  // Determine if we have WC2026 round data
+  const hasRoundData = Object.keys(matchByRound).some(r => parseInt(r) >= 73)
+
+  if (!hasRoundData) {
+    // Fallback: simple column layout for non-WC competitions
+    return (
+      <div style={{ display: 'flex', gap: 0, transform: `translateX(${translatePct}%)`, transition: 'transform 0.35s cubic-bezier(0.4,0,0.2,1)', willChange: 'transform' }}>
+        {bracketStages.map((stage, si) => (
+          <div key={stage} style={{ flex: `0 0 ${colPct}%`, width: `${colPct}%`, padding: si === 0 ? '0' : '0 0 0 1rem', boxSizing: 'border-box' }}>
+            {[...(byStage[stage]||[])].sort((a,b)=>(a.round??0)-(b.round??0)).map(match => (
+              <div key={match.id} style={{ marginBottom: '0.75rem' }}>
+                <MatchCard stacked={true} match={{ ...match, home_team: simulatedBracket[match.round]?.home_team||match.home_team, away_team: simulatedBracket[match.round]?.away_team||match.away_team }}
+                  pred={predictions[match.id]??{}} locked={isLocked(match)} onChange={(f,v)=>updatePred(match.id,f,v)} t={t} />
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  // ── WC2026 tree layout ────────────────────────────────────────────────────
+  // We render pairs: for each stage, matches are grouped in pairs that feed the next round.
+  // A "BracketPair" shows [matchA, matchB] on the left connected to [parentMatch] on the right.
+  // We slide the visible window using transform.
+
+  // Get ordered rounds for each visible stage
+  const stageRounds = bracketStages.map(s => (BRACKET_STAGE_ROUNDS[s] || []).filter(r => matchByRound[r]))
+
+  // For the first stage (leftmost), group matches into pairs based on their parent in next stage
+  // Each pair = [r, r] where they feed the same r16/qf/sf/final match
+  // We build the pairing from WC2026_CHILDREN reversed
+  const pairsForStage = (stageIdx) => {
+    const rounds = stageRounds[stageIdx]
+    if (!rounds?.length) return []
+    const nextRounds = stageRounds[stageIdx + 1]
+    if (!nextRounds?.length) return rounds.map(r => [r]) // last stage: singles
+
+    // Build child→parent map
+    const childToParent = {}
+    nextRounds.forEach(pr => {
+      const children = WC2026_CHILDREN[pr] || []
+      children.forEach(c => { childToParent[c] = pr })
+    })
+
+    // Group rounds by parent
+    const parentToChildren = {}
+    rounds.forEach(r => {
+      const parent = childToParent[r]
+      if (parent !== undefined) {
+        if (!parentToChildren[parent]) parentToChildren[parent] = []
+        parentToChildren[parent].push(r)
+      }
+    })
+
+    // Return pairs ordered by nextRounds order
+    return nextRounds.map(pr => parentToChildren[pr] || []).filter(p => p.length > 0)
+  }
+
+  const CONN_W = '1.5rem' // connector width between columns
+  const GAP = '0.625rem'  // gap between cards in a pair
+
+  const renderMatch = (round) => {
+    const match = matchByRound[round]
+    if (!match) return null
+    const enriched = { ...match, home_team: simulatedBracket[round]?.home_team || match.home_team, away_team: simulatedBracket[round]?.away_team || match.away_team }
+    return (
+      <MatchCard
+        key={match.id}
+        stacked={true}
+        match={enriched}
+        pred={predictions[match.id] ?? {}}
+        locked={isLocked(match)}
+        onChange={(f, v) => updatePred(match.id, f, v)}
+        t={t}
+      />
+    )
+  }
+
+  return (
+    <div style={{ overflow: 'hidden' }}>
+      <div style={{
+        display: 'flex',
+        flexWrap: 'nowrap',
+        transform: `translateX(${translatePct}%)`,
+        transition: 'transform 0.35s cubic-bezier(0.4,0,0.2,1)',
+        willChange: 'transform',
+        alignItems: 'stretch',
+      }}>
+        {bracketStages.map((stage, stageIdx) => {
+          const pairs = pairsForStage(stageIdx)
+          const isFirst = stageIdx === 0
+
+          return (
+            <div key={stage} style={{
+              flex: `0 0 ${colPct}%`,
+              width: `${colPct}%`,
+              display: 'flex',
+              flexDirection: 'column',
+              boxSizing: 'border-box',
+              paddingLeft: isFirst ? 0 : CONN_W,
+              gap: '0.5rem',
+            }}>
+              {pairs.map((pair, pairIdx) => (
+                <div key={pairIdx} style={{
+                  flex: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  position: 'relative',
+                  // vertical spacing between pairs
+                  marginBottom: pairIdx < pairs.length - 1 ? '0.5rem' : 0,
+                }}>
+                  {pair.map((round, ri) => (
+                    <div key={round} style={{
+                      position: 'relative',
+                      marginBottom: ri < pair.length - 1 ? GAP : 0,
+                    }}>
+                      {renderMatch(round)}
+                      {/* Right connector: horizontal line from card to next column */}
+                      {stageIdx < bracketStages.length - 1 && (
+                        <div style={{
+                          position: 'absolute',
+                          right: `-${CONN_W}`,
+                          top: '50%',
+                          width: `calc(${CONN_W} / 2)`,
+                          borderBottom: '2px solid var(--border-strong)',
+                          pointerEvents: 'none',
+                        }} />
+                      )}
+                    </div>
+                  ))}
+                  {/* Vertical connector: bracket joining the pair */}
+                  {pair.length === 2 && stageIdx < bracketStages.length - 1 && (
+                    <div style={{
+                      position: 'absolute',
+                      right: `-${CONN_W}`,
+                      top: `calc(50% - ${GAP} / 2)`,  // between the two horizontal lines
+                      width: `calc(${CONN_W} / 2)`,
+                      // This is just vertical — use a border
+                      bottom: `calc(50% - ${GAP} / 2)`,
+                      borderRight: '2px solid var(--border-strong)',
+                      pointerEvents: 'none',
+                    }} />
+                  )}
+                  {/* Horizontal line from bracket midpoint to next column */}
+                  {pair.length === 2 && stageIdx < bracketStages.length - 1 && (
+                    <div style={{
+                      position: 'absolute',
+                      right: `-${CONN_W}`,
+                      top: '50%',
+                      width: `calc(${CONN_W} / 2)`,
+                      borderBottom: '2px solid var(--border-strong)',
+                      pointerEvents: 'none',
+                    }} />
+                  )}
+                </div>
+              ))}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 function GroupTable({ rows, t }) {
   return (
     <div className="card card-sm" style={{ padding: 0 }}>
