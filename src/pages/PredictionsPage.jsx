@@ -475,13 +475,11 @@ const BRACKET_STAGE_ROUNDS = {
   sf:[101,102],
   final:[104],
 }
-const STAGE_DEPTH = { r32:0, r16:1, qf:2, sf:3, final:4 }
 const CONN_W = 18   // px — connector channel width
-const PAIR_GAP = 10 // px — gap between pairs in the same column
+const CARD_GAP = 10 // px — gap between consecutive cards in first column
 
 function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, isLocked, updatePred, t, colPct, translatePct }) {
-  // Measure real card height from a rendered card
-  const cardRef   = useRef(null)
+  const cardRef = useRef(null)
   const [cardH, setCardH] = useState(null)
 
   useEffect(() => {
@@ -494,68 +492,82 @@ function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, is
     return () => obs.disconnect()
   }, [])
 
+  // Build round -> match lookup
   const matchByRound = {}
   Object.values(byStage).flat().forEach(m => { if (m.round) matchByRound[m.round] = m })
-  const hasRoundData = Object.keys(matchByRound).some(r => parseInt(r) >= 73)
-  const stageRounds  = bracketStages.map(s => (BRACKET_STAGE_ROUNDS[s] || []).filter(r => matchByRound[r]))
 
-  function getPairs(si) {
-    const rounds     = stageRounds[si] || []
-    if (!rounds.length) return []
-    const nextRounds = stageRounds[si + 1] || []
-    if (!nextRounds.length) return rounds.map(r => [r])
-    const c2p = {}
-    nextRounds.forEach(pr => (WC2026_CHILDREN[pr] || []).forEach(c => { c2p[c] = pr }))
-    const p2c = {}
-    rounds.forEach(r => {
-      const pr = c2p[r]
-      if (pr != null) { if (!p2c[pr]) p2c[pr] = []; p2c[pr].push(r) }
+  // Ordered rounds per visible stage (keep ALL rounds, even without match data yet)
+  const stageRounds = bracketStages.map(s => BRACKET_STAGE_ROUNDS[s] || [])
+
+  // ── Compute Y positions for every round ──
+  // First column: cards stacked compactly top-to-bottom
+  // Subsequent columns: each card centred between its two children
+  const roundY = useMemo(() => {
+    if (!cardH) return {}
+    const pos = {}
+
+    // First visible stage: compact stack
+    const firstRounds = stageRounds[0] || []
+    firstRounds.forEach((r, i) => {
+      pos[r] = i * (cardH + CARD_GAP)
     })
-    return nextRounds.map(pr => p2c[pr]).filter(Boolean)
-  }
 
-  // Recursive slot height based on measured cardH
-  // slotH(0) = 2*cardH + PAIR_GAP   (two cards separated by PAIR_GAP)
-  // slotH(d) = 2*slotH(d-1) + PAIR_GAP
-  function getSlotH(d, h) {
-    if (d === 0) return 2 * h + PAIR_GAP
-    return 2 * getSlotH(d - 1, h) + PAIR_GAP
-  }
+    // Subsequent stages: centre between children
+    for (let si = 1; si < bracketStages.length; si++) {
+      const rounds = stageRounds[si] || []
+      rounds.forEach((r, idx) => {
+        const children = WC2026_CHILDREN[r] || []
+        const childCentres = children.map(c => pos[c] != null ? pos[c] + cardH / 2 : null).filter(y => y !== null)
+        if (childCentres.length === 2) {
+          pos[r] = (childCentres[0] + childCentres[1]) / 2 - cardH / 2
+        } else if (childCentres.length === 1) {
+          pos[r] = childCentres[0] - cardH / 2
+        } else {
+          pos[r] = idx * (cardH + CARD_GAP)
+        }
+      })
+    }
+    return pos
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cardH, bracketStages.join(',')])
 
-  const renderCard = (round, ref) => {
+  // Total bracket height
+  const totalH = useMemo(() => {
+    if (!cardH) return 0
+    const allY = Object.values(roundY)
+    if (!allY.length) return 0
+    return Math.max(...allY) + cardH
+  }, [roundY, cardH])
+
+  const renderCard = (round) => {
     const match = matchByRound[round]
-    if (!match) return <div ref={ref} style={{ minHeight: 80 }} />
+    if (!match) return <div style={{ minHeight: 80, opacity: 0.4 }} />
     const enriched = {
       ...match,
       home_team: simulatedBracket[round]?.home_team || match.home_team,
       away_team: simulatedBracket[round]?.away_team || match.away_team,
     }
     return (
-      <div ref={ref}>
-        <MatchCard stacked={true} match={enriched}
-          pred={predictions[match.id] ?? {}} locked={isLocked(match)}
-          onChange={(f, v) => updatePred(match.id, f, v)} t={t} />
-      </div>
+      <MatchCard stacked={true} match={enriched}
+        pred={predictions[match.id] ?? {}} locked={isLocked(match)}
+        onChange={(f, v) => updatePred(match.id, f, v)} t={t} />
     )
   }
 
-  // Find the first available match in R32 (or any first stage) to use as the probe card
-  const firstStageRounds = stageRounds[0] || []
-  const probeRound       = firstStageRounds[0]
-  const probeMatch       = probeRound ? matchByRound[probeRound] : null
+  // Probe card for measurement
+  const probeRound = (stageRounds[0] || [])[0]
+  const probeMatch = probeRound ? matchByRound[probeRound] : null
 
   return (
     <div style={{ overflowX: 'clip', overflowY: 'visible' }}>
-
-      {/* Probe card — rendered off-screen to measure real height */}
+      {/* Probe card rendered off-screen to measure real height */}
       {probeMatch && (
         <div ref={cardRef} style={{ position: 'absolute', visibility: 'hidden', pointerEvents: 'none', width: `${colPct}%` }}>
           <MatchCard stacked={true} match={probeMatch} pred={{}} locked={false} onChange={() => {}} t={t} />
         </div>
       )}
 
-      {/* Don't render the bracket until we have a real measurement */}
-      {cardH && (
+      {cardH && totalH > 0 && (
         <div style={{
           display: 'flex',
           alignItems: 'flex-start',
@@ -566,18 +578,9 @@ function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, is
           padding: '0.75rem 0',
         }}>
           {bracketStages.map((stage, si) => {
-            const pairs  = hasRoundData ? getPairs(si) : (stageRounds[si] || []).map(r => [r])
-            const depth  = si  // relative depth within visible stages
+            const rounds = stageRounds[si] || []
             const isLast = si === bracketStages.length - 1
-            const h      = getSlotH(depth, cardH)
-
-            // Connector geometry
-            // Card 1 center: cardH / 2 from top of slot
-            // Card 2 center: h - cardH / 2
-            // Arm top:    cardH / 2
-            // Arm height: h - cardH
-            const armTop = cardH / 2
-            const armH   = h - cardH
+            const nextRounds = !isLast ? (stageRounds[si + 1] || []) : []
 
             return (
               <div key={stage} style={{
@@ -585,66 +588,87 @@ function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, is
                 width: `${colPct}%`,
                 boxSizing: 'border-box',
                 paddingRight: isLast ? 0 : CONN_W,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: PAIR_GAP,
+                position: 'relative',
+                height: totalH,
                 overflow: 'visible',
               }}>
-                {pairs.map((pair, pi) => (
-                  <div key={pi} style={{
-                    height: h,
-                    flexShrink: 0,
-                    position: 'relative',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: pair.length === 2 ? 'space-between' : 'center',
-                    overflow: 'visible',
-                  }}>
-                    {pair.map(round => (
-                      <div key={round} style={{ height: cardH, flexShrink: 0 }}>
-                        {renderCard(round, null)}
-                      </div>
-                    ))}
+                {/* Render match cards */}
+                {rounds.map(round => {
+                  const y = roundY[round] ?? 0
+                  return (
+                    <div key={round} style={{
+                      position: 'absolute',
+                      top: y,
+                      left: 0,
+                      right: isLast ? 0 : CONN_W,
+                      height: cardH,
+                    }}>
+                      {renderCard(round)}
+                    </div>
+                  )
+                })}
 
-                    {/* Bracket connector */}
-                    {!isLast && pair.length === 2 && (
-                      <>
-                        <div style={{
+                {/* Draw bracket connectors: for each parent in the NEXT column, draw arms from its children in THIS column */}
+                {!isLast && nextRounds.map(parentRound => {
+                  const children = WC2026_CHILDREN[parentRound] || []
+                  const childrenInCol = children.filter(c => rounds.includes(c))
+                  if (childrenInCol.length !== 2) {
+                    // Single child: just draw a horizontal line
+                    if (childrenInCol.length === 1) {
+                      const cy = roundY[childrenInCol[0]]
+                      if (cy == null) return null
+                      return (
+                        <div key={`conn-${parentRound}`} style={{
                           position: 'absolute',
-                          right: -CONN_W,
-                          top: armTop,
-                          height: armH,
-                          width: CONN_W / 2,
-                          borderTop:    '2px solid var(--border-strong)',
-                          borderRight:  '2px solid var(--border-strong)',
-                          borderBottom: '2px solid var(--border-strong)',
-                          borderTopRightRadius:    4,
-                          borderBottomRightRadius: 4,
-                          boxSizing: 'border-box',
-                          pointerEvents: 'none',
-                        }} />
-                        <div style={{
-                          position: 'absolute',
-                          right: -CONN_W,
-                          top: h / 2,
+                          right: 0,
+                          top: cy + cardH / 2,
                           width: CONN_W,
                           borderBottom: '2px solid var(--border-strong)',
                           pointerEvents: 'none',
                         }} />
-                      </>
-                    )}
-                    {!isLast && pair.length === 1 && (
+                      )
+                    }
+                    return null
+                  }
+
+                  const y0 = roundY[childrenInCol[0]]
+                  const y1 = roundY[childrenInCol[1]]
+                  if (y0 == null || y1 == null) return null
+
+                  const topCentre = Math.min(y0, y1) + cardH / 2
+                  const botCentre = Math.max(y0, y1) + cardH / 2
+                  const armH = botCentre - topCentre
+                  const midY = (topCentre + botCentre) / 2
+
+                  return (
+                    <div key={`conn-${parentRound}`}>
+                      {/* Vertical bracket arm */}
                       <div style={{
                         position: 'absolute',
-                        right: -CONN_W,
-                        top: '50%',
+                        right: 0,
+                        top: topCentre,
+                        height: armH,
+                        width: CONN_W / 2,
+                        borderTop: '2px solid var(--border-strong)',
+                        borderRight: '2px solid var(--border-strong)',
+                        borderBottom: '2px solid var(--border-strong)',
+                        borderTopRightRadius: 4,
+                        borderBottomRightRadius: 4,
+                        boxSizing: 'border-box',
+                        pointerEvents: 'none',
+                      }} />
+                      {/* Horizontal line from midpoint to next column */}
+                      <div style={{
+                        position: 'absolute',
+                        right: 0,
+                        top: midY,
                         width: CONN_W,
                         borderBottom: '2px solid var(--border-strong)',
                         pointerEvents: 'none',
                       }} />
-                    )}
-                  </div>
-                ))}
+                    </div>
+                  )
+                })}
               </div>
             )
           })}
@@ -653,7 +677,6 @@ function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, is
     </div>
   )
 }
-
 
 function GroupTable({ rows, t }) {
   return (
