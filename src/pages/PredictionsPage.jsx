@@ -476,7 +476,7 @@ const BRACKET_STAGE_ROUNDS = {
   final:[104],
 }
 const CONN_W = 18   // px — connector channel width
-const CARD_GAP = 10 // px — vertical gap between cards in leftmost visible column
+const CARD_GAP = 18 // px — vertical gap between cards in leftmost visible column
 const ANIM = '0.35s cubic-bezier(0.4, 0, 0.2, 1)'
 
 function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, isLocked, updatePred, t, colPct, translatePct, offset, visibleCount }) {
