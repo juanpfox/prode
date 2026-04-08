@@ -425,9 +425,9 @@ export default function PredictionsPage() {
                 />
               </div>
 
-              {/* Third place */}
+              {/* Third place — shown below bracket with extra gap */}
               {byStage['third_place']?.length > 0 && (
-                <div style={{ marginTop: '1.5rem' }}>
+                <div style={{ marginTop: '3rem', maxWidth: isMobile ? '60%' : '30%', marginLeft: 'auto', marginRight: 'auto' }}>
                   <h3 style={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.75rem', textAlign: 'center' }}>
                     🥉 {t('predictions.stages.third_place')}
                   </h3>
