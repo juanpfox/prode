@@ -692,19 +692,33 @@ function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, is
 
                   return (
                     <div key={`conn-${parentRound}`}>
-                      {/* Vertical bracket arm */}
+                      {/* Horizontal stub from top child → mid-channel */}
                       <div style={{
                         position: 'absolute',
-                        right: 0,
+                        right: CONN_W / 2,
+                        top: topCentre,
+                        width: CONN_W / 2,
+                        borderBottom: '2px solid var(--border-strong)',
+                        pointerEvents: 'none',
+                        transition: trn,
+                      }} />
+                      {/* Horizontal stub from bottom child → mid-channel */}
+                      <div style={{
+                        position: 'absolute',
+                        right: CONN_W / 2,
+                        top: botCentre,
+                        width: CONN_W / 2,
+                        borderBottom: '2px solid var(--border-strong)',
+                        pointerEvents: 'none',
+                        transition: trn,
+                      }} />
+                      {/* Vertical line joining both stubs at mid-channel */}
+                      <div style={{
+                        position: 'absolute',
+                        right: CONN_W / 2,
                         top: topCentre,
                         height: armH,
-                        width: CONN_W / 2,
-                        borderTop: '2px solid var(--border-strong)',
-                        borderRight: '2px solid var(--border-strong)',
-                        borderBottom: '2px solid var(--border-strong)',
-                        borderTopRightRadius: 4,
-                        borderBottomRightRadius: 4,
-                        boxSizing: 'border-box',
+                        borderLeft: '2px solid var(--border-strong)',
                         pointerEvents: 'none',
                         transition: trn,
                       }} />
@@ -713,7 +727,7 @@ function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, is
                         position: 'absolute',
                         right: 0,
                         top: midY,
-                        width: CONN_W,
+                        width: CONN_W / 2,
                         borderBottom: '2px solid var(--border-strong)',
                         pointerEvents: 'none',
                         transition: trn,
