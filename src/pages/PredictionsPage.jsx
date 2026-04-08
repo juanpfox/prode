@@ -690,12 +690,7 @@ function MatchCard({ match, pred, locked, saving, saved, onChange, onSave, t, st
           marginBottom: '0.5rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
           <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600 }}>{kickoffStr}</span>
-          {match.venue && (
-            <span style={{ fontSize: '0.65rem', color: 'var(--text-subtle)', fontStyle: 'normal',
-                opacity: 0.8, display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
-              • {match.venue}
-            </span>
-          )}
+
         </div>
         {locked && (
           <span style={{ fontSize: '0.7rem', color: 'var(--warning)', fontWeight: 600 }}>
