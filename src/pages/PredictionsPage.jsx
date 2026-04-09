@@ -427,7 +427,7 @@ export default function PredictionsPage() {
 
               {/* Third place — only visible when sf+final are shown */}
               {byStage['third_place']?.length > 0 && safeOffset === bracketStages.length - visibleCount && (
-                <div style={{ marginTop: '1.25rem', maxWidth: isMobile ? '60%' : '30%', marginLeft: 'auto', marginRight: 'auto' }}>
+                <div style={{ marginTop: '0.5rem', maxWidth: isMobile ? '60%' : '30%', marginLeft: 'auto', marginRight: 'auto' }}>
                   <h3 style={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.75rem', textAlign: 'center' }}>
                     🥉 {t('predictions.stages.third_place')}
                   </h3>
