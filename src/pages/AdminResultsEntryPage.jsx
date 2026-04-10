@@ -49,6 +49,7 @@ export default function AdminResultsEntryPage() {
   const [view, setView] = useState('groups')
   const [activeGroup, setActiveGroup] = useState('A')
   const [saveStatus, setSaveStatus] = useState(null)
+  const [recalcStatus, setRecalcStatus] = useState('idle') // 'idle' | 'loading' | 'done' | 'error'
   const [bracketOffset, setBracketOffset] = useState(0)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640)
 
@@ -178,6 +179,22 @@ export default function AdminResultsEntryPage() {
 
 
 
+  const handleRecalculate = async () => {
+    setRecalcStatus('loading')
+    try {
+      const { error } = await supabase.rpc('recalculate_all_scores_for_competition', {
+        p_competition_id: competitionId
+      })
+      if (error) throw error
+      setRecalcStatus('done')
+      setTimeout(() => setRecalcStatus('idle'), 3000)
+    } catch (e) {
+      console.error(e)
+      setRecalcStatus('error')
+      setTimeout(() => setRecalcStatus('idle'), 3000)
+    }
+  }
+
   if (loading) return (
     <AppShell>
       <p style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '3rem' }}>{t('common.loading')}</p>
@@ -201,7 +218,16 @@ export default function AdminResultsEntryPage() {
           </div>
           
           <div style={{ textAlign: 'right' }}>
-            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.25rem' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.25rem', alignItems: 'center' }}>
+              <button
+                className="btn btn-sm btn-ghost"
+                onClick={handleRecalculate}
+                disabled={recalcStatus === 'loading'}
+                title="Recalcular puntos de todos los torneos de esta competición"
+                style={{ fontSize: '0.75rem', padding: '0.35rem 0.6rem', opacity: recalcStatus === 'loading' ? 0.6 : 1 }}
+              >
+                {recalcStatus === 'loading' ? '⏳' : recalcStatus === 'done' ? '✅' : recalcStatus === 'error' ? '❌' : '🔄'} Recalcular pts
+              </button>
               <button className={`btn btn-sm ${view === 'groups' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setView('groups')} style={{ fontSize: '0.75rem', padding: '0.35rem 0.6rem' }}>
                 {t('predictions.views.groups')}
               </button>
