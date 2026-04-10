@@ -62,6 +62,8 @@ export default function PredictionsPage() {
   const [bracketOffset, setBracketOffset] = useState(0)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640)
   const swipeTouchStart = useRef(null)
+  const bracketContainerRef = useRef(null)
+  const prevBracketOffset = useRef(0)
 
   const simulatedBracket = useMemo(() => {
     if (!tournament?.competitions?.name?.toLowerCase().includes('world cup')) return {}
@@ -79,6 +81,31 @@ export default function PredictionsPage() {
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
+
+  // Auto-scroll to connected match when bracket page changes
+  useEffect(() => {
+    if (!bracketContainerRef.current || bracketOffset === prevBracketOffset.current) {
+      prevBracketOffset.current = bracketOffset
+      return
+    }
+    const dir = bracketOffset > prevBracketOffset.current ? 1 : -1
+    prevBracketOffset.current = bracketOffset
+    // Small delay to let the CSS transition start
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        const container = bracketContainerRef.current
+        if (!container) return
+        // Find all cards in the new anchor column (bracketOffset)
+        const cards = container.querySelectorAll(`[data-stage-idx="${bracketOffset}"] [data-round]`)
+        if (!cards.length) return
+        // Pick the first card in the new anchor column
+        const target = cards[0]
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }
+      }, 80)
+    })
+  }, [bracketOffset])
 
   // Use a ref to store pending changes and a timeout for debouncing
   const pendingChanges = useRef({})
@@ -409,7 +436,7 @@ export default function PredictionsPage() {
               </div>
 
               {/* Bracket */}
-              <div onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+              <div ref={bracketContainerRef} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
                 <BracketTree
                   byStage={byStage}
                   bracketStages={bracketStages}
@@ -632,7 +659,7 @@ function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, is
             const nextRounds = !isLast ? (allStageRounds[si + 1] || []) : []
 
             return (
-              <div key={stage} style={{
+              <div key={stage} data-stage-idx={si} style={{
                 flex: `0 0 ${colPct}%`,
                 width: `${colPct}%`,
                 boxSizing: 'border-box',
@@ -646,7 +673,7 @@ function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, is
                 {rounds.map(round => {
                   const y = roundY[round] ?? 0
                   return (
-                    <div key={round} style={{
+                    <div key={round} data-round={round} style={{
                       position: 'absolute',
                       top: y,
                       left: 0,
