@@ -856,12 +856,7 @@ function MatchCard({ match, pred, locked, saving, saved, onChange, onSave, t, st
               <span className="match-team-name">{away}</span>
             </div>
             <div className="match-center-col">
-              {hasResult ? (
-                <>
-                  <ResultBubble val={match.home_goals} />
-                  <ResultBubble val={match.away_goals} />
-                </>
-              ) : locked ? (
+              {locked ? (
                 <>
                   <ResultBubble val={pred.home_goals !== '' ? pred.home_goals : '?'} muted={pred.home_goals === ''} />
                   <ResultBubble val={pred.away_goals !== '' ? pred.away_goals : '?'} muted={pred.away_goals === ''} />
@@ -881,13 +876,7 @@ function MatchCard({ match, pred, locked, saving, saved, onChange, onSave, t, st
               <TeamFlag code={match.home_team?.code} />
             </div>
             <div className="match-center-col">
-              {hasResult ? (
-                <div className="match-center-col">
-                  <ResultBubble val={match.home_goals} />
-                  <span className="match-vs-sep" style={{ color: 'var(--text-muted)', fontWeight: 700 }}>-</span>
-                  <ResultBubble val={match.away_goals} />
-                </div>
-              ) : locked ? (
+              {locked ? (
                 <div className="match-center-col">
                   <ResultBubble val={pred.home_goals !== '' ? pred.home_goals : '?'} muted={pred.home_goals === ''} />
                   <span className="match-vs-sep" style={{ color: 'var(--text-muted)', fontWeight: 700 }}>-</span>
@@ -1041,5 +1030,6 @@ function PredResult({ match, pred, t }) {
     </div>
   )
 }
+
 
 
