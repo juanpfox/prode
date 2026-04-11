@@ -1015,6 +1015,7 @@ function PredResult({ match, pred, t }) {
   const predWinner = pHome > pAway ? 'home' : pHome < pAway ? 'away' : 'draw'
   const realWinner = match.winner
   const correctWinner = predWinner === realWinner
+  const correctDraw = correctWinner && realWinner === 'draw'
 
   return (
     <div style={{ marginTop: '0.5rem', padding: '0.375rem 0.625rem',
@@ -1025,7 +1026,7 @@ function PredResult({ match, pred, t }) {
       </span>
       <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
         {t('predictions.result')}: {rHome}-{rAway}
-        {exactBoth ? ` · ${t('predictions.exact')}` : correctWinner ? ` · ${t('predictions.winner_ok')}` : ` · ${t('predictions.miss')}`}
+        {exactBoth ? ` · ${t('predictions.exact')}` : correctDraw ? ` · ${t('predictions.draw_ok')}` : correctWinner ? ` · ${t('predictions.winner_ok')}` : ` · ${t('predictions.miss')}`}
       </span>
     </div>
   )
