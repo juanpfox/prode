@@ -126,6 +126,7 @@
     "result": "Resultado",
     "exact": "¡Exacto!",
     "winner_ok": "Ganador correcto",
+    "draw_ok": "Empate correcto",
     "miss": "Fallaste",
     "saving_changes": "Guardando cambios...",
     "all_changes_saved": "Todos los cambios guardados",
