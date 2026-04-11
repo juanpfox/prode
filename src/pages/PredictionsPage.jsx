@@ -51,6 +51,7 @@ export default function PredictionsPage() {
   const [tournament, setTournament] = useState(null)
   const [matches, setMatches] = useState([])
   const [predictions, setPredictions] = useState({})
+  const [tournamentConfig, setTournamentConfig] = useState(null)
   const [saving, setSaving] = useState(false)
   const [saveStatus, setSaveStatus] = useState(null) // 'saving' | 'saved' | null
   const [loading, setLoading] = useState(true)
@@ -154,6 +155,13 @@ export default function PredictionsPage() {
           predMap[p.match_id] = { home_goals: p.home_goals ?? '', away_goals: p.away_goals ?? '', pen_pick: p.pen_pick ?? '' }
         }
         setPredictions(predMap)
+
+        const { data: cfg } = await supabase
+          .from('tournament_config')
+          .select('*')
+          .eq('tournament_id', tournamentId)
+          .single()
+        setTournamentConfig(cfg)
       }
     } finally {
       setLoading(false)
@@ -364,7 +372,7 @@ export default function PredictionsPage() {
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
               {byStage[stage].map(match => (
-                <MatchCard key={match.id} match={match} pred={predictions[match.id] ?? {}} locked={isLocked(match)} onChange={(f,v) => updatePred(match.id,f,v)} t={t} />
+                <MatchCard key={match.id} match={match} pred={predictions[match.id] ?? {}} locked={isLocked(match)} onChange={(f,v) => updatePred(match.id,f,v)} t={t} config={tournamentConfig} />
               ))}
             </div>
           </section>
@@ -379,7 +387,7 @@ export default function PredictionsPage() {
               </h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
                 {groupMatches.filter(m => m.home_team?.group_name === activeGroup).map(match => (
-                  <MatchCard key={match.id} match={match} pred={predictions[match.id] ?? {}} locked={isLocked(match)} onChange={(f,v) => updatePred(match.id,f,v)} t={t} />
+                  <MatchCard key={match.id} match={match} pred={predictions[match.id] ?? {}} locked={isLocked(match)} onChange={(f,v) => updatePred(match.id,f,v)} t={t} config={tournamentConfig} />
                 ))}
               </div>
             </div>
@@ -461,7 +469,7 @@ export default function PredictionsPage() {
                   {byStage['third_place'].map(match => (
                     <MatchCard stacked={true} key={match.id}
                       match={{ ...match, home_team: simulatedBracket[match.round]?.home_team || match.home_team, away_team: simulatedBracket[match.round]?.away_team || match.away_team }}
-                      pred={predictions[match.id] ?? {}} locked={isLocked(match)} onChange={(f, v) => updatePred(match.id, f, v)} t={t} />
+                      pred={predictions[match.id] ?? {}} locked={isLocked(match)} onChange={(f, v) => updatePred(match.id, f, v)} t={t} config={tournamentConfig} />
                   ))}
                 </div>
               )}
@@ -623,7 +631,7 @@ function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, is
     return (
       <MatchCard stacked={true} match={enriched}
         pred={predictions[match.id] ?? {}} locked={isLocked(match)}
-        onChange={(f, v) => updatePred(match.id, f, v)} t={t} />
+        onChange={(f, v) => updatePred(match.id, f, v)} t={t} config={tournamentConfig} />
     )
   }
 
@@ -810,7 +818,7 @@ function GroupTable({ rows, t }) {
   )
 }
 
-function MatchCard({ match, pred, locked, saving, saved, onChange, onSave, t, stacked }) {
+function MatchCard({ match, pred, locked, saving, saved, onChange, onSave, t, stacked, config }) {
   const home = t(`teams.${match.home_team?.code}`, { defaultValue: match.home_team?.name ?? '?' })
   const away = t(`teams.${match.away_team?.code}`, { defaultValue: match.away_team?.name ?? '?' })
   const kickoff = new Date(match.kickoff_at)
@@ -914,7 +922,7 @@ function MatchCard({ match, pred, locked, saving, saved, onChange, onSave, t, st
       )}
 
       {hasResult && predFilled && (
-        <PredResult match={match} pred={pred} t={t} />
+        <PredResult match={match} pred={pred} t={t} config={config} />
       )}
 
     </div>
@@ -1005,7 +1013,60 @@ function ResultBubble({ val, muted }) {
   )
 }
 
-function PredResult({ match, pred, t }) {
+function calcMatchPoints(match, pred, config) {
+  if (!config) return null
+  const pHome = parseInt(pred.home_goals)
+  const pAway = parseInt(pred.away_goals)
+  const rHome = match.home_goals
+  const rAway = match.away_goals
+  if (isNaN(pHome) || isNaN(pAway) || rHome === null || rAway === null) return null
+
+  const exactBoth = pHome === rHome && pAway === rAway
+  const predWinner = pHome > pAway ? 'home' : pHome < pAway ? 'away' : 'draw'
+  const realWinner = match.winner
+  const correctWinner = predWinner === realWinner
+
+  const stage = match.stage
+  const stageMultMap = {
+    group: 1, r32: 1, r16: config.mult_r16 ?? 2,
+    qf: config.mult_qf ?? 3, sf: config.mult_sf ?? 4,
+    third_place: 1, final: config.mult_final ?? 6,
+  }
+  const mult = stageMultMap[stage] ?? 1
+
+  let pts = 0
+
+  // Winner / draw
+  if (correctWinner) {
+    pts += realWinner === 'draw' ? (config.pts_draw ?? 1) : (config.pts_win ?? 3)
+  }
+
+  // Exact both goals
+  if (exactBoth) {
+    pts += config.pts_exact_both ?? 3
+  } else {
+    // Exact one team's goals
+    let exactOne = 0
+    if (pHome === rHome) exactOne++
+    if (pAway === rAway) exactOne++
+    pts += exactOne * (config.pts_exact_one ?? 1)
+  }
+
+  // Goal diff (legacy, only if non-zero in config)
+  if (config.pts_diff_correct || config.pts_diff_wrong) {
+    const predDiff = pHome - pAway
+    const realDiff = rHome - rAway
+    if (predDiff === realDiff) {
+      pts += config.pts_diff_correct ?? 0
+    } else {
+      pts += config.pts_diff_wrong ?? 0
+    }
+  }
+
+  return pts * mult
+}
+
+function PredResult({ match, pred, t, config }) {
   const pHome = parseInt(pred.home_goals)
   const pAway = parseInt(pred.away_goals)
   const rHome = match.home_goals
@@ -1016,6 +1077,7 @@ function PredResult({ match, pred, t }) {
   const realWinner = match.winner
   const correctWinner = predWinner === realWinner
   const correctDraw = correctWinner && realWinner === 'draw'
+  const pts = calcMatchPoints(match, pred, config)
 
   return (
     <div style={{ marginTop: '0.5rem', padding: '0.375rem 0.625rem',
@@ -1024,10 +1086,19 @@ function PredResult({ match, pred, t }) {
       <span style={{ fontSize: '0.9rem' }}>
         {exactBoth ? '🎯' : correctWinner ? '✅' : '❌'}
       </span>
-      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', flex: 1 }}>
         {t('predictions.result')}: {rHome}-{rAway}
         {exactBoth ? ` · ${t('predictions.exact')}` : correctDraw ? ` · ${t('predictions.draw_ok')}` : correctWinner ? ` · ${t('predictions.winner_ok')}` : ` · ${t('predictions.miss')}`}
       </span>
+      {pts !== null && (
+        <span style={{
+          fontSize: '0.75rem', fontWeight: 700,
+          color: pts > 0 ? 'var(--primary)' : 'var(--text-subtle)',
+          whiteSpace: 'nowrap',
+        }}>
+          {pts > 0 ? `+${pts} pts` : `${pts} pts`}
+        </span>
+      )}
     </div>
   )
 }
