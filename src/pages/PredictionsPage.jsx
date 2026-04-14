@@ -403,7 +403,17 @@ export default function PredictionsPage() {
         {/* --- VIEW: PLAYOFFS --- */}
         {view === 'playoffs' && (() => {
           const bracketStages = playoffStages.filter(s => s !== 'third_place')
-          const visibleCount = isMobile ? 2 : 4
+
+          if (bracketStages.length === 0) {
+            return (
+              <div className="card card-sm" style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
+                <span style={{ fontSize: '2rem', marginBottom: '0.5rem', display: 'block' }}>🏆</span>
+                <p style={{ margin: 0 }}>{t('predictions.no_playoff_matches')}</p>
+              </div>
+            )
+          }
+
+          const visibleCount = isMobile ? 2 : Math.min(4, bracketStages.length)
           const safeOffset = Math.min(bracketOffset, Math.max(0, bracketStages.length - visibleCount))
           const colPct = 100 / visibleCount
           const translatePct = -(safeOffset * colPct)
