@@ -55,16 +55,8 @@ const LATER_ROUNDS = {
 export function simulateWorldCupBracket(matches, preds) {
   const groupMatches = matches.filter(m => m.stage === 'group')
   
-  // Verify if all group matches have a prediction
-  const allGroupsPlayed = groupMatches.every(m => {
-    const p = preds[m.id]
-    // If exact match from db has result (for Admin uses), consider it played
-    if (m.home_goals !== null && m.away_goals !== null) return true;
-    return p && p.home_goals !== '' && p.away_goals !== '' && p.home_goals !== undefined && p.away_goals !== undefined
-  })
-
-  // If not all 72 projected group games are typed, return empty map
-  if (!allGroupsPlayed) return {}
+  // Note: we no longer abort if some group matches lack predictions.
+  // The bracket will show 'TBD' for unresolved slots instead of crashing.
 
   // 1. Calculate the Group Table
   const tables = {}
