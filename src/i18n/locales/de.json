@@ -57,5 +57,8 @@
     "tournaments": "Turniere",
     "leaderboard": "Rangliste",
     "profile": "Profil"
+  },
+  "predictions": {
+    "no_playoff_matches": "Noch keine Playoff-Spiele verfügbar"
   }
 }
