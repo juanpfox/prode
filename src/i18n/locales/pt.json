@@ -69,6 +69,7 @@
       "dates": "Todos os jogos",
       "groups": "Grupos",
       "playoffs": "Fase Final"
-    }
+    },
+    "no_playoff_matches": "Nenhuma partida de playoffs disponível ainda"
   }
 }
