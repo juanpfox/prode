@@ -57,5 +57,8 @@
     "tournaments": "联赛",
     "leaderboard": "排行榜",
     "profile": "个人资料"
+  },
+  "predictions": {
+    "no_playoff_matches": "暂无季后赛比赛"
   }
 }
