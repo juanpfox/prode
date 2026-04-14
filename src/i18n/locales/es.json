@@ -154,7 +154,8 @@
       "sf": "Semifinales",
       "third_place": "Tercer puesto",
       "final": "Final"
-    }
+    },
+    "no_playoff_matches": "No hay partidos de playoffs cargados aún"
   },
   "posiciones": {
     "hint": "Arrastrá los equipos para ordenarlos dentro de cada grupo. Luego elegí el podio.",
