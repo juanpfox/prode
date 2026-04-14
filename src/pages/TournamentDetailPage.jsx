@@ -406,7 +406,8 @@ export default function TournamentDetailPage() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                     {scores.map((s, i) => (
                       <div key={s.user_id} className="card card-sm"
-                        style={{ display: 'flex', alignItems: 'center', gap: '0.75rem',
+                        onClick={() => navigate(`/torneo/${id}/jugador/${s.user_id}`)}
+                        style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer',
                           background: s.user_id === user.id ? 'var(--primary-subtle)' : undefined,
                           border: s.user_id === user.id ? '1px solid var(--primary)' : undefined }}>
                         <span style={{ fontWeight: 800, fontSize: '1.1rem', width: '1.75rem', textAlign: 'center' }}>
