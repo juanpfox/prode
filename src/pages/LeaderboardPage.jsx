@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabase'
 import AppShell from '../components/AppShell'
@@ -7,6 +8,7 @@ import AppShell from '../components/AppShell'
 export default function LeaderboardPage() {
   const { t } = useTranslation()
   const { user } = useAuth()
+  const navigate = useNavigate()
 
   const [myTournaments, setMyTournaments] = useState([])
   const [selected, setSelected] = useState(null)
@@ -76,7 +78,8 @@ export default function LeaderboardPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 {scores.map((s, i) => (
                   <div key={s.user_id} className="card card-sm"
-                    style={{ display: 'flex', alignItems: 'center', gap: '0.75rem',
+                    onClick={() => navigate(`/torneo/${selected}/jugador/${s.user_id}`)}
+                    style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer',
                       background: s.user_id === user.id ? 'var(--primary-subtle)' : undefined,
                       border: s.user_id === user.id ? '1px solid var(--primary)' : undefined }}>
                     <span style={{ fontWeight: 800, fontSize: '1.1rem', width: '1.75rem', textAlign: 'center' }}>
