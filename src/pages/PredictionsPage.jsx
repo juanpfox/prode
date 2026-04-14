@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef, useMemo, Component } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
@@ -39,6 +39,26 @@ function TeamFlag({ code, size = 18 }) {
 }
 
 const STAGE_ORDER = ['group', 'r32', 'r16', 'qf', 'sf', 'third_place', 'final']
+
+// ── Error Boundary to prevent white screen crashes ──
+class PredictionErrorBoundary extends Component {
+  constructor(props) { super(props); this.state = { hasError: false, error: null } }
+  static getDerivedStateFromError(error) { return { hasError: true, error } }
+  componentDidCatch(err, info) { console.error('PredictionErrorBoundary caught:', err, info) }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="card card-sm" style={{ textAlign: 'center', padding: '2rem', margin: '2rem 1rem', color: 'var(--text-muted)' }}>
+          <span style={{ fontSize: '2rem', marginBottom: '0.5rem', display: 'block' }}>⚠️</span>
+          <p style={{ margin: '0 0 0.5rem' }}>Error al cargar esta vista</p>
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-subtle)', margin: 0 }}>{String(this.state.error?.message || '')}</p>
+          <button className="btn btn-ghost btn-sm" style={{ marginTop: '1rem' }} onClick={() => this.setState({ hasError: false, error: null })}>Reintentar</button>
+        </div>
+      )
+    }
+    return this.props.children
+  }
+}
 
 
 export default function PredictionsPage() {
@@ -311,6 +331,7 @@ export default function PredictionsPage() {
 
   return (
     <AppShell saveIndicator={saveStatus}>
+      <PredictionErrorBoundary>
       <div className="animate-fade-in">
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -501,6 +522,7 @@ export default function PredictionsPage() {
           )
         })()}
       </div>
+      </PredictionErrorBoundary>
     </AppShell>
   )
 }
