@@ -57,5 +57,8 @@
     "tournaments": "البطولات",
     "leaderboard": "الترتيب",
     "profile": "الملف الشخصي"
+  },
+  "predictions": {
+    "no_playoff_matches": "لا تتوفر مباريات التصفيات بعد"
   }
 }
