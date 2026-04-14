@@ -154,7 +154,8 @@
       "sf": "Semi-finals",
       "third_place": "Third place",
       "final": "Final"
-    }
+    },
+    "no_playoff_matches": "No playoff matches available yet"
   },
   "posiciones": {
     "hint": "Drag teams to rank them within each group. Then pick the world podium.",
