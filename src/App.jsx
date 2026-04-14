@@ -12,6 +12,7 @@ import LeaderboardPage from './pages/LeaderboardPage'
 import ProfilePage from './pages/ProfilePage'
 import AdminResultsSelectionPage from './pages/AdminResultsSelectionPage'
 import AdminResultsEntryPage from './pages/AdminResultsEntryPage'
+import PlayerPredictionsPage from './pages/PlayerPredictionsPage'
 
 function LoadingScreen() {
   const { t } = useTranslation()
@@ -42,6 +43,7 @@ export default function App() {
           <Route path="/torneos"                   element={<TournamentsPage />} />
           <Route path="/torneo/:id"                element={<TournamentDetailPage />} />
           <Route path="/torneo/:id/pronosticos"    element={<PredictionsPage />} />
+          <Route path="/torneo/:id/jugador/:userId"  element={<PlayerPredictionsPage />} />
           <Route path="/ranking"                   element={<LeaderboardPage />} />
           <Route path="/perfil"                    element={<ProfilePage />} />
           
