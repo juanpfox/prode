@@ -5,6 +5,7 @@ import './config-rules.css'
 
 const MATCH_FIELDS = [
   { key: 'pts_win',          label: 'config.pts_win',          min: 0 },
+  { key: 'pts_draw',         label: 'config.pts_draw',         min: 0 },
   { key: 'pts_exact_both',   label: 'config.pts_exact_both',   min: 0 },
   { key: 'pts_exact_one',    label: 'config.pts_exact_one',    min: 0 },
   { key: 'pts_diff_correct', label: 'config.pts_diff_correct', min: -10 },
