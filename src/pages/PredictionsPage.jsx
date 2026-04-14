@@ -488,6 +488,7 @@ export default function PredictionsPage() {
                   translatePct={translatePct}
                   offset={safeOffset}
                   visibleCount={visibleCount}
+                  config={tournamentConfig}
                 />
               </div>
 
@@ -546,7 +547,7 @@ const CONN_W = 18   // px — connector channel width
 const CARD_GAP = 18 // px — vertical gap between cards in leftmost visible column
 const ANIM = '0.35s cubic-bezier(0.4, 0, 0.2, 1)'
 
-function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, isLocked, updatePred, t, colPct, translatePct, offset, visibleCount }) {
+function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, isLocked, updatePred, t, colPct, translatePct, offset, visibleCount, config }) {
   const cardRef = useRef(null)
   const [cardH, setCardH] = useState(null)
 
@@ -663,7 +664,7 @@ function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, is
     return (
       <MatchCard stacked={true} match={enriched}
         pred={predictions[match.id] ?? {}} locked={isLocked(match)}
-        onChange={(f, v) => updatePred(match.id, f, v)} t={t} config={tournamentConfig} />
+        onChange={(f, v) => updatePred(match.id, f, v)} t={t} config={config} />
     )
   }
 
