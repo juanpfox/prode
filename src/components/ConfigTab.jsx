@@ -45,10 +45,10 @@ const POS_MULT_WORLD = [
 export default function ConfigTab({ tournamentId, isAdmin, mode }) {
   const { t } = useTranslation()
   const [config, setConfig] = useState(null)
-  const [original, setOriginal] = useState(null)
-  const [saving, setSaving] = useState(false)
-  const [saveMsg, setSaveMsg] = useState('')
+  const [saveStatus, setSaveStatus] = useState(null) // null | 'saving' | 'saved' | 'error'
   const [openSections, setOpenSections] = useState({})
+  const pendingChanges = useRef({})
+  const timeoutRef = useRef(null)
 
   useEffect(() => {
     supabase
@@ -57,40 +57,52 @@ export default function ConfigTab({ tournamentId, isAdmin, mode }) {
       .eq('tournament_id', tournamentId)
       .single()
       .then(({ data }) => {
-        if (data) {
-          setConfig({ ...data })
-          setOriginal({ ...data })
-        }
+        if (data) setConfig({ ...data })
       })
   }, [tournamentId])
 
-  if (!config) return null
+  // Clear timeout on unmount
+  useEffect(() => {
+    return () => { if (timeoutRef.current) clearTimeout(timeoutRef.current) }
+  }, [])
 
-  const hasChanges = original && JSON.stringify(config) !== JSON.stringify(original)
+  if (!config) return null
 
   function toggleSection(key) {
     setOpenSections(prev => ({ ...prev, [key]: !prev[key] }))
   }
 
-  function updateField(key, value) {
-    setConfig(prev => ({ ...prev, [key]: value === '' ? '' : parseInt(value) || 0 }))
+  function updateField(key, rawValue) {
+    const parsed = rawValue === '' ? 0 : parseInt(rawValue) || 0
+    setConfig(prev => {
+      const next = { ...prev, [key]: parsed }
+      pendingChanges.current[key] = parsed
+      return next
+    })
+    scheduleSave()
   }
 
-  async function handleSave() {
-    setSaving(true)
-    setSaveMsg('')
-    const { id, tournament_id, created_at, ...updates } = config
+  function scheduleSave() {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    setSaveStatus('saving')
+    timeoutRef.current = setTimeout(() => { savePendingChanges() }, 1500)
+  }
+
+  async function savePendingChanges() {
+    const changes = { ...pendingChanges.current }
+    if (Object.keys(changes).length === 0) return
+    pendingChanges.current = {}
+
     const { error } = await supabase
       .from('tournament_config')
-      .update(updates)
+      .update(changes)
       .eq('tournament_id', tournamentId)
-    setSaving(false)
+
     if (error) {
-      setSaveMsg(t('common.error_generic'))
+      setSaveStatus('error')
     } else {
-      setOriginal({ ...config })
-      setSaveMsg('✓')
-      setTimeout(() => setSaveMsg(''), 2000)
+      setSaveStatus('saved')
+      setTimeout(() => setSaveStatus(prev => prev === 'saved' ? null : prev), 3000)
     }
   }
 
@@ -108,12 +120,34 @@ export default function ConfigTab({ tournamentId, isAdmin, mode }) {
               <div className="config-row" key={f.key}>
                 <label>{t(f.label)}</label>
                 {isAdmin ? (
-                  <input
-                    type="number"
-                    value={config[f.key] ?? ''}
-                    onChange={e => updateField(f.key, e.target.value)}
-                    min={f.min ?? 1}
-                  />
+                  <div className="config-stepper">
+                    <button
+                      className="config-stepper-btn"
+                      tabIndex={-1}
+                      onClick={() => updateField(f.key, String(Math.max(f.min ?? -10, (config[f.key] ?? 0) - 1)))}
+                    >−</button>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      className="config-stepper-val"
+                      value={config[f.key] ?? ''}
+                      onChange={e => {
+                        const raw = e.target.value.replace(/[^0-9\-]/g, '')
+                        updateField(f.key, raw)
+                      }}
+                      onBlur={e => {
+                        const n = parseInt(e.target.value) || 0
+                        const clamped = Math.max(f.min ?? -10, n)
+                        updateField(f.key, String(clamped))
+                      }}
+                      onFocus={e => e.target.select()}
+                    />
+                    <button
+                      className="config-stepper-btn"
+                      tabIndex={-1}
+                      onClick={() => updateField(f.key, String(Math.min(99, (config[f.key] ?? 0) + 1)))}
+                    >+</button>
+                  </div>
                 ) : (
                   <span className="config-readonly-value">{config[f.key]}</span>
                 )}
@@ -136,6 +170,16 @@ export default function ConfigTab({ tournamentId, isAdmin, mode }) {
         </div>
       )}
 
+      {isAdmin && saveStatus && (
+        <div className={`config-autosave-bar config-autosave-${saveStatus}`}>
+          {saveStatus === 'saving' && (
+            <><svg className="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> {t('common.loading')}</>
+          )}
+          {saveStatus === 'saved' && <>✓ {t('config.save_ok') || 'Guardado'}</>}
+          {saveStatus === 'error' && <>{t('common.error_generic')}</>}
+        </div>
+      )}
+
       {isPartidos && (
         <>
           {renderSection(t('config.section_points'), 'match_pts', MATCH_FIELDS)}
@@ -149,15 +193,6 @@ export default function ConfigTab({ tournamentId, isAdmin, mode }) {
           {renderSection(t('config.section_mult_group'), 'pos_mult_group', POS_MULT_GROUP)}
           {renderSection(t('config.section_mult_world'), 'pos_mult_world', POS_MULT_WORLD)}
         </>
-      )}
-
-      {isAdmin && hasChanges && (
-        <div className="config-save-bar">
-          {saveMsg && <span className="config-save-msg">{saveMsg}</span>}
-          <button className="btn btn-primary btn-sm" onClick={handleSave} disabled={saving}>
-            {saving ? t('common.loading') : t('config.save')}
-          </button>
-        </div>
       )}
     </div>
   )
