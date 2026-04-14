@@ -53,10 +53,26 @@ const LATER_ROUNDS = {
 }
 
 export function simulateWorldCupBracket(matches, preds) {
+  try {
+    return _simulateWorldCupBracketInner(matches, preds)
+  } catch (err) {
+    console.warn('simulateWorldCupBracket error:', err)
+    return {}
+  }
+}
+
+function _simulateWorldCupBracketInner(matches, preds) {
   const groupMatches = matches.filter(m => m.stage === 'group')
-  
-  // Note: we no longer abort if some group matches lack predictions.
-  // The bracket will show 'TBD' for unresolved slots instead of crashing.
+
+  // Verify if all group matches have a prediction
+  const allGroupsPlayed = groupMatches.every(m => {
+    const p = preds[m.id]
+    if (m.home_goals !== null && m.away_goals !== null) return true
+    return p && p.home_goals !== '' && p.away_goals !== '' && p.home_goals !== undefined && p.away_goals !== undefined
+  })
+
+  // If not all group games are typed, return empty map (bracket shows placeholder teams)
+  if (!allGroupsPlayed) return {}
 
   // 1. Calculate the Group Table
   const tables = {}
