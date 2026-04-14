@@ -57,5 +57,8 @@
     "tournaments": "토너먼트",
     "leaderboard": "순위",
     "profile": "프로필"
+  },
+  "predictions": {
+    "no_playoff_matches": "아직 플레이오프 경기가 없습니다"
   }
 }
