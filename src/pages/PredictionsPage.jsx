@@ -1085,15 +1085,12 @@ function calcMatchPoints(match, pred, config) {
     pts += exactOne * (config.pts_exact_one ?? 1)
   }
 
-  // Goal diff (legacy, only if non-zero in config)
-  if (config.pts_diff_correct || config.pts_diff_wrong) {
+  // Goal diff proximity: bonus = pts_diff_correct - distance, no floor
+  if (config.pts_diff_correct) {
     const predDiff = pHome - pAway
     const realDiff = rHome - rAway
-    if (predDiff === realDiff) {
-      pts += config.pts_diff_correct ?? 0
-    } else {
-      pts += config.pts_diff_wrong ?? 0
-    }
+    const distance = Math.abs(predDiff - realDiff)
+    pts += config.pts_diff_correct - distance
   }
 
   return pts * mult
