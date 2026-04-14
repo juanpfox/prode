@@ -57,5 +57,8 @@
     "tournaments": "トーナメント",
     "leaderboard": "ランキング",
     "profile": "プロフィール"
+  },
+  "predictions": {
+    "no_playoff_matches": "プレーオフの試合はまだありません"
   }
 }
