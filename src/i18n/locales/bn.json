@@ -57,5 +57,8 @@
     "tournaments": "টুর্নামেন্ট",
     "leaderboard": "র‌্যাংকিং",
     "profile": "প্রোফাইল"
+  },
+  "predictions": {
+    "no_playoff_matches": "এখনও কোনো প্লেঅফ ম্যাচ নেই"
   }
 }
