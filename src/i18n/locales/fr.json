@@ -69,6 +69,7 @@
       "dates": "Tous les matchs",
       "groups": "Groupes",
       "playoffs": "Matchs à élimination directe"
-    }
+    },
+    "no_playoff_matches": "Pas encore de matchs de playoffs disponibles"
   }
 }
