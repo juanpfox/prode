@@ -189,7 +189,7 @@ export default function PredictionsPage() {
   }
 
   function isLocked(match) {
-    return new Date(match.kickoff_at) <= new Date(Date.now() + 60 * 60 * 1000)
+    return match.home_goals !== null || new Date(match.kickoff_at) <= new Date(Date.now() + 60 * 60 * 1000)
   }
 
   function updatePred(matchId, field, value) {
