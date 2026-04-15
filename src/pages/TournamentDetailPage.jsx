@@ -47,6 +47,8 @@ export default function TournamentDetailPage() {
         .eq('tournament_id', id)
       setPlayers(pls ?? [])
 
+      // Recalculate scores before fetching
+      await supabase.rpc('recalculate_tournament_scores', { p_tournament_id: id })
       const { data: scs } = await supabase
         .from('scores')
         .select('user_id, total_points, matches_scored, users(display_name)')
