@@ -155,7 +155,7 @@ export default function PlayerPredictionsPage() {
   }
 
   function isLocked(match) {
-    return new Date(match.kickoff_at) > new Date()
+    return match.home_goals === null && new Date(match.kickoff_at) > new Date()
   }
 
   const byStage = {}
@@ -456,7 +456,7 @@ function ReadOnlyBracketTree({ byStage, bracketStages, simulatedBracket, predict
       home_team: simulatedBracket[round]?.home_team || match.home_team,
       away_team: simulatedBracket[round]?.away_team || match.away_team,
     }
-    return <ReadOnlyMatchCard stacked={true} match={enriched} pred={predictions[match.id] ?? {}} locked={new Date(match.kickoff_at) > new Date()} t={t} config={config} />
+    return <ReadOnlyMatchCard stacked={true} match={enriched} pred={predictions[match.id] ?? {}} locked={match.home_goals === null && new Date(match.kickoff_at) > new Date()} t={t} config={config} />
   }
 
   const probeRound = (allStageRounds[0] || [])[0]
