@@ -31,14 +31,10 @@ export default function LeaderboardPage() {
   useEffect(() => {
     if (!selected) return
     setLoadingScores(true)
-    // Recalculate scores on the server, then fetch fresh data
-    supabase.rpc('recalculate_tournament_scores', { p_tournament_id: selected })
-      .then(() =>
-        supabase.from('scores')
-          .select('user_id, total_points, matches_scored, users(display_name)')
-          .eq('tournament_id', selected)
-          .order('total_points', { ascending: false })
-      )
+    supabase.from('scores')
+      .select('user_id, total_points, matches_scored, users(display_name)')
+      .eq('tournament_id', selected)
+      .order('total_points', { ascending: false })
       .then(({ data }) => {
         setScores(data ?? [])
         setLoadingScores(false)
