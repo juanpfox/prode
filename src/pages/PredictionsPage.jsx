@@ -645,13 +645,18 @@ function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, is
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cardH, offset, bracketStages.join(',')])
 
-  // Total bracket height (based on all computed positions, not just visible)
+  // Total bracket height — based only on rounds in VISIBLE columns.
+  // This collapses the tree's height when the user is viewing columns near the
+  // final (e.g. sf+final), so the third-place match sits close below.
   const totalH = useMemo(() => {
     if (!cardH) return 0
-    const allY = Object.values(roundY)
-    if (!allY.length) return 0
-    return Math.max(...allY) + cardH
-  }, [roundY, cardH])
+    const visibleRounds = allStageRounds
+      .slice(offset, offset + visibleCount)
+      .flat()
+    const visibleY = visibleRounds.map(r => roundY[r]).filter(y => y != null)
+    if (!visibleY.length) return 0
+    return Math.max(...visibleY) + cardH
+  }, [roundY, cardH, offset, visibleCount, allStageRounds])
 
   const renderCard = (round) => {
     const match = matchByRound[round]
