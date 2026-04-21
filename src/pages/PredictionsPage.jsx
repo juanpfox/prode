@@ -15,7 +15,7 @@ const FIFA_TO_ISO2 = {
   PER: 'pe', ECU: 'ec', MAR: 'ma', SEN: 'sn', GHA: 'gh', CMR: 'cm', NGA: 'ng',
   RSA: 'za', BIH: 'ba', CZE: 'cz', GRE: 'gr', TUR: 'tr', EGY: 'eg', TUN: 'tn',
   CRC: 'cr', PAN: 'pa', JAM: 'jm', HON: 'hn', PAR: 'py', BFA: 'bf', MLI: 'ml',
-  HAI: 'ht', SWE: 'se', CPV: 'cv',
+  HAI: 'ht', SWE: 'se', CPV: 'cv', COD: 'cd',
 }
 
 function TeamFlag({ code, size = 18 }) {
