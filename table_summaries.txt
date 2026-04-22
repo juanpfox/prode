@@ -1,0 +1,155 @@
+Table ID: 0
+Row 1: ['Nation', 'Vote']
+Row 2: ['Round 1']
+
+Table ID: 1
+Row 1: ['City', 'Stadium', 'Capacity', 'Image']
+Row 2: ['Dallas(Arlington, Texas)', 'AT&T Stadium‡(Dallas Stadium)', '94,000', '']
+
+Table ID: 2
+Row 1: ['Pot 1', 'Pot 2', 'Pot 3', 'Pot 4']
+Row 2: ['United States(co-host)(14)Mexico(co-host)(15)Canada(co-host)(27)Spain(1)Argentina(2)France(3)England(4)Brazil(5)Portugal(6)Netherlands(7)Belgium(8)Germany(9)', 'Croatia(10)Morocco(11)Colombia(13)Uruguay(16)Switzerland(17)Japan(18)Senegal(19)Iran(20)South Korea(22)Ecuador(23)Austria(24)Australia(26)', 'Norway(29)Panama(30)Egypt(34)Algeria(35)Scotland(36)Paraguay(39)Tunisia(40)Ivory Coast(42)Uzbekistan(50)Qatar(51)Saudi Arabia(60)South Africa(61)', 'Jordan(66)Cape Verde(68)Ghana(72)Curaçao(82)Haiti(84)New Zealand(86)UEFA Path Awinners[L]UEFA Path Bwinners[L]UEFA Path Cwinners[L]UEFA Path Dwinners[L]IC Path 1winners[L][M]IC Path 2winners[L][N]']
+
+Table ID: 3
+Row 1: ['Pos', 'Team']
+Row 2: ['A1', 'Mexico']
+
+Table ID: 4
+Row 1: ['Pos', 'Team']
+Row 2: ['B1', 'Canada']
+
+Table ID: 5
+Row 1: ['Pos', 'Team']
+Row 2: ['C1', 'Brazil']
+
+Table ID: 6
+Row 1: ['Pos', 'Team']
+Row 2: ['D1', 'United States']
+
+Table ID: 7
+Row 1: ['Pos', 'Team']
+Row 2: ['E1', 'Germany']
+
+Table ID: 8
+Row 1: ['Pos', 'Team']
+Row 2: ['F1', 'Netherlands']
+
+Table ID: 9
+Row 1: ['Pos', 'Team']
+Row 2: ['G1', 'Belgium']
+
+Table ID: 10
+Row 1: ['Pos', 'Team']
+Row 2: ['H1', 'Spain']
+
+Table ID: 11
+Row 1: ['Pos', 'Team']
+Row 2: ['I1', 'France']
+
+Table ID: 12
+Row 1: ['Pos', 'Team']
+Row 2: ['J1', 'Argentina']
+
+Table ID: 13
+Row 1: ['Pos', 'Team']
+Row 2: ['K1', 'Portugal']
+
+Table ID: 14
+Row 1: ['Pos', 'Team']
+Row 2: ['L1', 'England']
+
+Table ID: 15
+Row 1: ['Team', 'Training site', 'Hotel']
+Row 2: ['Algeria[81]', 'University of Kansas,[82]Lawrence, Kansas', 'The Oread Lawrence, Lawrence, Kansas']
+
+Table ID: 16
+Row 1: ['Round', 'Matchday', 'Date']
+Row 2: ['Group stage', 'Matchday 1', 'June 11–17, 2026']
+
+Table ID: 17
+Row 1: ['Matchday', 'Pairings', 'Groups', 'Date']
+Row 2: ['Matchday 1', '1 vs 23 vs 4', 'A', 'June 11, 2026']
+
+Table ID: 18
+Row 1: ['showTie-breaking criteria for group stage ranking']
+Row 2: ['The ranking of teams in each group is determined by the points obtained in all group matches. If two or more teams are equal on points, the following criteria are used to determine the ranking:[125]Most points obtained in the group matches played between the teams concerned;Superior goal difference in the group matches played between the teams concerned;Most goals scored in the group matches played between the teams concerned;If, after having applied criteria a to c, teams still had an equal ranking, criteria a to c are reapplied exclusively to the matches between the teams who are still level to determine their final rankings. If this procedure does not lead to a decision, criteria d to h apply.Superior goal difference in all group matches;Most goals scored in all group matches;Highest team conduct ("fair play") score in all group matches (only one deduction can be applied to a player or team coach/official in a single match):Yellow card: −1 point;Indirect red card (second yellow card): −3 points;Direct red card: −4 points;Yellow card and direct red card: −5 points;Better position in the most recentFIFA Men\'s World Ranking;Better position in progressively older FIFA Men\'s World Rankings until teams can be separated.']
+
+Table ID: 19
+Row 1: ['Pos', 'Teamvte', 'Pld', 'W', 'D']
+Row 2: ['1', 'Mexico(H)', '0', '0', '0']
+
+Table ID: 20
+Row 1: ['Pos', 'Teamvte', 'Pld', 'W', 'D']
+Row 2: ['1', 'Canada(H)', '0', '0', '0']
+
+Table ID: 21
+Row 1: ['Pos', 'Teamvte', 'Pld', 'W', 'D']
+Row 2: ['1', 'Brazil', '0', '0', '0']
+
+Table ID: 22
+Row 1: ['Pos', 'Teamvte', 'Pld', 'W', 'D']
+Row 2: ['1', 'United States(H)', '0', '0', '0']
+
+Table ID: 23
+Row 1: ['Pos', 'Teamvte', 'Pld', 'W', 'D']
+Row 2: ['1', 'Germany', '0', '0', '0']
+
+Table ID: 24
+Row 1: ['Pos', 'Teamvte', 'Pld', 'W', 'D']
+Row 2: ['1', 'Netherlands', '0', '0', '0']
+
+Table ID: 25
+Row 1: ['Pos', 'Teamvte', 'Pld', 'W', 'D']
+Row 2: ['1', 'Belgium', '0', '0', '0']
+
+Table ID: 26
+Row 1: ['Pos', 'Teamvte', 'Pld', 'W', 'D']
+Row 2: ['1', 'Spain', '0', '0', '0']
+
+Table ID: 27
+Row 1: ['Pos', 'Teamvte', 'Pld', 'W', 'D']
+Row 2: ['1', 'France', '0', '0', '0']
+
+Table ID: 28
+Row 1: ['Pos', 'Teamvte', 'Pld', 'W', 'D']
+Row 2: ['1', 'Argentina', '0', '0', '0']
+
+Table ID: 29
+Row 1: ['Pos', 'Teamvte', 'Pld', 'W', 'D']
+Row 2: ['1', 'Portugal', '0', '0', '0']
+
+Table ID: 30
+Row 1: ['Pos', 'Teamvte', 'Pld', 'W', 'D']
+Row 2: ['1', 'England', '0', '0', '0']
+
+Table ID: 31
+Row 1: ['Pos', 'Grp', 'Teamvte', 'Pld', 'W']
+Row 2: ['1', 'A', 'Third place Group A', '0', '0']
+
+Table ID: 32
+Row 1: ['No.', 'Third-placed teamsadvance from groupsvte', '', '1Avs', '1Bvs']
+Row 2: ['1', '', '', '', '']
+
+Table ID: 33
+Row 1: ['Player', 'Offense(s)', 'Suspension(s)']
+Row 2: ['Nicolás Otamendi', 'inCONMEBOL round robinvsEcuador(September 9, 2025)[128]', 'Group JvsAlgeria(matchday 1; June 16)']
+
+Table ID: 34
+Row 1: ['Atlanta – Jose HadhatyBoston – John RegoDallas – Matt CliffGuadalajara – CuemancheHouston – Stephanie LealKansas City – Jadie ArnettLos Angeles – Thieb Delaporte-RichardMexico City – CuemancheMiami – Rubem RobierbMonterrey – CuemancheNew York/New Jersey – Rich TuPhiladelphia – Nick McClintockSan Francisco Bay Area – Leroy DavidSeattle – Shogo OtaToronto – Dave MurrayVancouver – Jamin Zuroski']
+
+Table ID: 35
+Row 1: ['FIFA partners', 'FIFA World Cup sponsors', 'FIFA World Cup supporters']
+Row 2: ['Adidas[149]Aramco[150]Coca-Cola[151]Hyundai–Kia[152]Lenovo[153]Qatar Airways[154]Visa[155]', "AB InBev(Budweiser)[156]American Airlines[157]Bank of America[158]Frito-Lay(Lay's)[159]Hisense[160]McDonald's[161]Mengniu Dairy[162]Unilever(Dove,Rexona)[163]Verizon[164]", 'ADI Predictstreet[165]DoorDash[166]Marriott Bonvoy[167]Rock-it Cargo[168]Valvoline[169]']
+
+Table ID: 36
+Row 1: ['North American supporters', 'South American supporters', 'European supporters']
+Row 2: ['Airbnb[170]Diageo[171]Globant[172]Home Depot[173][174]', 'Diageo[171]', 'Globant[172]']
+
+Table ID: 37
+Row 1: ['Atlanta', 'Boston', 'Dallas', 'Guadalajara']
+Row 2: ['Cox Enterprises[174][175]Georgia-Pacific[174][175]Home Depot[174][175]NAPA Auto Parts[176]Southern Company[174][175]', 'Meet Boston[177]Sanofi[178]State Street[178]', 'Arca Continental[179]Choctaw Casinos & Resorts[180]North Texas Sports Foundation[181]UT Southwestern[181]', 'TBD']
+
+Table ID: 38
+Row 1: ['Place', 'Teams', 'Amount (in millions)']
+Row 2: ['Per team', 'Total']
+

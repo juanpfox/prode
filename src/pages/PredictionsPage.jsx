@@ -423,7 +423,9 @@ export default function PredictionsPage() {
 
         {/* --- VIEW: PLAYOFFS --- */}
         {view === 'playoffs' && (() => {
-          const bracketStages = playoffStages.filter(s => s !== 'third_place')
+          const bracketStages = isMobile 
+            ? playoffStages.filter(s => s !== 'third_place')
+            : playoffStages.filter(s => s !== 'group')
 
           if (bracketStages.length === 0) {
             return (
@@ -434,7 +436,7 @@ export default function PredictionsPage() {
             )
           }
 
-          const visibleCount = isMobile ? 2 : Math.min(4, bracketStages.length)
+          const visibleCount = isMobile ? 2 : bracketStages.length
           const safeOffset = Math.min(bracketOffset, Math.max(0, bracketStages.length - visibleCount))
           const colPct = 100 / visibleCount
           const translatePct = -(safeOffset * colPct)
@@ -492,8 +494,8 @@ export default function PredictionsPage() {
                 />
               </div>
 
-              {/* Third place — only visible when sf+final are shown */}
-              {byStage['third_place']?.length > 0 && safeOffset === bracketStages.length - visibleCount && (
+              {/* Third place — only visible on mobile (since desktop shows it as a column) */}
+              {isMobile && byStage['third_place']?.length > 0 && safeOffset === bracketStages.length - visibleCount && (
                 <div style={{ marginTop: '0.5rem', maxWidth: isMobile ? '60%' : '30%', marginLeft: 'auto', marginRight: 'auto' }}>
                   <h3 style={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.75rem', textAlign: 'center' }}>
                     🥉 {t('predictions.stages.third_place')}
@@ -541,6 +543,7 @@ const BRACKET_STAGE_ROUNDS = {
   r16:[89,90,91,92,93,94,95,96],
   qf:[97,98,99,100],
   sf:[101,102],
+  third_place:[103],
   final:[104],
 }
 const CONN_W = 18   // px — connector channel width
