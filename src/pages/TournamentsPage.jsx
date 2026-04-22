@@ -356,99 +356,23 @@ export default function TournamentsPage() {
                 </div>
               </div>
 
-              {/* Scoring section — shown once mode is selected */}
-              {(createForm.mode || (createForm.competition_id && competitions.find(c => c.id === createForm.competition_id)?.type !== 'world_cup')) && (() => {
-                const isPartidos = createForm.mode === 'partidos' || competitions.find(c => c.id === createForm.competition_id)?.type !== 'world_cup'
-                const isPosiciones = createForm.mode === 'posiciones'
-
-                const MATCH_FIELDS = [
-                  { key: 'pts_win',          label: t('config.pts_win') },
-                  { key: 'pts_exact_both',   label: t('config.pts_exact_both') },
-                  { key: 'pts_exact_one',    label: t('config.pts_exact_one') },
-                  { key: 'pts_diff_correct', label: t('config.pts_diff_correct'), min: -10 },
-                  { key: 'pts_diff_wrong',   label: t('config.pts_diff_wrong'),   min: -10 },
-                ]
-                const MATCH_MULT = [
-                  { key: 'mult_r16',   label: t('config.mult_r16'),   min: 1 },
-                  { key: 'mult_qf',    label: t('config.mult_qf'),    min: 1 },
-                  { key: 'mult_sf',    label: t('config.mult_sf'),    min: 1 },
-                  { key: 'mult_final', label: t('config.mult_final'), min: 1 },
-                ]
-                const POS_FIELDS = [
-                  { key: 'pts_position_exact', label: t('config.pts_position_exact') },
-                  { key: 'pts_semifinalist',   label: t('config.pts_semifinalist') },
-                  { key: 'pts_finalist',       label: t('config.pts_finalist') },
-                  { key: 'pts_champion_bonus', label: t('config.pts_champion_bonus') },
-                  { key: 'pts_win',            label: t('config.pts_win_pos') },
-                  { key: 'pts_win_pen',        label: t('config.pts_win_pen') },
-                  { key: 'pts_draw',           label: t('config.pts_draw') },
-                ]
-                const POS_MULT_GROUP = [
-                  { key: 'mult_group_1st', label: t('config.mult_group_1st'), min: 1 },
-                  { key: 'mult_group_2nd', label: t('config.mult_group_2nd'), min: 1 },
-                  { key: 'mult_group_3rd', label: t('config.mult_group_3rd'), min: 1 },
-                ]
-                const POS_MULT_WORLD = [
-                  { key: 'mult_world_1st', label: t('config.mult_world_1st'), min: 1 },
-                  { key: 'mult_world_2nd', label: t('config.mult_world_2nd'), min: 1 },
-                  { key: 'mult_world_3rd', label: t('config.mult_world_3rd'), min: 1 },
-                  { key: 'mult_world_4th', label: t('config.mult_world_4th'), min: 1 },
-                ]
-
-                const sections = isPartidos
-                  ? [
-                      { key: 'pts', label: t('config.section_points'),      fields: MATCH_FIELDS },
-                      { key: 'mlt', label: t('config.section_multipliers'), fields: MATCH_MULT },
-                    ]
-                  : [
-                      { key: 'pts',  label: t('config.section_points'),      fields: POS_FIELDS },
-                      { key: 'grp',  label: t('config.section_mult_group'),  fields: POS_MULT_GROUP },
-                      { key: 'wld',  label: t('config.section_mult_world'),  fields: POS_MULT_WORLD },
-                    ]
-
-                const toggleSection = key =>
-                  setScoringOpenSections(prev => ({ ...prev, [key]: !(prev[key] ?? true) }))
-
-                return (
-                  <div style={{ borderTop: '1px solid var(--border)', paddingTop: '0.75rem' }}>
-                    <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '0.625rem', fontWeight: 600 }}>
-                      {t('config.section_points')} & {t('config.section_multipliers')}
-                    </p>
-                    {sections.map(({ key, label, fields }) => {
-                      const isOpen = scoringOpenSections[key] ?? true
-                      return (
-                        <div key={key} className="config-section">
-                          <div className="config-section-header" onClick={() => toggleSection(key)}>
-                            <span>{label}</span>
-                            <span className={`chevron ${isOpen ? 'open' : ''}`}>▼</span>
-                          </div>
-                          {isOpen && (
-                            <div className="config-section-body">
-                              {fields.map(f => (
-                                <div className="config-row" key={f.key}>
-                                  <label>{f.label}</label>
-                                  <input
-                                    type="number"
-                                    min={f.min ?? 0}
-                                    value={createForm.scoring[f.key] ?? ''}
-                                    onChange={e => setCreateForm(frm => ({
-                                      ...frm,
-                                      scoring: {
-                                        ...frm.scoring,
-                                        [f.key]: e.target.value === '' ? '' : parseInt(e.target.value) || 0
-                                      }
-                                    }))}
-                                  />
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      )
-                    })}
-                  </div>
-                )
-              })()}
+              {/* Scoring section — unified using ConfigTab component */}
+              {(createForm.mode || (createForm.competition_id && competitions.find(c => c.id === createForm.competition_id)?.type !== 'world_cup')) && (
+                <div style={{ borderTop: '1px solid var(--border)', paddingTop: '1rem', marginTop: '0.25rem' }}>
+                  <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '0.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.02em' }}>
+                    ⚙️ {t('config.tab_config')}
+                  </p>
+                  <ConfigTab 
+                    isAdmin={true} 
+                    mode={createForm.mode || 'partidos'} 
+                    externalConfig={createForm.scoring}
+                    onExternalChange={(key, val) => setCreateForm(f => ({
+                      ...f,
+                      scoring: { ...f.scoring, [key]: val }
+                    }))}
+                  />
+                </div>
+              )}
 
               <button
                 className="btn btn-primary"

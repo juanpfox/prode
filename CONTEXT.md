@@ -1,117 +1,65 @@
-# Prode Mundial — Contexto del Proyecto
+# Prode Mundial — Proyecto Contexto
 
 ## Stack tecnológico
-- **Frontend:** Vite + React JS, desplegado en Cloudflare Pages (subdominio `.pages.dev`)
-- **Backend:** Supabase (Auth + PostgreSQL + RLS + Realtime + Edge Functions)
-- **PWA:** `vite-plugin-pwa` — instalable en iOS/Android como app nativa
-- **i18n:** `react-i18next` — 12 idiomas soportados: `ar`, `bn`, `de`, `en`, `es`, `fr`, `hi`, `ja`, `ko`, `pt`, `zh`.
+- **Frontend:** Vite + React JS (deployado en Cloudflare Pages)
+- **Backend:** Supabase (Auth, PostgreSQL, Realtime, Edge Functions)
+- **PWA:** `vite-plugin-pwa` — instalable y offline-ready
+- **i18n:** `react-i18next` — 11 idiomas: `ar`, `bn`, `de`, `en`, `es`, `fr`, `hi`, `ja`, `ko`, `pt`, `zh`.
 - **Data fetching:** TanStack Query
-- **Styling:** Vanilla CSS (Modern design system, glassmorphism, responsive grid)
+- **Styling:** Vanilla CSS con variables CSS (Modern design, glassmorphism, responsive grid)
 
 ## Supabase
 - **Project ID:** `lnjiplzfsvtjiijpdoos`
-- **Project URL:** `https://lnjiplzfsvtjiijpdoos.supabase.co`
-- **Región:** South America (São Paulo)
+- **Region:** South America (São Paulo)
 - **Plan:** Free
 
 ---
 
 ## Descripción del producto
-
-App de prode (quiniela) para el Mundial 2026 y Champions League, multitorneo y multiusuario. Cualquier usuario puede crear torneos e invitar amigos. Pensada para ser responsive y funcionar como PWA (principalmente mobile).
+App multitorneo y multiusuario para el Mundial 2026 y Champions League. Diseñada para ser mobile-first/PWA, permitiendo a los usuarios crear torneos, invitar amigos y competir por puntos basados en predicciones.
 
 ### Competiciones activas
-| Competición | Modos disponibles |
-|-------------|------------------|
-| World Cup 2026 | Posiciones + Partidos |
-| Champions League 2025/26 (beta) | Partidos únicamente |
+- **World Cup 2026:** Soporta modos "Posiciones" y "Partidos".
+- **Champions League 2025/26:** Soporta modo "Partidos".
 
 ---
 
-## Estructura de Páginas
-- **Home:** Dashboard principal con acceso a torneos y creación rápida.
-- **Tournaments:** Listado de torneos públicos y gestión de solicitudes.
-- **Tournament Detail:** Vista general del torneo, ranking y configuración.
-- **Predictions:** Carga de resultados con modos (Fechas, Grupos, Playoffs).
-- **Posiciones:** Predicción de posiciones finales de grupo y podio mundial.
-- **Leaderboard:** Ranking detallado del torneo.
-- **Profile:** Gestión de perfil de usuario (Header).
-- **Admin Resultados:** Interfaz para cargar resultados reales (restringido).
+## Estructura de Páginas y Componentes
+- **AppShell:** Layout común con navegación, selector de idioma y toggle de tema.
+- **Home:** Dashboard con mis torneos, unirse por código, y creación rápida con **configuración de puntos personalizada integrada**.
+- **Tournament Detail:** Leaderboard, gestión de jugadores (admin) y pestañas dinámicas de "Scoring" y "Rules".
+- **Predictions (Partidos):** Carga de resultados con vistas por Fecha, Grupo y Playoff Bracket (responsivo).
+- **Predictions (Posiciones):** Drag & drop para ordenar grupos y podio final.
+- **Admin Management:** Páginas especiales para que los superadmins carguen resultados reales.
 
 ---
 
-## Modos de juego
+## Reglas y Puntuación (Configurables por torneo)
 
-### Modo Posiciones (solo Mundial)
-El usuario pronostica la **posición final de cada equipo en su grupo** (1°-4°) y el **podio mundial** (campeón, subcampeón, 3°, 4°).
-**UI:** Grid responsivo con drag & drop y tablas dinámicas de posiciones.
+El creador del torneo elige los puntos y multiplicadores durante el proceso de **creación**, pudiendo editarlos luego en la pestaña de configuración.
 
-### Modo Partidos (Mundial + Champions)
-El usuario pronostica el **resultado exacto** de cada partido (goles de cada equipo con desplegables). En fase eliminatoria, si pronostica empate, se habilitan 2 desplegables extra para elegir ganador por penales.
-- **Vistas:** Por Fecha (Date-based), Por Grupo (Group-based) y Playoffs (Bracket interactivo).
-- **Auto-save:** Debounced saving al escribir resultados.
+### Modo Posiciones
+El usuario pronostica el **orden final de cada equipo en su grupo** y el **podio mundial**.
+- **Puntos:** Exact position, semifinalist, finalist, champion bonus.
+- **Multiplicadores:** Aplicables según la posición final (1°, 2°, 3°) y fase alcanzada.
+- **Tie-break:** En las tablas de posiciones (UI), se usa `initial_position` de la tabla `teams` como criterio de desempate final.
 
-**Sistema de puntos** (editables por torneo):
-
-| Situación | Default | Configurable |
-|-----------|---------|:------------:|
-| Ganador correcto | 0 | ✅ |
-| Pronosticaste empate y acertás | 0 | ✅ |
-| Pronosticaste empate y no acertás | 0 (sin penalidad) | — |
-| Ganador incorrecto (no empate) | 0 (sin penalidad) | — |
-| Resultado exacto (ambos goles) | +3 | ✅ |
-| Goles exactos de un equipo | +1 por equipo (máx +2) | ✅ |
-| Diferencia de goles correcta (legacy) | 0 | ✅ |
-| Diferencia de goles incorrecta (legacy) | 0 | ✅ |
-| **Bonus cercanía dif. de gol** | **+3** | ✅ |
-| Victoria por penales correcta | ×2 al total del partido | ✅ |
-| Derrota por penales | equivale a empate | — |
-
-**Bonus cercanía diferencia de gol (nueva regla):**
-```
-bonus = points_goal_diff_proximity - abs(dif_pronosticada - dif_real)
-```
-Donde `dif = goles_local - goles_visitante` (con signo). Sin piso negativo.
-
-Ejemplo: Resultado real Argentina 3 - Argelia 1 (dif_real = +2), base = 3:
-- Pronóstico 2-0 o 3-1 (dif +2) → distancia 0 → **+3 pts**
-- Pronóstico 1-0 (dif +1) → distancia 1 → **+2 pts**
-- Pronóstico 4-0 (dif +4) o 2-2 (dif 0) → distancia 2 → **+1 pt**
-- Pronóstico Argelia 1-0 (dif -1) → distancia 3 → **0 pts**
-- Pronóstico Argelia 3-0 (dif -3) → distancia 5 → **-2 pts**
-
-> Las reglas legacy de diferencia (+1/-1 por gol) se mantienen en 0 por defecto pero el owner puede activarlas. Ambas reglas se suman.
-
-**Multiplicadores por fase** (editables):
-| Fase | Mult. default |
-|------|--------------|
-| Fase de grupos | ×1 |
-| 16avos | ×2 |
-| 8avos | ×3 |
-| Cuartos | ×4 |
-| Semis | ×5 |
-| Final | ×6 |
-| 3°/4° puesto | ×1 (sin multiplicador) |
-
-**Bloqueo:** 1 hora antes de **cada partido** individualmente. Los pronósticos de ese partido se vuelven visibles para todos a partir del kickoff.
+### Modo Partidos
+Pronóstico de **resultado exacto**.
+- **Puntos base:** Ganador correcto, empate acertado, resultado exacto, diferencia de gol (per goal).
+- **Multiplicadores por fase:** Grupos (x1), 16avos (x2), 8avos (x3), Cuartos (x4), Semis (x5), Final (x6) — configurables por el admin del torneo.
+- **Penales:** En eliminatorias, si se predice empate, se habilita el selector de "Ganador por penales".
 
 ---
 
-## Sistema de torneos
-- Los creadores son admins y pueden aprobar/rechazar jugadores.
-- Límites: 10 jugadores/torneo, 4 torneos/usuario (ampliable vía pagos).
-- El perfil de usuario se encuentra en el Header superior.
-
----
-
-## Pendientes / próximos pasos
-- [X] Crear repo GitHub (`prode-mundial`)
-- [X] UI Base y navegación responsiva
-- [X] Implementar Admin Results Management (Carga de resultados reales)
-- [X] Refinar Playoff Brackets y Posiciones Grid
-- [X] Soporte multi-idioma expandido (12 locales)
-- [ ] Elegir e integrar API de resultados automáticos (API-Football vs footbal-data.org)
+## Roadmap / Estado del Proyecto
+- [X] Configuración PWA e instalabilidad
+- [X] i18n soporte para 11 idiomas
+- [X] Admin Results Management (Carga de resultados reales)
+- [X] Refinar Playoff Brackets (Mobile-ready)
+- [X] Sistema de tie-break por `initial_position` en tablas de grupo
+- [X] Pestañas de configuración de puntos (Creación + Edición) y reglas dinámicas
+- [ ] Elegir e integrar API de resultados automáticos (API-Football)
+- [ ] Implementar lógica de puntos automática en Supabase (Edge Functions / Triggers)
 - [ ] Crear bot/ping para evitar pausa de Supabase Free
-- [ ] Habilitar Supabase Realtime en tabla `scores`
-- [ ] Implementar lógica de cálculo de puntos en Edge Functions / Triggers
-- [ ] Integración MercadoPago Checkout
+- [ ] Integración MercadoPago para quitar límites de torneos/jugadores
