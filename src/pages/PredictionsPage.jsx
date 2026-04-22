@@ -423,9 +423,7 @@ export default function PredictionsPage() {
 
         {/* --- VIEW: PLAYOFFS --- */}
         {view === 'playoffs' && (() => {
-          const bracketStages = isMobile 
-            ? playoffStages.filter(s => s !== 'third_place')
-            : playoffStages.filter(s => s !== 'group')
+          const bracketStages = playoffStages.filter(s => s !== 'third_place' && s !== 'group')
 
           if (bracketStages.length === 0) {
             return (
@@ -470,7 +468,9 @@ export default function PredictionsPage() {
                       textAlign: 'center', whiteSpace: 'nowrap',
                       overflow: 'hidden', textOverflow: 'ellipsis',
                     }}>
-                      {t(`predictions.stages.${stage}`)}
+                      {stage === 'final' && !isMobile 
+                        ? `${t('predictions.stages.final')} & ${t('predictions.stages.third_place')}`
+                        : t(`predictions.stages.${stage}`)}
                     </h3>
                   ))}
                 </div>
@@ -494,9 +494,9 @@ export default function PredictionsPage() {
                 />
               </div>
 
-              {/* Third place — only visible on mobile (since desktop shows it as a column) */}
-              {isMobile && byStage['third_place']?.length > 0 && safeOffset === bracketStages.length - visibleCount && (
-                <div style={{ marginTop: '0.5rem', maxWidth: isMobile ? '60%' : '30%', marginLeft: 'auto', marginRight: 'auto' }}>
+              {/* Third place — only on mobile */}
+              {isMobile && byStage['third_place']?.length > 0 && (
+                <div style={{ marginTop: '0.5rem', maxWidth: '60%', marginLeft: 'auto', marginRight: 'auto' }}>
                   <h3 style={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.75rem', textAlign: 'center' }}>
                     🥉 {t('predictions.stages.third_place')}
                   </h3>
@@ -543,14 +543,14 @@ const BRACKET_STAGE_ROUNDS = {
   r16:[89,90,91,92,93,94,95,96],
   qf:[97,98,99,100],
   sf:[101,102],
-  third_place:[103],
-  final:[104],
+  final:[104, 103],
 }
 const CONN_W = 18   // px — connector channel width
 const CARD_GAP = 18 // px — vertical gap between cards in leftmost visible column
 const ANIM = '0.35s cubic-bezier(0.4, 0, 0.2, 1)'
 
 function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, isLocked, updatePred, t, colPct, translatePct, offset, visibleCount, config }) {
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 640
   const cardRef = useRef(null)
   const [cardH, setCardH] = useState(null)
 
@@ -599,7 +599,11 @@ function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, is
         } else if (childCentres.length === 1) {
           pos[r] = childCentres[0] - cardH / 2
         } else {
-          pos[r] = idx * (cardH + CARD_GAP)
+          if (r === 103 && pos[104] != null) {
+            pos[r] = pos[104] + cardH + CARD_GAP * 2
+          } else {
+            pos[r] = idx * (cardH + CARD_GAP)
+          }
         }
       })
     }

@@ -292,9 +292,7 @@ export default function AdminResultsEntryPage() {
 
         {/* --- VIEW: PLAYOFFS --- */}
         {view === 'playoffs' && (() => {
-          const bracketStages = isMobile 
-            ? playoffStages.filter(s => s !== 'third_place')
-            : playoffStages.filter(s => s !== 'group')
+          const bracketStages = playoffStages.filter(s => s !== 'third_place' && s !== 'group')
           const visibleCount = isMobile ? 1 : bracketStages.length
           const safeOffset = Math.min(bracketOffset, Math.max(0, bracketStages.length - visibleCount))
           const visibleStages = bracketStages.slice(safeOffset, safeOffset + visibleCount)
@@ -314,7 +312,9 @@ export default function AdminResultsEntryPage() {
                 <div style={{ display: 'flex', gap: '2.5rem', flex: 1, justifyContent: 'center', minWidth: 0 }}>
                   {visibleStages.map(stage => (
                     <h3 key={stage} style={{ width: isMobile ? 'auto' : '320px', flex: isMobile ? 1 : 'none', fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--text)', margin: 0, textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {t(`predictions.stages.${stage}`)}
+                      {stage === 'final' && !isMobile 
+                        ? `${t('predictions.stages.final')} & ${t('predictions.stages.third_place')}`
+                        : t(`predictions.stages.${stage}`)}
                     </h3>
                   ))}
                 </div>
@@ -390,11 +390,11 @@ export default function AdminResultsEntryPage() {
                           )}
                         </div>
                       ))}
-                      
-                      {isMobile && stage === 'final' && byStage['third_place'] && byStage['third_place'].length > 0 && (
+                      {stage === 'final' && byStage['third_place'] && byStage['third_place'].length > 0 && (
                         <div style={{
-                          position: 'absolute',
-                          top: 'calc(50% + 85px)',
+                          marginTop: isMobile ? '85px' : '3rem',
+                          position: isMobile ? 'absolute' : 'relative',
+                          top: isMobile ? 'calc(50% + 85px)' : 'auto',
                           left: 0,
                           right: 0,
                           zIndex: 10

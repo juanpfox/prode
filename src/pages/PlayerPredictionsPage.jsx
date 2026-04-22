@@ -62,8 +62,7 @@ const BRACKET_STAGE_ROUNDS = {
   r16:[89,90,91,92,93,94,95,96],
   qf:[97,98,99,100],
   sf:[101,102],
-  third_place:[103],
-  final:[104],
+  final:[104, 103],
 }
 const CONN_W = 18
 const CARD_GAP = 18
@@ -304,9 +303,7 @@ export default function PlayerPredictionsPage() {
           )}
 
           {view === "playoffs" && (() => {
-            const bracketStages = isMobile 
-              ? playoffStages.filter(s => s !== "third_place")
-              : playoffStages.filter(s => s !== "group")
+            const bracketStages = playoffStages.filter(s => s !== "third_place" && s !== "group")
             if (bracketStages.length === 0) {
               return (
                 <div className="card card-sm" style={{ textAlign: "center", padding: "2rem", color: "var(--text-muted)" }}>
@@ -338,7 +335,9 @@ export default function PlayerPredictionsPage() {
                           fontWeight: 800, fontSize: "0.8rem", textTransform: "uppercase",
                           color: "var(--text)", margin: 0, padding: "0.75rem 1rem",
                           textAlign: "center", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                        {t(`predictions.stages.${stage}`)}
+                      {stage === "final" && !isMobile 
+                        ? `${t("predictions.stages.final")} & ${t("predictions.stages.third_place")}`
+                        : t(`predictions.stages.${stage}`)}
                       </h3>
                     ))}
                   </div>
@@ -351,8 +350,8 @@ export default function PlayerPredictionsPage() {
                     offset={safeOffset} visibleCount={visibleCount} config={tournamentConfig}
                   />
                 </div>
-                {isMobile && byStage["third_place"]?.length > 0 && safeOffset === bracketStages.length - visibleCount && (
-                  <div style={{ marginTop: "0.5rem", maxWidth: isMobile ? "60%" : "30%", marginLeft: "auto", marginRight: "auto" }}>
+                {isMobile && byStage["third_place"]?.length > 0 && (
+                  <div style={{ marginTop: "0.5rem", maxWidth: "60%", marginLeft: "auto", marginRight: "auto" }}>
                     <h3 style={{ fontWeight: 800, fontSize: "0.75rem", textTransform: "uppercase",
                         color: "var(--text-muted)", marginBottom: "0.75rem", textAlign: "center" }}>
                       🥉 {t("predictions.stages.third_place")}
@@ -388,6 +387,7 @@ export default function PlayerPredictionsPage() {
 }
 
 function ReadOnlyBracketTree({ byStage, bracketStages, simulatedBracket, predictions, t, colPct, translatePct, offset, visibleCount, config }) {
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 640
   const cardRef = useRef(null)
   const [cardH, setCardH] = useState(null)
   useEffect(() => {
@@ -416,7 +416,10 @@ function ReadOnlyBracketTree({ byStage, bracketStages, simulatedBracket, predict
         const childCentres = children.map(c => pos[c] != null ? pos[c] + cardH / 2 : null).filter(y => y !== null)
         if (childCentres.length === 2) pos[r] = (childCentres[0] + childCentres[1]) / 2 - cardH / 2
         else if (childCentres.length === 1) pos[r] = childCentres[0] - cardH / 2
-        else pos[r] = idx * (cardH + CARD_GAP)
+        else {
+          if (r === 103 && pos[104] != null) pos[r] = pos[104] + cardH + CARD_GAP * 2
+          else pos[r] = idx * (cardH + CARD_GAP)
+        }
       })
     }
     for (let si = offset - 1; si >= 0; si--) {
