@@ -293,7 +293,7 @@ export default function AdminResultsEntryPage() {
         {/* --- VIEW: PLAYOFFS --- */}
         {view === 'playoffs' && (() => {
           const bracketStages = playoffStages.filter(s => s !== 'third_place' && s !== 'group')
-          const visibleCount = isMobile ? 1 : bracketStages.length
+          const visibleCount = isMobile ? 1 : (window.innerWidth < 1150 ? 2 : bracketStages.length)
           const safeOffset = Math.min(bracketOffset, Math.max(0, bracketStages.length - visibleCount))
           const visibleStages = bracketStages.slice(safeOffset, safeOffset + visibleCount)
           

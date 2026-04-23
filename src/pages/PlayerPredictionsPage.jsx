@@ -312,7 +312,7 @@ export default function PlayerPredictionsPage() {
                 </div>
               )
             }
-            const visibleCount = isMobile ? 2 : bracketStages.length
+            const visibleCount = isMobile ? 2 : (window.innerWidth < 1150 ? 3 : bracketStages.length)
             const safeOffset = Math.min(bracketOffset, Math.max(0, bracketStages.length - visibleCount))
             const colPct = 100 / visibleCount
             const translatePct = -(safeOffset * colPct)
@@ -326,8 +326,35 @@ export default function PlayerPredictionsPage() {
             }
             return (
               <div style={{ paddingBottom: "2rem" }}>
-                <div style={{ overflow: "hidden", borderRadius: "var(--r-md)", marginBottom: "1rem",
+                <div style={{ position: 'relative', overflow: "hidden", borderRadius: "var(--r-md)", marginBottom: "1rem",
                     border: "1px solid var(--border)", background: "var(--surface-2)" }}>
+                  {safeOffset > 0 && (
+                    <button 
+                      onClick={() => setBracketOffset(v => Math.max(0, v - 1))}
+                      style={{
+                        position: 'absolute', left: 0, top: 0, bottom: 0, width: '3.5rem',
+                        background: 'linear-gradient(to right, var(--surface-2) 60%, transparent)',
+                        border: 'none', color: 'var(--primary)', cursor: 'pointer', zIndex: 10,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', fontWeight: 900
+                      }}
+                    >
+                      ‹
+                    </button>
+                  )}
+                  {safeOffset < (bracketStages.length - visibleCount) && (
+                    <button 
+                      onClick={() => setBracketOffset(v => Math.min(v + 1, bracketStages.length - visibleCount))}
+                      style={{
+                        position: 'absolute', right: 0, top: 0, bottom: 0, width: '3.5rem',
+                        background: 'linear-gradient(to left, var(--surface-2) 60%, transparent)',
+                        border: 'none', color: 'var(--primary)', cursor: 'pointer', zIndex: 10,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', fontWeight: 900
+                      }}
+                    >
+                      ›
+                    </button>
+                  )}
+
                   <div style={{ display: "flex", transform: `translateX(${translatePct}%)`,
                       transition: "transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)", willChange: "transform" }}>
                     {bracketStages.map(stage => (
