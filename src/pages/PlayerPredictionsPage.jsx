@@ -312,7 +312,7 @@ export default function PlayerPredictionsPage() {
                 </div>
               )
             }
-            const visibleCount = isMobile ? 2 : (window.innerWidth < 1150 ? 3 : bracketStages.length)
+            const visibleCount = isMobile ? 2 : (window.innerWidth < 1400 ? 3 : bracketStages.length)
             const safeOffset = Math.min(bracketOffset, Math.max(0, bracketStages.length - visibleCount))
             const colPct = 100 / visibleCount
             const translatePct = -(safeOffset * colPct)
