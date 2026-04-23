@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth'
 import ThemeToggle from './ThemeToggle'
 import LangSelector from './LangSelector'
 
-export default function AppShell({ children, saveIndicator }) {
+export default function AppShell({ children, saveIndicator, wide }) {
   const { t } = useTranslation()
   const { user, profile, signOut } = useAuth()
   const navigate = useNavigate()
@@ -40,7 +40,7 @@ export default function AppShell({ children, saveIndicator }) {
         </div>
       </header>
 
-      <main className="app-content container" style={{ paddingTop: '1.5rem' }}>
+      <main className={`app-content container ${wide ? 'container-full' : ''}`} style={{ paddingTop: wide ? '1rem' : '1.5rem' }}>
         {children}
       </main>
 

@@ -202,7 +202,7 @@ export default function AdminResultsEntryPage() {
   )
 
   return (
-    <AppShell saveIndicator={saveStatus}>
+    <AppShell saveIndicator={saveStatus} wide={view === 'playoffs'}>
       <div className="animate-fade-in">
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>

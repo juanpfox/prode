@@ -330,7 +330,7 @@ export default function PredictionsPage() {
 
 
   return (
-    <AppShell saveIndicator={saveStatus}>
+    <AppShell saveIndicator={saveStatus} wide={view === 'playoffs'}>
       <PredictionErrorBoundary>
       <div className="animate-fade-in">
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>

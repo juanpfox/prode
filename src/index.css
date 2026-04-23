@@ -187,6 +187,8 @@ body {
 }
 .container-sm { max-width: var(--max-w); }
 .container-md { max-width: var(--max-w-md); }
+.container-xl { max-width: var(--max-w-xl); }
+.container-full { max-width: 1600px; }
 
 .sr-only {
   position: absolute; width: 1px; height: 1px; padding: 0;

@@ -56,7 +56,7 @@ Pronóstico de **resultado exacto**.
 - [X] Configuración PWA e instalabilidad
 - [X] i18n soporte para 11 idiomas
 - [X] Admin Results Management (Carga de resultados reales)
-- [X] Refinar Playoff Brackets (Mobile-ready + Full Desktop View)
+- [X] Refinar Playoff Brackets (Mobile-ready + Full Desktop View + 1600px wide layout)
 - [X] Sistema de tie-break por `initial_position` en tablas de grupo
 - [X] Pestañas de configuración de puntos (Creación + Edición) y reglas dinámicas
 - [ ] Elegir e integrar API de resultados automáticos (API-Football)

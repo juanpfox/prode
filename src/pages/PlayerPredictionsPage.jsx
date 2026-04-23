@@ -211,7 +211,7 @@ export default function PlayerPredictionsPage() {
   const groupMatches = matches.filter(m => m.stage === "group")
 
   return (
-    <AppShell>
+    <AppShell wide={view === "playoffs"}>
       <PredictionErrorBoundary>
         <div className="animate-fade-in">
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between",
