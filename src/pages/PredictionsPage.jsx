@@ -494,19 +494,7 @@ export default function PredictionsPage() {
                 />
               </div>
 
-              {/* Third place — only on mobile */}
-              {isMobile && byStage['third_place']?.length > 0 && (
-                <div style={{ marginTop: '0.5rem', maxWidth: '60%', marginLeft: 'auto', marginRight: 'auto' }}>
-                  <h3 style={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.75rem', textAlign: 'center' }}>
-                    🥉 {t('predictions.stages.third_place')}
-                  </h3>
-                  {byStage['third_place'].map(match => (
-                    <MatchCard stacked={true} key={match.id}
-                      match={{ ...match, home_team: simulatedBracket[match.round]?.home_team || match.home_team, away_team: simulatedBracket[match.round]?.away_team || match.away_team }}
-                      pred={predictions[match.id] ?? {}} locked={isLocked(match)} onChange={(f, v) => updatePred(match.id, f, v)} t={t} config={tournamentConfig} />
-                  ))}
-                </div>
-              )}
+
 
               {/* Dots indicator */}
               {bracketStages.length > visibleCount && (

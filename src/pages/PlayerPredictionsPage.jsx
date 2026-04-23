@@ -350,21 +350,7 @@ export default function PlayerPredictionsPage() {
                     offset={safeOffset} visibleCount={visibleCount} config={tournamentConfig}
                   />
                 </div>
-                {isMobile && byStage["third_place"]?.length > 0 && (
-                  <div style={{ marginTop: "0.5rem", maxWidth: "60%", marginLeft: "auto", marginRight: "auto" }}>
-                    <h3 style={{ fontWeight: 800, fontSize: "0.75rem", textTransform: "uppercase",
-                        color: "var(--text-muted)", marginBottom: "0.75rem", textAlign: "center" }}>
-                      🥉 {t("predictions.stages.third_place")}
-                    </h3>
-                    {byStage["third_place"].map(match => (
-                      <ReadOnlyMatchCard stacked={true} key={match.id}
-                        match={{ ...match, home_team: simulatedBracket[match.round]?.home_team || match.home_team,
-                          away_team: simulatedBracket[match.round]?.away_team || match.away_team }}
-                        pred={predictions[match.id] ?? {}} locked={isLocked(match)}
-                        t={t} config={tournamentConfig} />
-                    ))}
-                  </div>
-                )}
+
                 {bracketStages.length > visibleCount && (
                   <div style={{ display: "flex", justifyContent: "center", gap: "0.5rem", paddingTop: "1.25rem" }}>
                     {bracketStages.slice(0, bracketStages.length - visibleCount + 1).map((_, i) => (

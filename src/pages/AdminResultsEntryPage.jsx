@@ -390,23 +390,7 @@ export default function AdminResultsEntryPage() {
                           )}
                         </div>
                       ))}
-                      {stage === 'final' && byStage['third_place'] && byStage['third_place'].length > 0 && (
-                        <div style={{
-                          marginTop: isMobile ? '85px' : '3rem',
-                          position: isMobile ? 'absolute' : 'relative',
-                          top: isMobile ? 'calc(50% + 85px)' : 'auto',
-                          left: 0,
-                          right: 0,
-                          zIndex: 10
-                        }}>
-                          <h3 style={{ fontWeight: 800, fontSize: '0.70rem', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.5rem', textAlign: 'center' }}>
-                            {t('predictions.stages.third_place')}
-                          </h3>
-                          {byStage['third_place'].map(match => (
-                            <AdminMatchCard stacked={true} key={match.id} match={{ ...match, home_team: simulatedBracket[match.round]?.home_team || match.home_team, away_team: simulatedBracket[match.round]?.away_team || match.away_team }} onChange={updateMatch} t={t} />
-                          ))}
-                        </div>
-                      )}
+
                     </div>
                   </div>
                 )})}
