@@ -7,7 +7,7 @@ import { useAuth } from '../hooks/useAuth'
 export default function TournamentCard({ tournament, onDeleteSuccess }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const [showMenu, setShowMenu] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const [deleting, setDeleting] = useState(false)
@@ -15,7 +15,7 @@ export default function TournamentCard({ tournament, onDeleteSuccess }) {
   const [featured, setFeatured] = useState(tournament.is_featured || false)
 
   const isAdmin = tournament.role === 'admin'
-  const isAppAdmin = user?.email === 'guest@prodemundial.dev' || user?.email === 'juanpatriciofox@gmail.com'
+  const isAppAdmin = profile?.is_admin || user?.email === 'guest@prodemundial.dev' || user?.email === 'juanpatriciofox@gmail.com'
 
   useEffect(() => {
     if (!user || !tournament.id || !tournament.competition_id) return

@@ -28,12 +28,12 @@ function LoadingScreen() {
 export default function App() {
   useTheme()
   const { i18n } = useTranslation()
-  const { user, loading } = useAuth()
+  const { user, profile, loading } = useAuth()
   useEffect(() => { applyRTL(i18n.language) }, [i18n.language])
 
   if (loading) return <LoadingScreen />
 
-  const isAdmin = user?.email === 'guest@prodemundial.dev' || user?.email === 'juanpatriciofox@gmail.com'
+  const isAdmin = profile?.is_admin || user?.email === 'guest@prodemundial.dev' || user?.email === 'juanpatriciofox@gmail.com'
 
   return (
     <BrowserRouter>
