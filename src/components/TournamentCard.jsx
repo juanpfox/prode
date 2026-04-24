@@ -12,8 +12,10 @@ export default function TournamentCard({ tournament, onDeleteSuccess }) {
   const [showConfirm, setShowConfirm] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [predStats, setPredStats] = useState(null) // { submitted, total }
+  const [featured, setFeatured] = useState(tournament.is_featured || false)
 
   const isAdmin = tournament.role === 'admin'
+  const isAppAdmin = user?.email === 'guest@prodemundial.dev' || user?.email === 'juanpatriciofox@gmail.com'
 
   useEffect(() => {
     if (!user || !tournament.id || !tournament.competition_id) return
@@ -71,6 +73,20 @@ export default function TournamentCard({ tournament, onDeleteSuccess }) {
     } finally {
       setDeleting(false)
       setShowConfirm(false)
+    }
+  }
+
+  const handleToggleFeatured = async (e) => {
+    e.stopPropagation()
+    const newValue = !featured
+    setFeatured(newValue)
+    try {
+      const { error } = await supabase.from('tournaments').update({ is_featured: newValue }).eq('id', tournament.id)
+      if (error) throw error
+    } catch (err) {
+      console.error('Error toggling featured:', err)
+      setFeatured(!newValue)
+      alert(t('common.error_generic'))
     }
   }
 
@@ -143,6 +159,19 @@ export default function TournamentCard({ tournament, onDeleteSuccess }) {
       {/* Visible Action Icons */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', flexShrink: 0 }}>
         
+        {/* Featured Toggle (App Admin Only) */}
+        {isAppAdmin && (
+          <button 
+            className={`btn-icon-action ${featured ? 'featured-active' : ''}`}
+            title={featured ? t('tournaments.featured_remove') : t('tournaments.featured_add')}
+            onClick={handleToggleFeatured}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill={featured ? "var(--warning)" : "none"} stroke={featured ? "var(--warning)" : "currentColor"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+          </button>
+        )}
+
         {/* Cargar Pronósticos */}
         <button 
           className="btn-icon-action" 
@@ -267,6 +296,12 @@ export default function TournamentCard({ tournament, onDeleteSuccess }) {
           background: var(--surface-2);
           color: var(--primary);
           transform: translateY(-1px);
+        }
+        .btn-icon-action.featured-active {
+          color: var(--warning);
+        }
+        .btn-icon-action.featured-active:hover {
+          background: rgba(251, 191, 36, 0.1);
         }
         .dropdown-item {
           display: flex;

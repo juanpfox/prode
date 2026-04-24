@@ -1,0 +1,36 @@
+name: Sync UCL Results
+
+on:
+  schedule:
+    # Every 30 min on Tue & Wed (UCL match days) between 19:00-23:30 UTC
+    - cron: '0,30 19-23 * * 2,3'
+    # Also run once each morning to catch any late updates
+    - cron: '0 7 * * *'
+  workflow_dispatch: # Allow manual trigger from GitHub UI
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Trigger sync Edge Function
+        run: |
+          response=$(curl -s -w "\n%{http_code}" -X POST \
+            "${{ secrets.SUPABASE_URL }}/functions/v1/sync-ucl-results" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d '{}')
+
+          body=$(echo "$response" | head -n -1)
+          status=$(echo "$response" | tail -n 1)
+
+          echo "HTTP status: $status"
+          echo "Response: $body"
+
+          if [ "$status" != "200" ]; then
+            echo "::error::Sync failed with status $status"
+            exit 1
+          fi
+
+          updated=$(echo "$body" | jq -r '.db_updated // 0')
+          echo "Matches updated: $updated"

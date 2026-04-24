@@ -28,6 +28,14 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
   - [ ] Implementar checkout y configuración de webhooks en Supabase para registrar ventas exitosas.
   - [ ] Modificar condicionalmente los límites en el backend y frontend (ej: deshabilitar el cap).
 
+## Fase 4: Experiencia de Usuario y Destacados
+
+- [x] **Torneos Destacados (Featured Tournaments)**
+  - [x] Agregar columna `is_featured` a la tabla `tournaments`.
+  - [x] Implementar el toggle de estrella en `TournamentCard` (solo para admins de la app).
+  - [x] Actualizar la lógica de `HomePage` para mostrar torneos destacados primero para usuarios nuevos.
+  - [x] Asegurar que el orden de los torneos respete la categoría de destacados.
+
 ---
 
 > **Nota para Agentes:** Cuando completen un ítem principal, generen y almacenen artefactos (capturas de pantalla, grabaciones de browser, diffs de código o walkthroughs) resumiendo los logros, actualicen este archivo y **hagan un commit atómico** de los cambios antes de pasar al próximo hito.

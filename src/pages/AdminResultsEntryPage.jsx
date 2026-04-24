@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import AppShell from '../components/AppShell'
 import { simulateWorldCupBracket } from '../utils/simulatorWC2026'
+import { simulateChampionsLeagueBracket } from '../utils/simulatorUCL'
 
 const FIFA_TO_ISO2 = {
   ARG: 'ar', BRA: 'br', FRA: 'fr', GER: 'de', ITA: 'it', ESP: 'es', POR: 'pt', NED: 'nl',
@@ -50,17 +51,25 @@ export default function AdminResultsEntryPage() {
   const [activeGroup, setActiveGroup] = useState('A')
   const [saveStatus, setSaveStatus] = useState(null)
   const [recalcStatus, setRecalcStatus] = useState('idle') // 'idle' | 'loading' | 'done' | 'error'
+  const [syncStatus, setSyncStatus] = useState('idle') // 'idle' | 'loading' | 'done' | 'error'
+  const [syncResult, setSyncResult] = useState(null)
   const [bracketOffset, setBracketOffset] = useState(0)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640)
 
   const simulatedBracket = useMemo(() => {
-    if (!competition?.name?.toLowerCase().includes('world cup')) return {}
+    if (!competition) return {}
     // We send matches as both matches and preds format
     const predsFormat = {}
     matches.forEach(m => {
-      predsFormat[m.id] = { home_goals: m.home_goals !== null ? m.home_goals : '', away_goals: m.away_goals !== null ? m.away_goals : '' }
+      predsFormat[m.id] = { home_goals: m.home_goals !== null ? m.home_goals : '', away_goals: m.away_goals !== null ? m.away_goals : '', pen_pick: m.pen_winner ?? null }
     })
-    return simulateWorldCupBracket(matches, predsFormat)
+    if (competition.name?.toLowerCase().includes('world cup')) {
+      return simulateWorldCupBracket(matches, predsFormat)
+    }
+    if (competition.type === 'champions_league') {
+      return simulateChampionsLeagueBracket(matches, predsFormat)
+    }
+    return {}
   }, [matches, competition])
 
   const pendingChanges = useRef({})
@@ -179,6 +188,23 @@ export default function AdminResultsEntryPage() {
 
 
 
+  const handleSyncFromApi = async () => {
+    setSyncStatus('loading')
+    setSyncResult(null)
+    try {
+      const { data, error } = await supabase.functions.invoke('sync-ucl-results')
+      if (error) throw error
+      setSyncResult(data)
+      setSyncStatus('done')
+      if (data?.db_updated > 0) await loadData()
+      setTimeout(() => setSyncStatus('idle'), 6000)
+    } catch (e) {
+      console.error(e)
+      setSyncStatus('error')
+      setTimeout(() => setSyncStatus('idle'), 4000)
+    }
+  }
+
   const handleRecalculate = async () => {
     setRecalcStatus('loading')
     try {
@@ -218,7 +244,30 @@ export default function AdminResultsEntryPage() {
           </div>
           
           <div style={{ textAlign: 'right' }}>
-            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.25rem', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.25rem', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+              {competition?.type === 'champions_league' && (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.2rem' }}>
+                  <button
+                    className="btn btn-sm btn-ghost"
+                    onClick={handleSyncFromApi}
+                    disabled={syncStatus === 'loading'}
+                    title="Importar resultados reales desde football-data.org"
+                    style={{ fontSize: '0.75rem', padding: '0.35rem 0.6rem', opacity: syncStatus === 'loading' ? 0.6 : 1, color: 'var(--primary)', borderColor: 'var(--primary)' }}
+                  >
+                    {syncStatus === 'loading' ? '⏳' : syncStatus === 'done' ? '✅' : syncStatus === 'error' ? '❌' : '🌐'} Sync API
+                  </button>
+                  {syncStatus === 'done' && syncResult && (
+                    <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>
+                      {syncResult.db_updated > 0
+                        ? `+${syncResult.db_updated} partido${syncResult.db_updated !== 1 ? 's' : ''} actualizado${syncResult.db_updated !== 1 ? 's' : ''}`
+                        : 'Sin cambios nuevos'}
+                    </span>
+                  )}
+                  {syncStatus === 'error' && (
+                    <span style={{ fontSize: '0.65rem', color: 'var(--error, red)' }}>Error al conectar con la API</span>
+                  )}
+                </div>
+              )}
               <button
                 className="btn btn-sm btn-ghost"
                 onClick={handleRecalculate}
@@ -262,7 +311,7 @@ export default function AdminResultsEntryPage() {
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
               {byStage[stage].map(m => (
-                <AdminMatchCard stacked={true} key={m.id} match={STAGE_ORDER.indexOf(stage) > 0 ? { ...m, home_team: simulatedBracket[m.round]?.home_team || m.home_team, away_team: simulatedBracket[m.round]?.away_team || m.away_team } : m} onChange={updateMatch} t={t} />
+                <AdminMatchCard stacked={true} key={m.id} match={STAGE_ORDER.indexOf(stage) > 0 ? { ...m, home_team: simulatedBracket[m.id]?.home_team || simulatedBracket[m.round]?.home_team || m.home_team, away_team: simulatedBracket[m.id]?.away_team || simulatedBracket[m.round]?.away_team || m.away_team } : m} onChange={updateMatch} t={t} />
               ))}
             </div>
           </section>
@@ -343,7 +392,7 @@ export default function AdminResultsEntryPage() {
                     }}>
                       {byStage[stage].map((match, matchIndex) => (
                         <div key={match.id} className="bracket-match-cell">
-                          <AdminMatchCard stacked={true} match={{ ...match, home_team: simulatedBracket[match.round]?.home_team || match.home_team, away_team: simulatedBracket[match.round]?.away_team || match.away_team }} onChange={updateMatch} t={t} />
+                          <AdminMatchCard stacked={true} match={{ ...match, home_team: simulatedBracket[match.id]?.home_team || simulatedBracket[match.round]?.home_team || match.home_team, away_team: simulatedBracket[match.id]?.away_team || simulatedBracket[match.round]?.away_team || match.away_team }} onChange={updateMatch} t={t} />
                           
                           {isLastColumn && stage !== 'final' && (
                             <>

@@ -55,7 +55,7 @@ export default function TournamentsPage() {
           .select(`
             role, 
             tournaments(
-              id, name, mode, invite_code, competition_id, prize,
+              id, name, mode, invite_code, competition_id, prize, is_featured,
               competitions(name, type),
               creator:users!tournaments_created_by_fkey(display_name),
               participants:tournament_players(count)
@@ -64,12 +64,13 @@ export default function TournamentsPage() {
           .eq('user_id', user.id).eq('status', 'approved'),
         supabase.from('tournaments')
           .select(`
-            id, name, mode, invite_code, competition_id, is_public, prize,
+            id, name, mode, invite_code, competition_id, is_public, prize, is_featured,
             competitions(name, type),
             creator:users!tournaments_created_by_fkey(display_name),
             participants:tournament_players(count)
           `)
           .eq('is_public', true)
+          .order('is_featured', { ascending: false })
           .order('created_at', { ascending: false }).limit(30),
         supabase.from('competitions').select('id, name, type, status').order('name'),
       ])
@@ -83,7 +84,11 @@ export default function TournamentsPage() {
         ...tr,
         creator_name: tr.creator?.display_name,
         participants_count: tr.participants?.[0]?.count ?? 0
-      })) ?? [])
+      })).sort((a, b) => {
+        if (a.is_featured && !b.is_featured) return -1;
+        if (!a.is_featured && b.is_featured) return 1;
+        return 0;
+      }) ?? [])
       setCompetitions(comps ?? [])
     } finally {
       setLoading(false)

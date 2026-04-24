@@ -23,7 +23,7 @@ export default function HomePage() {
             .select(`
               role, 
               tournaments(
-                id, name, invite_code, mode, competition_id, is_public,
+                id, name, invite_code, mode, competition_id, is_public, is_featured,
                 competitions(name, type), 
                 creator:users!tournaments_created_by_fkey(display_name),
                 participants:tournament_players(count)
@@ -32,12 +32,13 @@ export default function HomePage() {
             .eq('user_id', user.id).eq('status', 'approved'),
           supabase.from('tournaments')
             .select(`
-              id, name, invite_code, mode, competition_id, is_public,
+              id, name, invite_code, mode, competition_id, is_public, is_featured,
               competitions(name, type),
               creator:users!tournaments_created_by_fkey(display_name),
               participants:tournament_players(count)
             `)
             .eq('is_public', true)
+            .order('is_featured', { ascending: false })
             .order('created_at', { ascending: false }).limit(20)
         ])
 
@@ -56,7 +57,11 @@ export default function HomePage() {
           ...t,
           creator_name: t.creator?.display_name,
           participants_count: t.participants?.[0]?.count ?? 0
-        })) ?? [])
+        })).sort((a, b) => {
+          if (a.is_featured && !b.is_featured) return -1;
+          if (!a.is_featured && b.is_featured) return 1;
+          return 0;
+        }) ?? [])
       } finally {
         setLoading(false)
       }

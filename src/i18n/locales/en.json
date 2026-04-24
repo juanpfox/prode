@@ -90,7 +90,9 @@
     "confirm_leave": "Are you sure you want to leave this tournament?",
     "leave_confirm_btn": "Yes, leave",
     "invite_btn": "Invite",
-    "prize_placeholder": "🏅 Prize for the winner (optional)"
+    "prize_placeholder": "🏅 Prize for the winner (optional)",
+    "featured_add": "Mark as featured",
+    "featured_remove": "Remove from featured"
   },
   "nav": {
     "home": "Home",

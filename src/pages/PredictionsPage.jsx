@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase'
 import AppShell from '../components/AppShell'
 import PosicionesPredictionsPage from './PosicionesPredictionsPage'
 import { simulateWorldCupBracket } from '../utils/simulatorWC2026'
+import { simulateChampionsLeagueBracket } from '../utils/simulatorUCL'
  
 const FIFA_TO_ISO2 = {
   ARG: 'ar', BRA: 'br', FRA: 'fr', GER: 'de', ITA: 'it', ESP: 'es', POR: 'pt', NED: 'nl',
@@ -87,8 +88,15 @@ export default function PredictionsPage() {
   const prevBracketOffset = useRef(0)
 
   const simulatedBracket = useMemo(() => {
-    if (!tournament?.competitions?.name?.toLowerCase().includes('world cup')) return {}
-    return simulateWorldCupBracket(matches, predictions)
+    const comp = tournament?.competitions
+    if (!comp) return {}
+    if (comp.name?.toLowerCase().includes('world cup')) {
+      return simulateWorldCupBracket(matches, predictions)
+    }
+    if (comp.type === 'champions_league') {
+      return simulateChampionsLeagueBracket(matches, predictions)
+    }
+    return {}
   }, [matches, predictions, tournament])
 
   useEffect(() => {
@@ -392,9 +400,15 @@ export default function PredictionsPage() {
               {t(`predictions.stages.${stage}`)}
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
-              {byStage[stage].map(match => (
-                <MatchCard key={match.id} match={match} pred={predictions[match.id] ?? {}} locked={isLocked(match)} onChange={(f,v) => updatePred(match.id,f,v)} t={t} config={tournamentConfig} />
-              ))}
+              {byStage[stage].map(match => {
+                const simulated = simulatedBracket[match.id] || simulatedBracket[match.round]
+                const enriched = STAGE_ORDER.indexOf(stage) > 0 && simulated
+                  ? { ...match, home_team: simulated.home_team || match.home_team, away_team: simulated.away_team || match.away_team }
+                  : match
+                return (
+                  <MatchCard key={match.id} match={enriched} pred={predictions[match.id] ?? {}} locked={isLocked(match)} onChange={(f,v) => updatePred(match.id,f,v)} t={t} config={tournamentConfig} />
+                )
+              })}
             </div>
           </section>
         ))}

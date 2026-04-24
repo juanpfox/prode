@@ -90,7 +90,9 @@
     "confirm_leave": "¿Estás seguro que querés salir de este torneo?",
     "leave_confirm_btn": "Sí, salir",
     "invite_btn": "Invitar",
-    "prize_placeholder": "🏅 Premio para el ganador (opcional)"
+    "prize_placeholder": "🏅 Premio para el ganador (opcional)",
+    "featured_add": "Marcar como destacado",
+    "featured_remove": "Quitar de destacados"
   },
   "nav": {
     "home": "Inicio",
