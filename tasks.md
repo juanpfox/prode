@@ -5,12 +5,13 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
 ## Fase 1: Automatización de Resultados (API y Backend)
 
 - [ ] **Elegir e integrar API de resultados automáticos (API-Football)**
-  - [ ] Investigar la documentación de API-Football (o la API elegida) para encontrar los endpoints relevantes de World Cup y Champions League.
-  - [ ] Desarrollar la integración para traer los resultados en tiempo real y poblar la base de datos de Supabase.
+  - [x] Investigar la documentación de API-Football (o la API elegida) para encontrar los endpoints relevantes de World Cup y Champions League.
+  - [x] Desarrollar la integración para traer los resultados de **Champions League** en tiempo real y poblar la base de datos de Supabase (Edge Function `sync-ucl-results`).
+  - [ ] Desarrollar la integración para los resultados del **Mundial 2026**.
   - [ ] Validar que los updates de la API no sobreescriban resultados de manera errónea.
 - [ ] **Implementar lógica de puntos automática en Supabase**
-  - [ ] Configurar un webhook o proceso periódico (Edge Functions / Cron) para obtener los resultados finales.
-  - [ ] Diseñar y programar los triggers de base de datos o lógica serverless para que, al actualizarse el resultado real de un partido, se calculen los puntos automáticamente basándose en las predicciones de los usuarios (considerando el multiplicador de la fase del torneo).
+  - [x] Configurar un webhook o proceso periódico (Edge Functions / Cron) para obtener los resultados finales (Activo vía GitHub Actions para UCL).
+  - [x] Diseñar y programar los triggers de base de datos o lógica serverless para que, al actualizarse el resultado real de un partido, se calculen los puntos automáticamente (`recalculate_all_scores_for_competition`).
   - [ ] Realizar testing extensivo en ambientes de prueba para asegurar que el cálculo de puntos y la sumatoria de tabla de líderes se actualicen sin errores.
 
 ## Fase 2: Mantenimiento e Infraestructura
