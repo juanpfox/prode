@@ -13,6 +13,7 @@ import ProfilePage from './pages/ProfilePage'
 import AdminResultsSelectionPage from './pages/AdminResultsSelectionPage'
 import AdminResultsEntryPage from './pages/AdminResultsEntryPage'
 import PlayerPredictionsPage from './pages/PlayerPredictionsPage'
+import GuestLoginPage from './pages/GuestLoginPage'
 
 function LoadingScreen() {
   const { t } = useTranslation()
@@ -59,6 +60,7 @@ export default function App() {
         </Routes>
       ) : (
         <Routes>
+          <Route path="/guest" element={<GuestLoginPage />} />
           <Route path="*" element={<LoginPage />} />
         </Routes>
       )}
