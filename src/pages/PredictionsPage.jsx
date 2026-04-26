@@ -6,7 +6,7 @@ import { supabase } from '../lib/supabase'
 import AppShell from '../components/AppShell'
 import PosicionesPredictionsPage from './PosicionesPredictionsPage'
 import { simulateWorldCupBracket } from '../utils/simulatorWC2026'
-import { simulateChampionsLeagueBracket } from '../utils/simulatorUCL'
+import { simulateChampionsLeagueBracket, areSFsResolved } from '../utils/simulatorUCL'
  
 const FIFA_TO_ISO2 = {
   ARG: 'ar', BRA: 'br', FRA: 'fr', GER: 'de', ITA: 'it', ESP: 'es', POR: 'pt', NED: 'nl',
@@ -87,16 +87,17 @@ export default function PredictionsPage() {
   const bracketContainerRef = useRef(null)
   const prevBracketOffset = useRef(0)
 
-  const simulatedBracket = useMemo(() => {
+  const { simulatedBracket, sfResolved } = useMemo(() => {
     const comp = tournament?.competitions
-    if (!comp) return {}
+    if (!comp) return { simulatedBracket: {}, sfResolved: false }
     if (comp.name?.toLowerCase().includes('world cup')) {
-      return simulateWorldCupBracket(matches, predictions)
+      return { simulatedBracket: simulateWorldCupBracket(matches, predictions), sfResolved: true }
     }
     if (comp.type === 'champions_league') {
-      return simulateChampionsLeagueBracket(matches, predictions)
+      const resolved = areSFsResolved(matches, predictions)
+      return { simulatedBracket: simulateChampionsLeagueBracket(matches, predictions), sfResolved: resolved }
     }
-    return {}
+    return { simulatedBracket: {}, sfResolved: false }
   }, [matches, predictions, tournament])
 
   useEffect(() => {
@@ -402,8 +403,13 @@ export default function PredictionsPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
               {byStage[stage].map(match => {
                 const simulated = simulatedBracket[match.id] || simulatedBracket[match.round]
-                const enriched = STAGE_ORDER.indexOf(stage) > 0 && simulated
-                  ? { ...match, home_team: simulated.home_team || match.home_team, away_team: simulated.away_team || match.away_team }
+                const isUCLFinalDates = tournament?.competitions?.type === 'champions_league' && match.stage === 'final'
+                const enriched = STAGE_ORDER.indexOf(stage) > 0
+                  ? {
+                      ...match,
+                      home_team: simulated?.home_team || (!isUCLFinalDates || sfResolved ? match.home_team : null),
+                      away_team: simulated?.away_team || (!isUCLFinalDates || sfResolved ? match.away_team : null),
+                    }
                   : match
                 return (
                   <MatchCard key={match.id} match={enriched} pred={predictions[match.id] ?? {}} locked={isLocked(match)} onChange={(f,v) => updatePred(match.id,f,v)} t={t} config={tournamentConfig} />
@@ -698,10 +704,13 @@ function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, is
   const renderCard = (round) => {
     const match = matchByRound[round]
     if (!match) return <div style={{ minHeight: 80, opacity: 0.4 }} />
+    const isUCLFinal = tournament?.competitions?.type === 'champions_league' && match.stage === 'final'
+    const simHome = simulatedBracket[round]?.home_team
+    const simAway = simulatedBracket[round]?.away_team
     const enriched = {
       ...match,
-      home_team: simulatedBracket[round]?.home_team || match.home_team,
-      away_team: simulatedBracket[round]?.away_team || match.away_team,
+      home_team: simHome || (!isUCLFinal || sfResolved ? match.home_team : null),
+      away_team: simAway || (!isUCLFinal || sfResolved ? match.away_team : null),
     }
     return (
       <MatchCard stacked={true} match={enriched}

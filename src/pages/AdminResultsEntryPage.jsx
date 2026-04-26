@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import AppShell from '../components/AppShell'
 import { simulateWorldCupBracket } from '../utils/simulatorWC2026'
-import { simulateChampionsLeagueBracket } from '../utils/simulatorUCL'
+import { simulateChampionsLeagueBracket, areSFsResolved } from '../utils/simulatorUCL'
 
 const FIFA_TO_ISO2 = {
   ARG: 'ar', BRA: 'br', FRA: 'fr', GER: 'de', ITA: 'it', ESP: 'es', POR: 'pt', NED: 'nl',
@@ -56,20 +56,21 @@ export default function AdminResultsEntryPage() {
   const [bracketOffset, setBracketOffset] = useState(0)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640)
 
-  const simulatedBracket = useMemo(() => {
-    if (!competition) return {}
+  const { simulatedBracket, sfResolved } = useMemo(() => {
+    if (!competition) return { simulatedBracket: {}, sfResolved: false }
     // We send matches as both matches and preds format
     const predsFormat = {}
     matches.forEach(m => {
       predsFormat[m.id] = { home_goals: m.home_goals !== null ? m.home_goals : '', away_goals: m.away_goals !== null ? m.away_goals : '', pen_pick: m.pen_winner ?? null }
     })
     if (competition.name?.toLowerCase().includes('world cup')) {
-      return simulateWorldCupBracket(matches, predsFormat)
+      return { simulatedBracket: simulateWorldCupBracket(matches, predsFormat), sfResolved: true }
     }
     if (competition.type === 'champions_league') {
-      return simulateChampionsLeagueBracket(matches, predsFormat)
+      const resolved = areSFsResolved(matches, predsFormat)
+      return { simulatedBracket: simulateChampionsLeagueBracket(matches, predsFormat), sfResolved: resolved }
     }
-    return {}
+    return { simulatedBracket: {}, sfResolved: false }
   }, [matches, competition])
 
   const pendingChanges = useRef({})
@@ -311,7 +312,17 @@ export default function AdminResultsEntryPage() {
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
               {byStage[stage].map(m => (
-                <AdminMatchCard stacked={true} key={m.id} match={STAGE_ORDER.indexOf(stage) > 0 ? { ...m, home_team: simulatedBracket[m.id]?.home_team || simulatedBracket[m.round]?.home_team || m.home_team, away_team: simulatedBracket[m.id]?.away_team || simulatedBracket[m.round]?.away_team || m.away_team } : m} onChange={updateMatch} t={t} />
+                <AdminMatchCard stacked={true} key={m.id} match={STAGE_ORDER.indexOf(stage) > 0 ? (() => {
+                    const simHome = simulatedBracket[m.id]?.home_team || simulatedBracket[m.round]?.home_team
+                    const simAway = simulatedBracket[m.id]?.away_team || simulatedBracket[m.round]?.away_team
+                    // For UCL final: only use DB team as fallback when SFs are resolved
+                    const useDbFallback = competition?.type !== 'champions_league' || sfResolved || m.stage !== 'final'
+                    return {
+                      ...m,
+                      home_team: simHome || (useDbFallback ? m.home_team : null),
+                      away_team: simAway || (useDbFallback ? m.away_team : null),
+                    }
+                  })() : m} onChange={updateMatch} t={t} />
               ))}
             </div>
           </section>
@@ -392,7 +403,16 @@ export default function AdminResultsEntryPage() {
                     }}>
                       {byStage[stage].map((match, matchIndex) => (
                         <div key={match.id} className="bracket-match-cell">
-                          <AdminMatchCard stacked={true} match={{ ...match, home_team: simulatedBracket[match.id]?.home_team || simulatedBracket[match.round]?.home_team || match.home_team, away_team: simulatedBracket[match.id]?.away_team || simulatedBracket[match.round]?.away_team || match.away_team }} onChange={updateMatch} t={t} />
+                          <AdminMatchCard stacked={true} match={(() => {
+                              const simHome = simulatedBracket[match.id]?.home_team || simulatedBracket[match.round]?.home_team
+                              const simAway = simulatedBracket[match.id]?.away_team || simulatedBracket[match.round]?.away_team
+                              const useDbFallback = competition?.type !== 'champions_league' || sfResolved || match.stage !== 'final'
+                              return {
+                                ...match,
+                                home_team: simHome || (useDbFallback ? match.home_team : null),
+                                away_team: simAway || (useDbFallback ? match.away_team : null),
+                              }
+                            })()} onChange={updateMatch} t={t} />
                           
                           {isLastColumn && stage !== 'final' && (
                             <>

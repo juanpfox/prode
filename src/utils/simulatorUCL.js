@@ -74,6 +74,25 @@ export function simulateChampionsLeagueBracket(matches, preds) {
   }
 }
 
+/**
+ * Returns true only when both SF ties have enough results to determine
+ * a winner (both legs played for both pairs).
+ */
+export function areSFsResolved(matches, preds) {
+  try {
+    const sfLegs = matches.filter(m => m.stage === 'sf')
+    const sfPairs = pairLegs(sfLegs)
+    if (sfPairs.length < 2) return false
+    for (const pair of sfPairs) {
+      const res = aggregateWinner(pair.leg1, pair.leg2, preds)
+      if (!res) return false
+    }
+    return true
+  } catch {
+    return false
+  }
+}
+
 function _inner(matches, preds) {
   const finalMatch = matches.find(m => m.stage === 'final')
   if (!finalMatch) return {}
