@@ -20,6 +20,7 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
 - [ ] **Resolución de bugs o mantenimientos menores (sección abierta)**
   - [X] Mostrar todas las fases de playoffs (R32 a Final + 3er puesto) simultáneamente en vista desktop.
   - [X] Expandir el ancho del contenedor en escritorio (1600px) para la vista de PlayOffs.
+  - [x] Eliminar botón "Entrar como invitado" de la página de inicio.
 
 ## Fase 3: Monetización e Integraciones Externas
 

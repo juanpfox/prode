@@ -7,7 +7,7 @@ import './LoginPage.css'
 
 export default function LoginPage() {
   const { t } = useTranslation()
-  const { signInWithEmail, signInWithGoogle, signInAsGuest } = useAuth()
+  const { signInWithEmail, signInWithGoogle } = useAuth()
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState('idle') // idle | sending | sent | error
   const [errorMsg, setErrorMsg] = useState('')
@@ -41,15 +41,6 @@ export default function LoginPage() {
     }
   }
 
-  const handleGuest = async () => {
-    setStatus('sending')
-    setErrorMsg('')
-    const { error } = await signInAsGuest()
-    if (error) {
-      setStatus('error')
-      setErrorMsg(error.message)
-    }
-  }
 
   return (
     <div className="login-page pitch-bg">
@@ -165,17 +156,6 @@ export default function LoginPage() {
                 </p>
               )}
 
-              {/* Guest access */}
-              <div style={{ marginTop: '1.25rem', textAlign: 'center' }}>
-                <button
-                  className="btn btn-ghost btn-sm"
-                  onClick={handleGuest}
-                  disabled={status === 'sending'}
-                  style={{ color: 'var(--text-muted)', fontSize: '0.8125rem' }}
-                >
-                  {t('auth.enter_as_guest')}
-                </button>
-              </div>
             </>
           )}
         </div>
