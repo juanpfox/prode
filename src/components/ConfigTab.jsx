@@ -161,6 +161,7 @@ export default function ConfigTab({
                         updateField(f.key, String(clamped))
                       }}
                       onFocus={e => e.target.select()}
+                      onKeyDown={e => { if (e.key === 'Enter') e.preventDefault() }}
                     />
                     <button
                       type="button"
