@@ -6,6 +6,24 @@ import AppShell from '../components/AppShell'
 import { simulateWorldCupBracket } from '../utils/simulatorWC2026'
 import { simulateChampionsLeagueBracket, areSFsResolved } from '../utils/simulatorUCL'
 
+// ─── WC2026 bracket tree constants ───────────────────────────────────────────
+const WC2026_CHILDREN = {
+  89:[73,75], 90:[74,77], 91:[76,78], 92:[79,80],
+  93:[81,84], 94:[82,86], 95:[85,88], 96:[83,87],
+  97:[89,90], 98:[91,92], 99:[93,94], 100:[95,96],
+  101:[97,98], 102:[99,100], 104:[101,102],
+}
+const BRACKET_STAGE_ROUNDS = {
+  r32:[73,75,74,77,76,78,79,80,81,84,82,86,85,88,83,87],
+  r16:[89,90,91,92,93,94,95,96],
+  qf:[97,98,99,100],
+  sf:[101,102],
+  final:[104, 103],
+}
+const CONN_W = 18
+const CARD_GAP = 18
+const ANIM = '0.35s cubic-bezier(0.4, 0, 0.2, 1)'
+
 const FIFA_TO_ISO2 = {
   ARG: 'ar', BRA: 'br', FRA: 'fr', GER: 'de', ITA: 'it', ESP: 'es', POR: 'pt', NED: 'nl',
   ENG: 'gb', SCO: 'gb', WAL: 'gb', NIR: 'gb', USA: 'us', MEX: 'mx', CAN: 'ca',
@@ -55,6 +73,9 @@ export default function AdminResultsEntryPage() {
   const [syncResult, setSyncResult] = useState(null)
   const [bracketOffset, setBracketOffset] = useState(0)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640)
+  const swipeTouchStart = useRef(null)
+  const bracketContainerRef = useRef(null)
+  const prevBracketOffset = useRef(0)
 
   const { simulatedBracket, sfResolved } = useMemo(() => {
     if (!competition) return { simulatedBracket: {}, sfResolved: false }
@@ -85,6 +106,24 @@ export default function AdminResultsEntryPage() {
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
+
+  // Auto-scroll when bracket offset changes
+  useEffect(() => {
+    if (!bracketContainerRef.current || bracketOffset === prevBracketOffset.current) {
+      prevBracketOffset.current = bracketOffset
+      return
+    }
+    prevBracketOffset.current = bracketOffset
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        const container = bracketContainerRef.current
+        if (!container) return
+        const cards = container.querySelectorAll(`[data-stage-idx="${bracketOffset}"] [data-round]`)
+        if (!cards.length) return
+        cards[0]?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }, 80)
+    })
+  }, [bracketOffset])
 
   useEffect(() => { loadData() }, [competitionId])
   useEffect(() => { return () => { if (timeoutRef.current) clearTimeout(timeoutRef.current) } }, [])
@@ -353,122 +392,333 @@ export default function AdminResultsEntryPage() {
         {/* --- VIEW: PLAYOFFS --- */}
         {view === 'playoffs' && (() => {
           const bracketStages = playoffStages.filter(s => s !== 'third_place' && s !== 'group')
-          const visibleCount = isMobile ? 1 : (window.innerWidth < 1400 ? 2 : bracketStages.length)
+
+          if (bracketStages.length === 0) {
+            return (
+              <div className="card card-sm" style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
+                <span style={{ fontSize: '2rem', marginBottom: '0.5rem', display: 'block' }}>🏆</span>
+                <p style={{ margin: 0 }}>No hay partidos de playoff</p>
+              </div>
+            )
+          }
+
+          const visibleCount = isMobile ? 2 : (window.innerWidth < 1400 ? 3 : bracketStages.length)
           const safeOffset = Math.min(bracketOffset, Math.max(0, bracketStages.length - visibleCount))
-          const visibleStages = bracketStages.slice(safeOffset, safeOffset + visibleCount)
-          
+          const colPct = 100 / visibleCount
+          const translatePct = -(safeOffset * colPct)
+
+          const handleTouchStart = (e) => { swipeTouchStart.current = e.touches[0].clientX }
+          const handleTouchEnd = (e) => {
+            if (swipeTouchStart.current === null) return
+            const delta = swipeTouchStart.current - e.changedTouches[0].clientX
+            if (delta > 50) setBracketOffset(v => Math.min(v + 1, Math.max(0, bracketStages.length - visibleCount)))
+            else if (delta < -50) setBracketOffset(v => Math.max(0, v - 1))
+            swipeTouchStart.current = null
+          }
+
           return (
             <div style={{ paddingBottom: '2rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem 1rem', background: 'var(--surface-2)', borderRadius: 'var(--r-md)', marginBottom: '1.5rem', border: '1px solid var(--border)' }}>
-                <button 
-                  className="btn btn-icon" 
-                  onClick={() => setBracketOffset(v => Math.max(0, v - 1))} 
-                  disabled={safeOffset === 0}
-                  style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '0.2rem 0.6rem' }}
-                >
-                  &lt;
-                </button>
-                
-                <div style={{ display: 'flex', gap: '2.5rem', flex: 1, justifyContent: 'center', minWidth: 0 }}>
-                  {visibleStages.map(stage => (
-                    <h3 key={stage} style={{ width: isMobile ? 'auto' : '320px', flex: isMobile ? 1 : 'none', fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--text)', margin: 0, textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {stage === 'final' && !isMobile 
+              {/* Stage titles */}
+              <div style={{ position: 'relative', overflow: 'hidden', borderRadius: 'var(--r-md)', marginBottom: '1rem', border: '1px solid var(--border)', background: 'var(--surface-2)' }}>
+                {safeOffset > 0 && (
+                  <button
+                    onClick={() => setBracketOffset(v => Math.max(0, v - 1))}
+                    style={{
+                      position: 'absolute', left: 0, top: 0, bottom: 0, width: '3.5rem',
+                      background: 'linear-gradient(to right, var(--surface-2) 60%, transparent)',
+                      border: 'none', color: 'var(--primary)', cursor: 'pointer', zIndex: 10,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', fontWeight: 900
+                    }}
+                  >
+                    ‹
+                  </button>
+                )}
+                {safeOffset < (bracketStages.length - visibleCount) && (
+                  <button
+                    onClick={() => setBracketOffset(v => Math.min(v + 1, bracketStages.length - visibleCount))}
+                    style={{
+                      position: 'absolute', right: 0, top: 0, bottom: 0, width: '3.5rem',
+                      background: 'linear-gradient(to left, var(--surface-2) 60%, transparent)',
+                      border: 'none', color: 'var(--primary)', cursor: 'pointer', zIndex: 10,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', fontWeight: 900
+                    }}
+                  >
+                    ›
+                  </button>
+                )}
+                <div style={{
+                  display: 'flex',
+                  transform: `translateX(${translatePct}%)`,
+                  transition: 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+                  willChange: 'transform',
+                }}>
+                  {bracketStages.map(stage => (
+                    <h3 key={stage} style={{
+                      flex: `0 0 ${colPct}%`,
+                      width: `${colPct}%`,
+                      fontWeight: 800, fontSize: '0.8rem',
+                      textTransform: 'uppercase', color: 'var(--text)',
+                      margin: 0, padding: '0.75rem 1rem',
+                      textAlign: 'center', whiteSpace: 'nowrap',
+                      overflow: 'hidden', textOverflow: 'ellipsis',
+                    }}>
+                      {stage === 'final' && !isMobile
                         ? `${t('predictions.stages.final')} & ${t('predictions.stages.third_place')}`
                         : t(`predictions.stages.${stage}`)}
                     </h3>
                   ))}
                 </div>
-
-                <button 
-                  className="btn btn-icon" 
-                  onClick={() => setBracketOffset(v => Math.min(bracketStages.length - visibleCount, v + 1))} 
-                  disabled={safeOffset >= bracketStages.length - visibleCount || bracketStages.length <= visibleCount}
-                  style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '0.2rem 0.6rem' }}
-                >
-                  &gt;
-                </button>
               </div>
 
-              <div className={`playoff-bracket ${isMobile ? 'is-mobile' : ''}`} style={{ justifyContent: 'center', marginBottom: byStage['third_place']?.length > 0 ? '6rem' : 0 }}>
-                {visibleStages.map((stage, index) => {
-                  const isLastColumn = index === visibleStages.length - 1
-                  return (
-                  <div key={stage} className={`bracket-column ${index === 0 && bracketOffset > 0 ? 'is-shifted-first' : ''}`}>
-                    <div style={{ 
-                      flex: 1, 
-                      display: 'flex', 
-                      flexDirection: 'column',
-                      position: 'relative',
-                      minHeight: undefined
-                    }}>
-                      {byStage[stage].map((match, matchIndex) => (
-                        <div key={match.id} className="bracket-match-cell">
-                          <AdminMatchCard stacked={true} match={(() => {
-                              const simHome = simulatedBracket[match.id]?.home_team || simulatedBracket[match.round]?.home_team
-                              const simAway = simulatedBracket[match.id]?.away_team || simulatedBracket[match.round]?.away_team
-                              const useDbFallback = competition?.type !== 'champions_league' || sfResolved || match.stage !== 'final'
-                              return {
-                                ...match,
-                                home_team: simHome || (useDbFallback ? match.home_team : null),
-                                away_team: simAway || (useDbFallback ? match.away_team : null),
-                              }
-                            })()} onChange={updateMatch} t={t} />
-                          
-                          {isLastColumn && stage !== 'final' && (
-                            <>
-                              {matchIndex % 2 === 0 && (
-                                <div style={{
-                                  position: 'absolute',
-                                  right: '-1.25rem',
-                                  top: '50%',
-                                  width: '1.25rem',
-                                  height: '50%',
-                                  borderTop: '2px solid var(--border-strong)',
-                                  borderRight: '2px solid var(--border-strong)',
-                                  borderTopRightRadius: '6px',
-                                  pointerEvents: 'none',
-                                  zIndex: 0
-                                }} />
-                              )}
-                              {matchIndex % 2 === 1 && (
-                                <>
-                                  <div style={{
-                                    position: 'absolute',
-                                    right: '-1.25rem',
-                                    bottom: '50%',
-                                    width: '1.25rem',
-                                    height: '50%',
-                                    borderBottom: '2px solid var(--border-strong)',
-                                    borderRight: '2px solid var(--border-strong)',
-                                    borderBottomRightRadius: '6px',
-                                    pointerEvents: 'none',
-                                    zIndex: 0
-                                  }} />
-                                  <div style={{
-                                    position: 'absolute',
-                                    right: '-2.5rem',
-                                    top: '-1px',
-                                    width: '1.25rem',
-                                    borderTop: '2px solid var(--border-strong)',
-                                    pointerEvents: 'none',
-                                    zIndex: 0
-                                  }} />
-                                </>
-                              )}
-                            </>
-                          )}
-                        </div>
-                      ))}
-
-                    </div>
-                  </div>
-                )})}
+              {/* Bracket */}
+              <div ref={bracketContainerRef} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+                <AdminBracketTree
+                  byStage={byStage}
+                  bracketStages={bracketStages}
+                  simulatedBracket={simulatedBracket}
+                  sfResolved={sfResolved}
+                  competition={competition}
+                  updateMatch={updateMatch}
+                  t={t}
+                  colPct={colPct}
+                  translatePct={translatePct}
+                  offset={safeOffset}
+                  visibleCount={visibleCount}
+                />
               </div>
+
+              {/* Dots indicator */}
+              {bracketStages.length > visibleCount && (
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', paddingTop: '1.25rem' }}>
+                  {bracketStages.slice(0, bracketStages.length - visibleCount + 1).map((_, i) => (
+                    <button key={i} onClick={() => setBracketOffset(i)} style={{
+                      width: i === safeOffset ? '20px' : '8px', height: '8px',
+                      borderRadius: '9999px', border: 'none', cursor: 'pointer',
+                      background: i === safeOffset ? 'var(--primary)' : 'var(--border-strong)',
+                      transition: 'all 0.2s ease', padding: 0,
+                    }} />
+                  ))}
+                </div>
+              )}
             </div>
           )
         })()}
       </div>
     </AppShell>
+  )
+}
+
+// ─── AdminBracketTree — same layout as BracketTree in PredictionsPage ────────
+function AdminBracketTree({ byStage, bracketStages, simulatedBracket, sfResolved, competition, updateMatch, t, colPct, translatePct, offset, visibleCount }) {
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 640
+  const cardRef = useRef(null)
+  const [cardH, setCardH] = useState(null)
+
+  useEffect(() => {
+    if (!cardRef.current) return
+    const obs = new ResizeObserver(entries => {
+      const h = entries[0]?.contentRect?.height
+      if (h && h > 0) setCardH(h)
+    })
+    obs.observe(cardRef.current)
+    return () => obs.disconnect()
+  }, [])
+
+  const matchByRound = {}
+  Object.values(byStage).flat().forEach(m => { if (m.round) matchByRound[m.round] = m })
+
+  const allStageRounds = useMemo(() => bracketStages.map(s => BRACKET_STAGE_ROUNDS[s] || []), [bracketStages])
+
+  const roundY = useMemo(() => {
+    if (!cardH) return {}
+    const pos = {}
+
+    // Phase 1: anchor column (compact stack)
+    const anchorRounds = allStageRounds[offset] || []
+    anchorRounds.forEach((r, i) => { pos[r] = i * (cardH + CARD_GAP) })
+
+    // Phase 2: go RIGHT — each card centres on its children
+    for (let si = offset + 1; si < bracketStages.length; si++) {
+      const rounds = allStageRounds[si] || []
+      rounds.forEach((r, idx) => {
+        const children = WC2026_CHILDREN[r] || []
+        const childCentres = children
+          .map(c => pos[c] != null ? pos[c] + cardH / 2 : null)
+          .filter(y => y !== null)
+        if (childCentres.length === 2) {
+          pos[r] = (childCentres[0] + childCentres[1]) / 2 - cardH / 2
+        } else if (childCentres.length === 1) {
+          pos[r] = childCentres[0] - cardH / 2
+        } else {
+          if (r === 103 && pos[104] != null) {
+            pos[r] = pos[104] + cardH + CARD_GAP * 2
+          } else {
+            pos[r] = idx * (cardH + CARD_GAP)
+          }
+        }
+      })
+    }
+
+    // Phase 3: go LEFT — position based on parent expectations
+    for (let si = offset - 1; si >= 0; si--) {
+      const rounds = allStageRounds[si] || []
+      const nextRounds = allStageRounds[si + 1] || []
+      const c2p = {}
+      nextRounds.forEach(pr => (WC2026_CHILDREN[pr] || []).forEach(c => { c2p[c] = pr }))
+      const parentChildren = {}
+      rounds.forEach(r => {
+        const pr = c2p[r]
+        if (pr != null) {
+          if (!parentChildren[pr]) parentChildren[pr] = []
+          parentChildren[pr].push(r)
+        }
+      })
+      Object.entries(parentChildren).forEach(([pr, kids]) => {
+        const parentY = pos[parseInt(pr)]
+        if (parentY == null) return
+        const parentCentre = parentY + cardH / 2
+        if (kids.length === 2) {
+          const spacing = cardH + CARD_GAP
+          pos[kids[0]] = parentCentre - spacing / 2 - cardH / 2
+          pos[kids[1]] = parentCentre + spacing / 2 - cardH / 2
+        } else if (kids.length === 1) {
+          pos[kids[0]] = parentCentre - cardH / 2
+        }
+      })
+      rounds.forEach((r, idx) => { if (pos[r] == null) pos[r] = idx * (cardH + CARD_GAP) })
+    }
+
+    return pos
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cardH, offset, bracketStages.join(',')])
+
+  const totalH = useMemo(() => {
+    if (!cardH) return 0
+    const visibleRounds = allStageRounds.slice(offset, offset + visibleCount).flat()
+    const visibleY = visibleRounds.map(r => roundY[r]).filter(y => y != null)
+    if (!visibleY.length) return 0
+    return Math.max(...visibleY) + cardH
+  }, [roundY, cardH, offset, visibleCount, allStageRounds])
+
+  const renderCard = (round) => {
+    const match = matchByRound[round]
+    if (!match) return <div style={{ minHeight: 80, opacity: 0.4 }} />
+    const isUCLFinal = competition?.type === 'champions_league' && match.stage === 'final'
+    const simHome = simulatedBracket[round]?.home_team
+    const simAway = simulatedBracket[round]?.away_team
+    const enriched = {
+      ...match,
+      home_team: simHome || (!isUCLFinal || sfResolved ? match.home_team : null),
+      away_team: simAway || (!isUCLFinal || sfResolved ? match.away_team : null),
+    }
+    return (
+      <AdminMatchCard stacked={true} match={enriched} onChange={updateMatch} t={t} />
+    )
+  }
+
+  // Probe card for height measurement
+  const probeRound = (allStageRounds[0] || [])[0]
+  const probeMatch = probeRound ? matchByRound[probeRound] : null
+
+  const trn = `top ${ANIM}, height ${ANIM}`
+
+  return (
+    <div style={{ overflowX: 'clip', overflowY: 'visible' }}>
+      {probeMatch && (
+        <div ref={cardRef} style={{ position: 'absolute', visibility: 'hidden', pointerEvents: 'none', width: `${colPct}%` }}>
+          <AdminMatchCard stacked={true} match={probeMatch} onChange={() => {}} t={t} />
+        </div>
+      )}
+
+      {cardH && totalH > 0 && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          flexWrap: 'nowrap',
+          transform: `translateX(${translatePct}%)`,
+          transition: `transform ${ANIM}`,
+          willChange: 'transform',
+          padding: '0.75rem 0',
+        }}>
+          {bracketStages.map((stage, si) => {
+            const rounds = allStageRounds[si] || []
+            const isLast = si === bracketStages.length - 1
+            const nextRounds = !isLast ? (allStageRounds[si + 1] || []) : []
+
+            return (
+              <div key={stage} data-stage-idx={si} style={{
+                flex: `0 0 ${colPct}%`,
+                width: `${colPct}%`,
+                boxSizing: 'border-box',
+                paddingRight: isLast ? 0 : CONN_W,
+                position: 'relative',
+                height: totalH,
+                overflow: 'visible',
+                transition: `height ${ANIM}`,
+              }}>
+                {rounds.map(round => {
+                  const y = roundY[round] ?? 0
+                  return (
+                    <div key={round} data-round={round} style={{
+                      position: 'absolute',
+                      top: y,
+                      left: 0,
+                      right: isLast ? 0 : CONN_W,
+                      height: cardH,
+                      transition: trn,
+                    }}>
+                      {renderCard(round)}
+                    </div>
+                  )
+                })}
+
+                {/* Bracket connectors */}
+                {!isLast && nextRounds.map(parentRound => {
+                  const children = WC2026_CHILDREN[parentRound] || []
+                  const childrenInCol = children.filter(c => rounds.includes(c))
+
+                  if (childrenInCol.length === 1) {
+                    const cy = roundY[childrenInCol[0]]
+                    if (cy == null) return null
+                    return (
+                      <div key={`conn-${parentRound}`} style={{
+                        position: 'absolute',
+                        right: 0,
+                        top: cy + cardH / 2,
+                        width: CONN_W,
+                        borderBottom: '2px solid var(--border-strong)',
+                        pointerEvents: 'none',
+                        transition: trn,
+                      }} />
+                    )
+                  }
+
+                  if (childrenInCol.length !== 2) return null
+
+                  const y0 = roundY[childrenInCol[0]]
+                  const y1 = roundY[childrenInCol[1]]
+                  if (y0 == null || y1 == null) return null
+
+                  const topCentre = Math.min(y0, y1) + cardH / 2
+                  const botCentre = Math.max(y0, y1) + cardH / 2
+                  const armH = botCentre - topCentre
+                  const midY = (topCentre + botCentre) / 2
+
+                  return (
+                    <div key={`conn-${parentRound}`}>
+                      <div style={{ position: 'absolute', right: CONN_W / 2, top: topCentre, width: CONN_W / 2, borderBottom: '2px solid var(--border-strong)', pointerEvents: 'none', transition: trn }} />
+                      <div style={{ position: 'absolute', right: CONN_W / 2, top: botCentre, width: CONN_W / 2, borderBottom: '2px solid var(--border-strong)', pointerEvents: 'none', transition: trn }} />
+                      <div style={{ position: 'absolute', right: CONN_W / 2, top: topCentre, height: armH, borderLeft: '2px solid var(--border-strong)', pointerEvents: 'none', transition: trn }} />
+                      <div style={{ position: 'absolute', right: 0, top: midY, width: CONN_W / 2, borderBottom: '2px solid var(--border-strong)', pointerEvents: 'none', transition: trn }} />
+                    </div>
+                  )
+                })}
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </div>
   )
 }
 
