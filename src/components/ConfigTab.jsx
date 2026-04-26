@@ -141,6 +141,7 @@ export default function ConfigTab({
                 {isAdmin ? (
                   <div className="config-stepper">
                     <button
+                      type="button"
                       className="config-stepper-btn"
                       tabIndex={-1}
                       onClick={() => updateField(f.key, String(Math.max(f.min ?? -10, (effectiveConfig[f.key] ?? 0) - 1)))}
@@ -162,6 +163,7 @@ export default function ConfigTab({
                       onFocus={e => e.target.select()}
                     />
                     <button
+                      type="button"
                       className="config-stepper-btn"
                       tabIndex={-1}
                       onClick={() => updateField(f.key, String(Math.min(99, (effectiveConfig[f.key] ?? 0) + 1)))}

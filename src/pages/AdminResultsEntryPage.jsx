@@ -852,6 +852,7 @@ function AdminMatchCard({ match, onChange, t, stacked }) {
           {match.went_to_pens && (
             <div style={{ display: 'flex', gap: '0.5rem' }}>
               <button 
+                type="button"
                 className={`btn btn-sm ${match.pen_winner === 'home' ? 'btn-primary' : 'btn-ghost'}`}
                 style={{ fontSize: '0.75rem', padding: '0.2rem 0.625rem' }}
                 onClick={() => onChange(match.id, 'pen_winner', 'home')}
@@ -859,6 +860,7 @@ function AdminMatchCard({ match, onChange, t, stacked }) {
                 {home}
               </button>
               <button 
+                type="button"
                 className={`btn btn-sm ${match.pen_winner === 'away' ? 'btn-primary' : 'btn-ghost'}`}
                 style={{ fontSize: '0.75rem', padding: '0.2rem 0.625rem' }}
                 onClick={() => onChange(match.id, 'pen_winner', 'away')}
@@ -925,7 +927,7 @@ function AdminGoalInput({ val, onChange }) {
 
   return (
     <div className="goal-input-wrapper">
-      <button className="goal-input-btn" tabIndex={-1} onClick={dec}>−</button>
+      <button type="button" className="goal-input-btn" tabIndex={-1} onClick={dec}>−</button>
       <input
         ref={inputRef}
         type="text"
@@ -937,7 +939,7 @@ function AdminGoalInput({ val, onChange }) {
         onFocus={(e) => e.target.select()}
         autoComplete="off"
       />
-      <button className="goal-input-btn" tabIndex={-1} onClick={inc}>+</button>
+      <button type="button" className="goal-input-btn" tabIndex={-1} onClick={inc}>+</button>
     </div>
   )
 }
