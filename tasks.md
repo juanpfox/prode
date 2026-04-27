@@ -40,10 +40,11 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
     - [x] Mostrar ambas tablas (Pronóstico y Real) con sus respectivos títulos.
     - [x] Actualizar traducciones.
   - [x] **Vista Grupos: Página de Mejores Terceros**
-    - [x] Agregar botón "3º" después del Grupo L.
-    * [x] Implementar lógica de cálculo para el ranking de terceros (puntos, dif, goles).
-    * [x] Mostrar tablas de Pronóstico y Real con línea divisoria (cutoff) en la 8ª posición.
-    * [x] Actualizar traducciones.
+    - [x] Agregar botón "3º" después del Grupo L (en `PredictionsPage` y `PlayerPredictionsPage`).
+    - [x] Implementar lógica de cálculo para el ranking de terceros (puntos, dif, goles).
+    - [x] Mostrar tablas de Pronóstico y Real con línea divisoria (cutoff) en la 8ª posición.
+    - [x] Sincronizar cambios en la vista de otros jugadores (`PlayerPredictionsPage.jsx`).
+    - [x] Actualizar traducciones.
 
 
   - [x] **Bug Fix: Equipos reales en bracket de playoffs**
