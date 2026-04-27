@@ -510,19 +510,6 @@ const SCORING_DEFAULTS = {
 
         {!showCreate && (
           <>
-            <div className="card card-sm" style={{ marginBottom: '1.5rem' }}>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
-                {t('tournaments.enter_code_label')}
-              </p>
-              <form onSubmit={handleJoin} style={{ display: 'flex', gap: '0.5rem' }}>
-                <input className="input" placeholder={t('tournaments.enter_code')}
-                  value={joinCode} onChange={e => setJoinCode(e.target.value.toUpperCase())}
-                  maxLength={8} style={{ flex: 1, fontFamily: 'monospace', letterSpacing: '0.1em' }} />
-                <button className="btn btn-primary btn-sm" type="submit" disabled={joining || !joinCode}>
-                  {joining ? '…' : t('tournaments.join_btn')}
-                </button>
-              </form>
-            </div>
 
             <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
               {['mine', 'public'].map(k => (

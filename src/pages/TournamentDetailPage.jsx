@@ -23,7 +23,6 @@ export default function TournamentDetailPage() {
   const [myStatus, setMyStatus] = useState(null)
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
-  const [showInviteCode, setShowInviteCode] = useState(false)
   const [updating, setUpdating] = useState(false)
   const [editName, setEditName] = useState('')
   const [editSlug, setEditSlug] = useState('')
@@ -364,8 +363,10 @@ export default function TournamentDetailPage() {
     }
   }
 
-  function copyCode() {
-    navigator.clipboard.writeText(tournament.invite_code ?? '')
+  function copyInvitation() {
+    const url = `${window.location.origin}/${tournament.slug || tournament.id}`
+    const message = t('tournaments.invitation_text', { url })
+    navigator.clipboard.writeText(message)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -400,50 +401,21 @@ export default function TournamentDetailPage() {
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.5rem' }}>
             <div style={{ flex: 1 }}>
               <h2 style={{ fontWeight: 800, fontSize: '1.125rem', color: 'var(--text)' }}>{tournament.name}</h2>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginTop: '0.25rem' }}>
-                {tournament.competitions?.name}
-                {tournament.mode && (
-                  <span style={{
-                    marginLeft: '0.5rem', fontSize: '0.75rem', fontWeight: 700,
-                    background: 'var(--primary-subtle)', color: 'var(--primary)',
-                    borderRadius: '4px', padding: '0.1rem 0.4rem'
-                  }}>
-                    {tournament.mode === 'posiciones' ? `🏆 ${t('modes.posiciones_full')}` : `⚽ ${t('modes.partidos_full')}`}
-                  </span>
-                )}
-              </p>
+
             </div>
-            {/* Invite code icon */}
-            {tournament.invite_code && isApproved && (
+            {/* Copy invitation button */}
+            {isApproved && (
               <button
                 className="btn btn-ghost btn-sm"
-                onClick={() => setShowInviteCode(v => !v)}
-                title={t('tournaments.invite_code')}
-                style={{ fontSize: '0.85rem', padding: '0.3rem 0.6rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
+                onClick={copyInvitation}
+                title={t('tournaments.copy_invitation')}
+                style={{ fontSize: '0.85rem', padding: '0.3rem 0.6rem', display: 'flex', alignItems: 'center', gap: '0.3rem', color: copied ? 'var(--primary)' : 'inherit' }}
               >
-                <span>📨</span>
-                <span>{showInviteCode ? t('common.close') : t('tournaments.invite_btn')}</span>
+                <span>{copied ? '✅' : '📨'}</span>
+                <span>{copied ? t('common.saved', '¡Copiado!') : t('tournaments.copy_invitation')}</span>
               </button>
             )}
           </div>
-
-          {/* Invite code — expandible */}
-          {showInviteCode && tournament.invite_code && (
-            <div style={{ marginTop: '0.875rem', display: 'flex', alignItems: 'center', gap: '0.75rem',
-                background: 'var(--surface-2)', borderRadius: 'var(--r-md)', padding: '0.625rem 0.875rem',
-                animation: 'fade-in 0.15s ease both' }}>
-              <div style={{ flex: 1 }}>
-                <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>
-                  {t('tournaments.invite_code')}
-                </p>
-                <p style={{ fontFamily: 'monospace', fontWeight: 800, fontSize: '1.25rem',
-                    color: 'var(--primary)', letterSpacing: '0.15em' }}>
-                  {tournament.invite_code}
-                </p>
-              </div>
-              <button className="btn btn-ghost btn-sm" onClick={copyCode}>{copied ? '✓' : '📋'}</button>
-            </div>
-          )}
 
           {isBanned && (
             <div style={{ marginTop: '0.75rem', padding: '0.625rem', background: '#fee2e2',

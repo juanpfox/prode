@@ -51,7 +51,10 @@
     "confirm_leave": "Tem certeza que quer sair deste torneio?",
     "leave_confirm_btn": "Sim, sair",
     "invite_btn": "Convidar",
-    "prize_placeholder": "🏅 Prêmio para o vencedor (opcional)"
+    "prize_placeholder": "🏅 Prêmio para o vencedor (opcional)",
+    "copy_invitation": "Copiar convite",
+    "invitation_text": "Olá! Convido você a participar do meu Prode da Copa do Mundo 2026. Entre aqui: {{url}}",
+    "invitation_copied": "Convite copiado para a área de transferência"
   },
   "nav": {
     "home": "Início",

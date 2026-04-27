@@ -101,7 +101,10 @@
     "slug_help_full": "El torneo será accesible en:",
     "slug_suggestion": "Sugerencia:",
     "featured_add": "Marcar como destacado",
-    "featured_remove": "Quitar de destacados"
+    "featured_remove": "Quitar de destacados",
+    "copy_invitation": "Copiar invitación",
+    "invitation_text": "¡Hola! Te invito a participar en mi Prode del Mundial 2026. Unite acá: {{url}}",
+    "invitation_copied": "Invitación copiada al portapapeles"
   },
   "nav": {
     "home": "Inicio",

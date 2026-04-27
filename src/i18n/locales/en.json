@@ -92,7 +92,10 @@
     "invite_btn": "Invite",
     "prize_placeholder": "🏅 Prize for the winner (optional)",
     "featured_add": "Mark as featured",
-    "featured_remove": "Remove from featured"
+    "featured_remove": "Remove from featured",
+    "copy_invitation": "Copy invitation",
+    "invitation_text": "Hi! I'm inviting you to join my 2026 World Cup Prode. Join here: {{url}}",
+    "invitation_copied": "Invitation copied to clipboard"
   },
   "nav": {
     "home": "Home",

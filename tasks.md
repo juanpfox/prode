@@ -45,6 +45,9 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
     - [x] Mostrar tablas de Pronóstico y Real con línea divisoria (cutoff) en la 8ª posición.
     - [x] Sincronizar cambios en la vista de otros jugadores (`PlayerPredictionsPage.jsx`).
     - [x] Actualizar traducciones.
+  - [x] **Limpiar fichas de torneos**
+    - [x] Eliminar nombre de competición y modo de juego en `TournamentCard.jsx`.
+    - [x] Eliminar nombre de competición y modo de juego en el header de `TournamentDetailPage.jsx`.
 
 
    - [x] **Bug Fix: Tournament Config Page empty**
@@ -87,6 +90,11 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
   - [x] Validación: prevenir uso de palabras reservadas como slugs.
   - [x] Disponibilidad: verificar en tiempo real si el slug está en uso y ofrecer sugerencias.
   - [x] Asegurar que las redirecciones y links usen el slug cuando esté disponible.
+  - [x] **Descartar códigos de invitación y priorizar URL**
+    - [x] Reemplazar botón "Invitar" por "Copiar invitación" en toda la app.
+    - [x] Implementar copiado de mensaje con URL (tipo Zoom).
+    - [x] Eliminar display de códigos de invitación y campos de ingreso por código.
+    - [x] Actualizar traducciones (ES, EN, PT, FR, DE).
 
 ---
 

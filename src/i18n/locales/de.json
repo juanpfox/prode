@@ -50,7 +50,10 @@
     "confirm_leave": "Möchtest du dieses Turnier wirklich verlassen?",
     "leave_confirm_btn": "Ja, verlassen",
     "invite_btn": "Einladen",
-    "prize_placeholder": "🏅 Preis für den Gewinner (optional)"
+    "prize_placeholder": "🏅 Preis für den Gewinner (optional)",
+    "copy_invitation": "Einladung kopieren",
+    "invitation_text": "Hallo! Ich lade dich ein, an meinem 2026 World Cup Prode teilzunehmen. Tritt hier bei: {{url}}",
+    "invitation_copied": "Einladung in die Zwischenablage kopiert"
   },
   "nav": {
     "home": "Start",

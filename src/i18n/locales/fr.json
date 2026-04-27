@@ -50,7 +50,10 @@
     "confirm_leave": "Êtes-vous sûr de vouloir quitter ce tournoi ?",
     "leave_confirm_btn": "Oui, quitter",
     "invite_btn": "Inviter",
-    "prize_placeholder": "🏅 Prix pour le gagnant (optionnel)"
+    "prize_placeholder": "🏅 Prix pour le gagnant (optionnel)",
+    "copy_invitation": "Copier l'invitation",
+    "invitation_text": "Salut ! Je t'invite à rejoindre mon Prode pour la Coupe du Monde 2026. Rejoins ici : {{url}}",
+    "invitation_copied": "Invitation copiée dans le presse-papiers"
   },
   "nav": {
     "home": "Accueil",

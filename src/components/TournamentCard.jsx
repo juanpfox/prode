@@ -13,6 +13,7 @@ export default function TournamentCard({ tournament, onDeleteSuccess }) {
   const [deleting, setDeleting] = useState(false)
   const [predStats, setPredStats] = useState(null) // { submitted, total }
   const [featured, setFeatured] = useState(tournament.is_featured || false)
+  const [copiedInvitation, setCopiedInvitation] = useState(false)
 
   const isAdmin = tournament.role === 'admin'
   const isAppAdmin = profile?.is_admin || user?.email === 'guest@prodemundial.dev' || user?.email === 'juanpatriciofox@gmail.com'
@@ -53,10 +54,13 @@ export default function TournamentCard({ tournament, onDeleteSuccess }) {
     fetchPredStats()
   }, [user, tournament.id, tournament.competition_id, tournament.mode])
 
-  const handleCopyCode = (e) => {
+  const handleCopyInvitation = (e) => {
     e.stopPropagation()
-    navigator.clipboard.writeText(tournament.invite_code ?? '')
-    // Potentially add a small toast here
+    const url = `${window.location.origin}/${tournament.slug || tournament.id}`
+    const message = t('tournaments.invitation_text', { url })
+    navigator.clipboard.writeText(message)
+    setCopiedInvitation(true)
+    setTimeout(() => setCopiedInvitation(false), 2000)
     setShowMenu(false)
   }
 
@@ -102,16 +106,7 @@ export default function TournamentCard({ tournament, onDeleteSuccess }) {
         <p style={{ fontWeight: 700, fontSize: '0.9375rem', color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {tournament.name}
         </p>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.2rem', minWidth: 0 }}>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flexShrink: 1 }}>
-            {tournament.competitions?.name}
-          </p>
-          {tournament.mode && (
-            <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', opacity: 0.8, whiteSpace: 'nowrap', flexShrink: 0 }}>
-              • {t(`modes.${tournament.mode}_full`)}
-            </span>
-          )}
-        </div>
+
         {tournament.prize && (
           <p style={{
             fontSize: '0.75rem', marginTop: '0.15rem',
@@ -183,18 +178,21 @@ export default function TournamentCard({ tournament, onDeleteSuccess }) {
           </svg>
         </button>
 
-        {/* Copiar Código */}
-        {tournament.invite_code && (
-          <button 
-            className="btn-icon-action" 
-            title={t('actions.copy_code')} 
-            onClick={handleCopyCode}
-          >
+        {/* Copiar Invitación */}
+        <button 
+          className="btn-icon-action" 
+          title={t('tournaments.copy_invitation')} 
+          onClick={handleCopyInvitation}
+          style={{ color: copiedInvitation ? 'var(--primary)' : 'inherit' }}
+        >
+          {copiedInvitation ? (
+            <span style={{ fontSize: '0.9rem' }}>✅</span>
+          ) : (
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+              <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/>
             </svg>
-          </button>
-        )}
+          )}
+        </button>
 
         {/* Ajustes and More Menu - Only for Admins/Owners */}
         {isAdmin && (

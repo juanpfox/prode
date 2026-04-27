@@ -26,7 +26,7 @@ App multitorneo y multiusuario para el Mundial 2026 y Champions League. Diseñad
 
 ## Estructura de Páginas y Componentes
 - **AppShell:** Layout común con navegación, selector de idioma y toggle de tema.
-- **Home:** Dashboard con mis torneos, unirse por código, y creación rápida con **configuración de puntos personalizada integrada**.
+- **Home:** Dashboard con mis torneos, y creación rápida con **configuración de puntos personalizada integrada**.
 - **Tournament Detail:** Leaderboard, gestión de jugadores (admin) y pestañas dinámicas de "Scoring" y "Rules".
 - **Predictions (Partidos):** Carga de resultados con vistas por Fecha, Grupo y Playoff Bracket (responsivo).
 - **Predictions (Posiciones):** Drag & drop para ordenar grupos y podio final.
@@ -61,6 +61,7 @@ Pronóstico de **resultado exacto**.
 - [X] Pestañas de configuración de puntos (Creación + Edición) y reglas dinámicas
 - [X] Sistema de Torneos Destacados (Admin only) y ordenamiento prioritario
 - [X] Sub-URLs personalizadas para torneos (Slugs) — ej: `prode.mundial.com/mi-torneo`
+- [x] Simplificación de UI: eliminación de etiquetas de competición y modo en fichas de torneos.
 - [ ] Elegir e integrar API de resultados automáticos (API-Football)
 - [ ] Implementar lógica de puntos automática en Supabase (Edge Functions / Triggers)
 - [ ] Crear bot/ping para evitar pausa de Supabase Free
