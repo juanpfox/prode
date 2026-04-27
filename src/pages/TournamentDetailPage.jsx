@@ -141,19 +141,53 @@ export default function TournamentDetailPage() {
     }
   }
 
+  const [slugStatus, setSlugStatus] = useState(null) // null | 'checking' | 'available' | 'taken'
+  const [slugSuggestion, setSlugSuggestion] = useState(null)
+
+  useEffect(() => {
+    const slugValue = editSlug.trim().toLowerCase()
+    if (!slugValue || slugValue === (tournament?.slug ?? '')) {
+      setSlugStatus(null)
+      setSlugSuggestion(null)
+      return
+    }
+    
+    if (RESERVED_SLUGS.includes(slugValue)) {
+      setSlugStatus('taken')
+      setSlugSuggestion(slugValue + '_1')
+      return
+    }
+
+    setSlugStatus('checking')
+    const timer = setTimeout(async () => {
+      try {
+        const { data, error } = await supabase
+          .from('tournaments')
+          .select('id')
+          .eq('slug', slugValue)
+          .neq('id', tournament.id)
+          .maybeSingle()
+        
+        if (error) throw error
+        if (data) {
+          setSlugStatus('taken')
+          setSlugSuggestion(slugValue + '_1')
+        } else {
+          setSlugStatus('available')
+          setSlugSuggestion(null)
+        }
+      } catch {
+        setSlugStatus(null)
+      }
+    }, 500)
+
+    return () => clearTimeout(timer)
+  }, [editSlug, tournament?.id])
+
   async function updateSlug() {
     const slugValue = editSlug.trim().toLowerCase()
     if (slugValue === (tournament.slug ?? '')) return
-    if (slugValue) {
-      if (!/^[a-z0-9_-]+$/.test(slugValue)) {
-        alert(t('tournaments.slug_error_format'))
-        return
-      }
-      if (RESERVED_SLUGS.includes(slugValue)) {
-        alert(t('tournaments.slug_error_taken'))
-        return
-      }
-    }
+    if (slugStatus === 'taken') return
     setUpdating(true)
     try {
       const { error } = await supabase
@@ -511,8 +545,8 @@ export default function TournamentDetailPage() {
 
                 {/* Tournament settings: name, prize, visibility, join method */}
                 <div className="card card-sm" style={{ marginBottom: '1rem' }}>
-                  <h3 style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '1rem' }}>{t('tournaments.tournament_name')}</h3>
-                  <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                  <h3 style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '0.5rem' }}>{t('tournaments.tournament_name')}</h3>
+                  <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
                     <input
                       className="input"
                       value={editName}
@@ -529,29 +563,76 @@ export default function TournamentDetailPage() {
                     </button>
                   </div>
 
-                  <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem', flexDirection: 'column' }}>
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                      <input
-                        className="input"
-                        value={editSlug}
-                        onChange={e => setEditSlug(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''))}
-                        placeholder={t('tournaments.slug_placeholder')}
-                        style={{ flex: 1, fontSize: '0.9rem' }}
-                      />
+                  <h3 style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '0.5rem', color: 'var(--primary)' }}>
+                    {t('tournaments.slug_label', 'URL del torneo')}
+                  </h3>
+                  <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem', flexDirection: 'column' }}>
+                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                      <div className="input" style={{ 
+                        flex: 1, display: 'flex', alignItems: 'center', gap: '0.25rem', paddingRight: '0.5rem',
+                        border: slugStatus === 'taken' ? '1px solid var(--error, #dc2626)' : 
+                                slugStatus === 'available' ? '1px solid var(--success, #16a34a)' : undefined
+                      }}>
+                        <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem', userSelect: 'none' }}>prodemundial.pages.dev/</span>
+                        <input
+                          style={{ flex: 1, background: 'none', border: 'none', color: 'inherit', fontSize: '0.9rem', padding: 0, outline: 'none' }}
+                          value={editSlug}
+                          onChange={e => setEditSlug(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''))}
+                          placeholder={t('tournaments.slug_placeholder')}
+                        />
+                        {slugStatus === 'checking' && <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>…</span>}
+                        {slugStatus === 'available' && <span style={{ fontSize: '0.75rem', color: 'var(--success, #16a34a)' }}>✓</span>}
+                        {slugStatus === 'taken' && <span style={{ fontSize: '0.75rem', color: 'var(--error, #dc2626)' }}>✕</span>}
+                        
+                        <button 
+                          className="btn-icon-action" 
+                          title="Copiar URL"
+                          onClick={() => {
+                            const url = `https://prodemundial.pages.dev/${editSlug || tournament.id}`
+                            navigator.clipboard.writeText(url)
+                            setCopied(true)
+                            setTimeout(() => setCopied(false), 2000)
+                          }}
+                          style={{ padding: '0.25rem', color: copied ? 'var(--primary)' : 'inherit' }}
+                        >
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                          </svg>
+                        </button>
+                      </div>
                       <button
                         className="btn btn-primary btn-sm"
                         onClick={updateSlug}
-                        disabled={updating || editSlug.trim().toLowerCase() === (tournament.slug ?? '')}
+                        disabled={updating || editSlug.trim().toLowerCase() === (tournament.slug ?? '') || slugStatus === 'taken' || slugStatus === 'checking'}
                       >
                         {updating ? '…' : t('common.save')}
                       </button>
                     </div>
-                    <p style={{ fontSize: '0.675rem', color: 'var(--text-muted)', marginLeft: '0.5rem' }}>
-                      {t('tournaments.slug_help')}<strong>{editSlug || t('tournaments.slug_placeholder')}</strong>
+                    {slugStatus === 'taken' && (
+                      <div style={{ marginLeft: '0.5rem', marginTop: '0.25rem' }}>
+                        <p style={{ fontSize: '0.75rem', color: 'var(--error, #dc2626)', margin: 0 }}>
+                          ⚠️ {t('tournaments.slug_error_taken', 'Esta URL ya está en uso')}
+                        </p>
+                        {slugSuggestion && (
+                          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '0.2rem 0 0' }}>
+                            {t('tournaments.slug_suggestion', 'Sugerencia:')} {' '}
+                            <span 
+                              style={{ color: 'var(--primary)', cursor: 'pointer', textDecoration: 'underline' }}
+                              onClick={() => setEditSlug(slugSuggestion)}
+                            >
+                              {slugSuggestion}
+                            </span>
+                          </p>
+                        )}
+                      </div>
+                    )}
+                    <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginLeft: '0.5rem', lineHeight: 1.4 }}>
+                      {t('tournaments.slug_help_full', 'El torneo será accesible en:')} <br/>
+                      <strong style={{ color: 'var(--primary)' }}>prodemundial.pages.dev/{editSlug || tournament.id}</strong>
                     </p>
                   </div>
 
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
                     <input
                       className="input"
                       value={editPrize}

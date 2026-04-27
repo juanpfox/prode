@@ -34,6 +34,7 @@ const SCORING_DEFAULTS = {
   const [createForm, setCreateForm] = useState({
     name: '',
     slug: '',
+    slug_manual: false,
     prize: '',
     competition_id: '00000000-0000-0000-0000-000000000001',
     mode: '',
@@ -97,8 +98,51 @@ const SCORING_DEFAULTS = {
     }
   }
 
+  const [slugStatus, setSlugStatus] = useState(null) // null | 'checking' | 'available' | 'taken'
+  const [slugSuggestion, setSlugSuggestion] = useState(null)
+
+  useEffect(() => {
+    const slugValue = createForm.slug.trim().toLowerCase()
+    if (!slugValue) {
+      setSlugStatus(null)
+      setSlugSuggestion(null)
+      return
+    }
+    
+    if (RESERVED_SLUGS.includes(slugValue)) {
+      setSlugStatus('taken')
+      setSlugSuggestion(slugValue + '_1')
+      return
+    }
+
+    setSlugStatus('checking')
+    const timer = setTimeout(async () => {
+      try {
+        const { data, error } = await supabase
+          .from('tournaments')
+          .select('id')
+          .eq('slug', slugValue)
+          .maybeSingle()
+        
+        if (error) throw error
+        if (data) {
+          setSlugStatus('taken')
+          setSlugSuggestion(slugValue + '_1')
+        } else {
+          setSlugStatus('available')
+          setSlugSuggestion(null)
+        }
+      } catch {
+        setSlugStatus(null)
+      }
+    }, 500)
+
+    return () => clearTimeout(timer)
+  }, [createForm.slug])
+
   async function handleCreate(e) {
     e.preventDefault()
+    if (slugStatus === 'taken') return
     const selectedComp = competitions.find(c => c.id === createForm.competition_id)
     const isWorldCup = selectedComp?.type === 'world_cup'
     const effectiveMode = isWorldCup ? createForm.mode : 'partidos'
@@ -233,21 +277,60 @@ const SCORING_DEFAULTS = {
             <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               <input className="input" placeholder={t('tournaments.name_placeholder')}
                 value={createForm.name} required
-                onChange={e => setCreateForm(f => ({ ...f, name: e.target.value }))} />
+                onChange={e => {
+                  const newName = e.target.value
+                  setCreateForm(f => {
+                    const next = { ...f, name: newName }
+                    if (!f.slug_manual) {
+                      next.slug = newName.toLowerCase()
+                        .trim()
+                        .replace(/\s+/g, '_')
+                        .replace(/[^a-z0-9_-]/g, '')
+                    }
+                    return next
+                  })
+                }} />
               
               <div style={{ position: 'relative' }}>
-                <input 
-                  className="input" 
-                  placeholder={t('tournaments.slug_placeholder')}
-                  value={createForm.slug}
-                  onChange={e => {
-                    const val = e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, '')
-                    setCreateForm(f => ({ ...f, slug: val }))
-                  }}
-                  style={{ fontSize: '0.9rem' }}
-                />
+                <div className="input" style={{ 
+                  display: 'flex', alignItems: 'center', gap: '0.25rem', paddingRight: '0.5rem',
+                  border: slugStatus === 'taken' ? '1px solid var(--error, #dc2626)' : 
+                          slugStatus === 'available' ? '1px solid var(--success, #16a34a)' : undefined
+                }}>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem', userSelect: 'none' }}>prodemundial.pages.dev/</span>
+                  <input 
+                    style={{ flex: 1, background: 'none', border: 'none', color: 'inherit', fontSize: '0.9rem', padding: 0, outline: 'none' }}
+                    placeholder={t('tournaments.slug_placeholder')}
+                    value={createForm.slug}
+                    onChange={e => {
+                      const val = e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, '')
+                      setCreateForm(f => ({ ...f, slug: val, slug_manual: true }))
+                    }}
+                  />
+                  {slugStatus === 'checking' && <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>…</span>}
+                  {slugStatus === 'available' && <span style={{ fontSize: '0.75rem', color: 'var(--success, #16a34a)' }}>✓</span>}
+                  {slugStatus === 'taken' && <span style={{ fontSize: '0.75rem', color: 'var(--error, #dc2626)' }}>✕</span>}
+                </div>
+                {slugStatus === 'taken' && (
+                  <div style={{ marginLeft: '0.5rem', marginTop: '0.25rem' }}>
+                    <p style={{ fontSize: '0.675rem', color: 'var(--error, #dc2626)', margin: 0 }}>
+                      ⚠️ {t('tournaments.slug_error_taken')}
+                    </p>
+                    {slugSuggestion && (
+                      <p style={{ fontSize: '0.675rem', color: 'var(--text-muted)', margin: '0.1rem 0 0' }}>
+                        {t('tournaments.slug_suggestion', 'Sugerencia:')} {' '}
+                        <span 
+                          style={{ color: 'var(--primary)', cursor: 'pointer', textDecoration: 'underline' }}
+                          onClick={() => setCreateForm(f => ({ ...f, slug: slugSuggestion, slug_manual: true }))}
+                        >
+                          {slugSuggestion}
+                        </span>
+                      </p>
+                    )}
+                  </div>
+                )}
                 <p style={{ fontSize: '0.675rem', color: 'var(--text-muted)', marginTop: '0.3rem', marginLeft: '0.5rem' }}>
-                  {t('tournaments.slug_help')}<strong>{createForm.slug || t('tournaments.slug_placeholder')}</strong>
+                  {t('tournaments.slug_help')}<strong>{createForm.slug || '...'}</strong>
                 </p>
               </div>
 

@@ -80,11 +80,12 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
 - [x] **Sub-URLs personalizadas para torneos (Slugs)**
   - [x] Migración DB: agregar columna `slug` única y con validación regex.
   - [x] Traducciones: agregar labels y errores para el campo slug.
-  - [x] UI Creación: agregar campo slug con validación en tiempo real.
-  - [x] UI Configuración: permitir editar el slug del torneo.
+  - [x] UI Creación: agregar campo slug con validación en tiempo real y auto-completado desde el nombre.
+  - [x] UI Configuración: rediseño según mockup con botón de copiar URL y preview dinámico.
   - [x] Routing: soportar rutas dinámicas `/:slug`, `/:slug/pronosticos`, etc.
   - [x] Navegación: actualizar links para usar el slug si existe.
   - [x] Validación: prevenir uso de palabras reservadas como slugs.
+  - [x] Disponibilidad: verificar en tiempo real si el slug está en uso y ofrecer sugerencias.
   - [x] Asegurar que las redirecciones y links usen el slug cuando esté disponible.
 
 ---
