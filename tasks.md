@@ -24,6 +24,8 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
   - [x] Eliminar botón "Entrar como invitado" de la página de inicio.
   - [x] **Bug Fix: Tournament Creation Scoring Buttons**
     - [x] Corregir botones + y - en `ConfigTab.jsx` para que no disparen el submit del form de creación.
+  - [x] **Bug Fix: Rules Tab Example**
+    - [x] Corregir interpolación de variables y claves faltantes en el ejemplo de cálculo.
   - [x] **Simplificar creación de torneos: Solo World Cup**
     - [x] Eliminar selector de competición en el form de creación.
     - [x] Forzar `competition_id` a World Cup 2026 por defecto.
