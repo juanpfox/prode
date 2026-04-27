@@ -530,6 +530,8 @@ export default function PredictionsPage() {
                   byStage={byStage}
                   bracketStages={bracketStages}
                   simulatedBracket={simulatedBracket}
+                  sfResolved={sfResolved}
+                  tournament={tournament}
                   predictions={predictions}
                   isLocked={isLocked}
                   updatePred={updatePred}
@@ -585,7 +587,7 @@ const CONN_W = 18   // px — connector channel width
 const CARD_GAP = 18 // px — vertical gap between cards in leftmost visible column
 const ANIM = '0.35s cubic-bezier(0.4, 0, 0.2, 1)'
 
-function BracketTree({ byStage, bracketStages, simulatedBracket, predictions, isLocked, updatePred, t, colPct, translatePct, offset, visibleCount, config }) {
+function BracketTree({ byStage, bracketStages, simulatedBracket, sfResolved, tournament, predictions, isLocked, updatePred, t, colPct, translatePct, offset, visibleCount, config }) {
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 640
   const cardRef = useRef(null)
   const [cardH, setCardH] = useState(null)

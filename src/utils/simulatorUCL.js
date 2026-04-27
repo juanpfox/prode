@@ -80,6 +80,10 @@ export function simulateChampionsLeagueBracket(matches, preds) {
  */
 export function areSFsResolved(matches, preds) {
   try {
+    // If the final match already has real teams in the DB, SFs are definitively resolved.
+    const finalMatch = matches.find(m => m.stage === 'final')
+    if (finalMatch?.home_team && finalMatch?.away_team) return true
+
     const sfLegs = matches.filter(m => m.stage === 'sf')
     const sfPairs = pairLegs(sfLegs)
     if (sfPairs.length < 2) return false
@@ -96,6 +100,17 @@ export function areSFsResolved(matches, preds) {
 function _inner(matches, preds) {
   const finalMatch = matches.find(m => m.stage === 'final')
   if (!finalMatch) return {}
+
+  // If the final already has real teams stored in the DB (the bracket was officially
+  // populated after the SFs completed), use those actual teams directly.
+  if (finalMatch.home_team && finalMatch.away_team) {
+    return {
+      [finalMatch.id]: {
+        home_team: finalMatch.home_team,
+        away_team: finalMatch.away_team,
+      },
+    }
+  }
 
   const sfLegs = matches.filter(m => m.stage === 'sf')
   const sfPairs = pairLegs(sfLegs)

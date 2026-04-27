@@ -64,6 +64,10 @@ export function simulateWorldCupBracket(matches, preds) {
 function _simulateWorldCupBracketInner(matches, preds) {
   const groupMatches = matches.filter(m => m.stage === 'group')
 
+  // Check if any playoff match already has a confirmed DB result.
+  // If so, we must proceed to populate bracketTeams with real data even if group predictions are incomplete.
+  const hasAnyPlayoffResult = matches.some(m => m.stage !== 'group' && m.home_goals !== null && m.away_goals !== null)
+
   // Verify if all group matches have a prediction
   const allGroupsPlayed = groupMatches.every(m => {
     const p = preds[m.id]
@@ -71,8 +75,8 @@ function _simulateWorldCupBracketInner(matches, preds) {
     return p && p.home_goals !== '' && p.away_goals !== '' && p.home_goals !== undefined && p.away_goals !== undefined
   })
 
-  // If not all group games are typed, return empty map (bracket shows placeholder teams)
-  if (!allGroupsPlayed) return {}
+  // If not all group games are typed AND no playoff results exist yet, return empty map
+  if (!allGroupsPlayed && !hasAnyPlayoffResult) return {}
 
   // 1. Calculate the Group Table
   const tables = {}
@@ -125,8 +129,10 @@ function _simulateWorldCupBracketInner(matches, preds) {
     
     placeholders['1' + letter] = sorted[0]
     placeholders['2' + letter] = sorted[1]
-    sorted[2].group_letter = letter // save for combination lookup
-    thirdPlaces.push(sorted[2])
+    if (sorted[2]) {
+      sorted[2].group_letter = letter // save for combination lookup
+      thirdPlaces.push(sorted[2])
+    }
   })
 
   // 3. Rank third places and get top 8
@@ -155,22 +161,35 @@ function _simulateWorldCupBracketInner(matches, preds) {
     }
   }
 
+  // Override bracketTeams with real DB teams for any playoff match that has a confirmed result.
+  // This ensures that once admin loads real results, the bracket reflects actual participants.
+  for (const m of matches) {
+    if (!m.round || m.stage === 'group') continue
+    if (m.home_goals !== null && m.away_goals !== null && m.home_team && m.away_team) {
+      bracketTeams[m.round] = {
+        home_team: m.home_team,
+        away_team: m.away_team,
+      }
+    }
+  }
+
   // Helper to determine winner of a match based on predictions
   const getWinner = (matchRound) => {
     // Find the db match for this round
     const m = matches.find(x => x.round === matchRound)
     if (!m) return null
-    const p = preds[m?.id]
-    if (!p || p.home_goals === '' || p.away_goals === '') {
-       // if exact match from db has result
-       if (m.home_goals !== null && m.away_goals !== null) {
-          if (m.home_goals > m.away_goals) return bracketTeams[matchRound]?.home_team
-          if (m.home_goals < m.away_goals) return bracketTeams[matchRound]?.away_team
-          if (m.pen_winner === 'home') return bracketTeams[matchRound]?.home_team
-          if (m.pen_winner === 'away') return bracketTeams[matchRound]?.away_team
-       }
-       return null
+
+    // If the match has a real DB result, use the real winner
+    if (m.home_goals !== null && m.away_goals !== null) {
+      if (m.home_goals > m.away_goals) return bracketTeams[matchRound]?.home_team
+      if (m.home_goals < m.away_goals) return bracketTeams[matchRound]?.away_team
+      if (m.pen_winner === 'home') return bracketTeams[matchRound]?.home_team
+      if (m.pen_winner === 'away') return bracketTeams[matchRound]?.away_team
+      return null
     }
+
+    const p = preds[m?.id]
+    if (!p || p.home_goals === '' || p.away_goals === '') return null
 
     const hg = parseInt(p.home_goals)
     const ag = parseInt(p.away_goals)
