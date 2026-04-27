@@ -14,6 +14,7 @@ import AdminResultsSelectionPage from './pages/AdminResultsSelectionPage'
 import AdminResultsEntryPage from './pages/AdminResultsEntryPage'
 import PlayerPredictionsPage from './pages/PlayerPredictionsPage'
 import GuestLoginPage from './pages/GuestLoginPage'
+import Guest2LoginPage from './pages/Guest2LoginPage'
 
 function LoadingScreen() {
   const { t } = useTranslation()
@@ -34,7 +35,7 @@ export default function App() {
 
   if (loading) return <LoadingScreen />
 
-  const isAdmin = profile?.is_admin || user?.email === 'guest@prodemundial.dev' || user?.email === 'juanpatriciofox@gmail.com'
+  const isAdmin = profile?.is_admin || user?.email === 'guest@prodemundial.dev' || user?.email === 'guest2@prodemundial.dev' || user?.email === 'juanpatriciofox@gmail.com'
 
   return (
     <BrowserRouter>
@@ -61,6 +62,7 @@ export default function App() {
       ) : (
         <Routes>
           <Route path="/guest" element={<GuestLoginPage />} />
+          <Route path="/guest2" element={<Guest2LoginPage />} />
           <Route path="*" element={<LoginPage />} />
         </Routes>
       )}

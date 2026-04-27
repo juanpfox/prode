@@ -4,6 +4,9 @@ import { supabase } from '../lib/supabase'
 const GUEST_EMAIL = 'guest@prodemundial.dev'
 const GUEST_PASS  = 'guest1234'
 
+const GUEST2_EMAIL = 'guest2@prodemundial.dev'
+const GUEST2_PASS  = 'guest2_1234'
+
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
@@ -64,12 +67,20 @@ export function AuthProvider({ children }) {
     return { error }
   }
 
+  const signInAsGuest2 = async () => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email: GUEST2_EMAIL,
+      password: GUEST2_PASS,
+    })
+    return { error }
+  }
+
   const signOut = async () => {
     await supabase.auth.signOut()
   }
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, signInWithEmail, signInWithGoogle, signInAsGuest, signOut, refreshProfile: () => fetchProfile(user?.id) }}>
+    <AuthContext.Provider value={{ user, profile, loading, signInWithEmail, signInWithGoogle, signInAsGuest, signInAsGuest2, signOut, refreshProfile: () => fetchProfile(user?.id) }}>
       {children}
     </AuthContext.Provider>
   )

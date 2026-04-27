@@ -64,3 +64,10 @@ Pronóstico de **resultado exacto**.
 - [ ] Implementar lógica de puntos automática en Supabase (Edge Functions / Triggers)
 - [ ] Crear bot/ping para evitar pausa de Supabase Free
 - [ ] Integración MercadoPago para quitar límites de torneos/jugadores
+
+---
+
+## Testing / Accesos Directos
+Para facilitar las pruebas en desarrollo local, existen rutas de acceso directo que inician sesión automáticamente como usuarios de prueba:
+- **`/guest`**: Inicia sesión como `guest` (Admin).
+- **`/guest2`**: Inicia sesión como `guest2` (Admin).

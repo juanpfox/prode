@@ -71,6 +71,10 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
   - [x] Ocultar email en el dashboard cuando no hay torneos.
   - [x] Reemplazar título "Todos" por "Elegí el torneo en el que querés jugar" (i18n).
   - [x] Ocultar sección "Mis Torneos" y estado vacío cuando el usuario no participa en nada todavía.
+- [x] **Crear usuario de prueba guest2**
+  - [x] Crear cuenta `guest2@prodemundial.dev` en Supabase Auth y perfil en public.
+  - [x] Implementar ruta `/guest2` para login automático sin contraseña.
+  - [x] Otorgar permisos de admin a guest2.
 
 ---
 
