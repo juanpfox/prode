@@ -64,19 +64,21 @@ export function simulateWorldCupBracket(matches, preds) {
 function _simulateWorldCupBracketInner(matches, preds) {
   const groupMatches = matches.filter(m => m.stage === 'group')
 
-  // Check if any playoff match already has a confirmed DB result.
+  // Check if any playoff match already has teams or results in the DB.
   // If so, we must proceed to populate bracketTeams with real data even if group predictions are incomplete.
-  const hasAnyPlayoffResult = matches.some(m => m.stage !== 'group' && m.home_goals !== null && m.away_goals !== null)
+  const hasAnyPlayoffData = matches.some(m =>
+    m.stage !== 'group' && ((m.home_goals !== null && m.away_goals !== null) || (m.home_team && m.away_team))
+  )
 
-  // Verify if all group matches have a prediction
+  // Verify if all group matches have a prediction or real result
   const allGroupsPlayed = groupMatches.every(m => {
     const p = preds[m.id]
     if (m.home_goals !== null && m.away_goals !== null) return true
     return p && p.home_goals !== '' && p.away_goals !== '' && p.home_goals !== undefined && p.away_goals !== undefined
   })
 
-  // If not all group games are typed AND no playoff results exist yet, return empty map
-  if (!allGroupsPlayed && !hasAnyPlayoffResult) return {}
+  // If not all group games are typed AND no playoff data exists yet, return empty map
+  if (!allGroupsPlayed && !hasAnyPlayoffData) return {}
 
   // 1. Calculate the Group Table
   const tables = {}
@@ -152,7 +154,7 @@ function _simulateWorldCupBracketInner(matches, preds) {
   
   const bracketTeams = {} // Map match `round` to { home_team, away_team }
 
-  // Resolve R32 
+  // Resolve R32 from group standings (may be prediction-based or real)
   for (const [roundStr, p] of Object.entries(r32Map)) {
     const round = parseInt(roundStr)
     bracketTeams[round] = {
@@ -161,21 +163,25 @@ function _simulateWorldCupBracketInner(matches, preds) {
     }
   }
 
-  // Override bracketTeams with real DB teams for any playoff match that has a confirmed result.
-  // This ensures that once admin loads real results, the bracket reflects actual participants.
+  // Override bracketTeams with real DB teams for any playoff match that has teams
+  // assigned in the database. This covers two scenarios:
+  //   a) R32 matches populated with real qualifying teams after groups finish
+  //   b) Later-round matches that already have results loaded
+  // Track which rounds are overridden so the chaining loop doesn't clobber them.
+  const dbOverridden = new Set()
   for (const m of matches) {
     if (!m.round || m.stage === 'group') continue
-    if (m.home_goals !== null && m.away_goals !== null && m.home_team && m.away_team) {
+    if (m.home_team && m.away_team) {
       bracketTeams[m.round] = {
         home_team: m.home_team,
         away_team: m.away_team,
       }
+      dbOverridden.add(m.round)
     }
   }
 
-  // Helper to determine winner of a match based on predictions
+  // Helper to determine winner of a match based on DB result or user predictions
   const getWinner = (matchRound) => {
-    // Find the db match for this round
     const m = matches.find(x => x.round === matchRound)
     if (!m) return null
 
@@ -188,6 +194,7 @@ function _simulateWorldCupBracketInner(matches, preds) {
       return null
     }
 
+    // Fall back to user prediction
     const p = preds[m?.id]
     if (!p || p.home_goals === '' || p.away_goals === '') return null
 
@@ -202,7 +209,6 @@ function _simulateWorldCupBracketInner(matches, preds) {
   }
 
   const getLoser = (matchRound) => {
-    // find winner, then return the other one
     const w = getWinner(matchRound)
     if (!w) return null
     
@@ -213,9 +219,11 @@ function _simulateWorldCupBracketInner(matches, preds) {
     return null
   }
 
-  // 5. Chain the rest of the rounds
+  // 5. Chain the rest of the rounds — skip any round already overridden with real DB teams
   for (const [roundStr, src] of Object.entries(LATER_ROUNDS)) {
     const round = parseInt(roundStr)
+    if (dbOverridden.has(round)) continue
+
     const [hSrc, aSrc] = src
 
     const home = typeof hSrc === 'number' ? getWinner(hSrc) : getLoser(parseInt(hSrc.replace('L', '')))
