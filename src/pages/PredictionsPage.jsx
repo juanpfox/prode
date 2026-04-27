@@ -349,6 +349,20 @@ export default function PredictionsPage() {
   const groupMatches = matches.filter(m => m.stage === 'group')
   const playoffStages = STAGE_ORDER.filter(s => s !== 'group' && byStage[s]?.length)
 
+  // ── BEST THIRDS CALCULATION ──────────────────────────────
+  function calculateBestThirdsTable(allMatches, preds, useRealResults = false) {
+    const groupLetters = ['A','B','C','D','E','F','G','H','I','J','K','L']
+    const thirds = []
+    groupLetters.forEach(l => {
+      const gMatches = allMatches.filter(m => m.home_team?.group_name === l)
+      const table = calculateGroupTable(gMatches, preds, useRealResults)
+      if (table.length >= 3) {
+        thirds.push({ ...table[2], group: l })
+      }
+    })
+    return thirds.sort((a,b) => b.pts - a.pts || b.dg - a.dg || b.gf - a.gf || (a.initial_position - b.initial_position))
+  }
+
 
   return (
     <AppShell saveIndicator={saveStatus} wide={view === 'playoffs'}>
@@ -391,6 +405,11 @@ export default function PredictionsPage() {
                 className={`btn btn-sm ${activeGroup === l ? 'btn-primary' : 'btn-ghost'}`} 
                 style={{ width: '2.2rem', height: '2.2rem', padding: 0 }}>{l}</button>
             ))}
+            <button onClick={() => setActiveGroup('3rds')} 
+              className={`btn btn-sm ${activeGroup === '3rds' ? 'btn-primary' : 'btn-ghost'}`} 
+              style={{ fontSize: '0.75rem', padding: '0 0.75rem', height: '2.2rem' }}>
+              3º
+            </button>
             <button className="btn btn-ghost btn-sm" onClick={() => setView('playoffs')} 
               style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginLeft: '0.5rem' }}>PlayOffs →</button>
           </div>
@@ -432,7 +451,7 @@ export default function PredictionsPage() {
         ))}
 
         {/* --- VIEW: GROUPS --- */}
-        {view === 'groups' && (
+        {view === 'groups' && activeGroup !== '3rds' && (
           <div className="predictions-layout-grid">
             <div className="matches-column">
               <h3 style={{ fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.625rem' }}>
@@ -456,6 +475,26 @@ export default function PredictionsPage() {
                 t={t}
               />
             </div>
+          </div>
+        )}
+
+        {/* --- VIEW: BEST THIRDS --- */}
+        {view === 'groups' && activeGroup === '3rds' && (
+          <div style={{ maxWidth: '800px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            <GroupTable 
+              title={t('predictions.table.best_thirds_predicted')}
+              rows={calculateBestThirdsTable(matches, predictions)}
+              t={t}
+              showGroup={true}
+              highlightCutoff={8}
+            />
+            <GroupTable 
+              title={t('predictions.table.best_thirds_real')}
+              rows={calculateBestThirdsTable(matches, predictions, true)}
+              t={t}
+              showGroup={true}
+              highlightCutoff={8}
+            />
           </div>
         )}
 
@@ -884,7 +923,7 @@ function BracketTree({ byStage, bracketStages, simulatedBracket, sfResolved, tou
   )
 }
 
-function GroupTable({ rows, t, title }) {
+function GroupTable({ rows, t, title, showGroup = false, highlightCutoff = null }) {
   return (
     <div className="card card-sm" style={{ padding: 0 }}>
       <div style={{ padding: '0.75rem 0.875rem', borderBottom: '1px solid var(--border)' }}>
@@ -896,26 +935,34 @@ function GroupTable({ rows, t, title }) {
             <tr style={{ background: 'var(--surface-3)', textAlign: 'left', color: 'var(--text-muted)' }}>
               <th style={{ padding: '0.5rem 0.875rem', fontWeight: 700 }}>#</th>
               <th style={{ padding: '0.5rem 0.25rem', fontWeight: 700 }}>{t('predictions.table.team')}</th>
+              {showGroup && <th style={{ padding: '0.5rem 0.25rem', textAlign: 'center', fontWeight: 700 }}>{t('posiciones.group')}</th>}
               <th style={{ padding: '0.5rem 0.25rem', textAlign: 'center', fontWeight: 700 }}>{t('predictions.table.pj')}</th>
               <th style={{ padding: '0.5rem 0.25rem', textAlign: 'center', fontWeight: 700 }}>{t('predictions.table.pts')}</th>
               <th style={{ padding: '0.5rem 0.25rem', textAlign: 'center', fontWeight: 700 }}>{t('predictions.table.dif')}</th>
             </tr>
           </thead>
           <tbody>
-            {rows.map((r, i) => (
-              <tr key={r.id} style={{ borderBottom: '1px solid var(--border)' }}>
-                <td style={{ padding: '0.625rem 0.875rem', fontWeight: 800, color: i < 2 ? 'var(--primary)' : 'var(--text-muted)' }}>{i + 1}</td>
-                <td style={{ padding: '0.625rem 0.25rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                    <TeamFlag code={r.code} size={14} />
-                    <span style={{ fontWeight: 600 }}>{t(`teams.${r.code}`, { defaultValue: r.name })}</span>
-                  </div>
-                </td>
-                <td style={{ padding: '0.625rem 0.25rem', textAlign: 'center' }}>{r.pj}</td>
-                <td style={{ padding: '0.625rem 0.25rem', textAlign: 'center', fontWeight: 800 }}>{r.pts}</td>
-                <td style={{ padding: '0.625rem 0.25rem', textAlign: 'center' }}>{r.dg > 0 ? `+${r.dg}` : r.dg}</td>
-              </tr>
-            ))}
+            {rows.map((r, i) => {
+              const isCutoff = highlightCutoff && (i + 1) === highlightCutoff;
+              return (
+                <tr key={r.id} style={{ 
+                  borderBottom: isCutoff ? '3px solid var(--primary)' : '1px solid var(--border)',
+                  background: (highlightCutoff && i < highlightCutoff) ? 'var(--surface-hover)' : undefined
+                }}>
+                  <td style={{ padding: '0.625rem 0.875rem', fontWeight: 800, color: (highlightCutoff ? i < highlightCutoff : i < 2) ? 'var(--primary)' : 'var(--text-muted)' }}>{i + 1}</td>
+                  <td style={{ padding: '0.625rem 0.25rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      <TeamFlag code={r.code} size={14} />
+                      <span style={{ fontWeight: 600 }}>{t(`teams.${r.code}`, { defaultValue: r.name })}</span>
+                    </div>
+                  </td>
+                  {showGroup && <td style={{ padding: '0.625rem 0.25rem', textAlign: 'center', fontWeight: 700, color: 'var(--text-muted)' }}>{r.group}</td>}
+                  <td style={{ padding: '0.625rem 0.25rem', textAlign: 'center' }}>{r.pj}</td>
+                  <td style={{ padding: '0.625rem 0.25rem', textAlign: 'center', fontWeight: 800 }}>{r.pts}</td>
+                  <td style={{ padding: '0.625rem 0.25rem', textAlign: 'center' }}>{r.dg > 0 ? `+${r.dg}` : r.dg}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>      </div>
     </div>

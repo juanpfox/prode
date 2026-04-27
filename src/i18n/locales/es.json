@@ -147,7 +147,10 @@
       "dif": "Dif",
       "pts": "Pts",
       "predicted_title": "Posiciones Pronóstico",
-      "real_title": "Posiciones Real"
+      "real_title": "Posiciones Real",
+      "best_thirds_title": "Mejores Terceros",
+      "best_thirds_predicted": "Mejores Terceros (Pronóstico)",
+      "best_thirds_real": "Mejores Terceros (Real)"
     },
     "stages": {
       "group": "Fase de grupos",
