@@ -106,7 +106,7 @@ function MatchRules({ config, t }) {
               <p style={{ marginTop: '0.5rem' }}>
                 {c.pts_win > 0 && <>{t('rules.example_correct_winner')}: <span className="highlight">+{c.pts_win}</span><br /></>}
                 {c.pts_exact_one > 0 && <>{t('rules.example_exact_one')}: <span className="highlight">+{c.pts_exact_one}</span> (Brasil: 1)<br /></>}
-                {c.pts_diff_wrong !== 0 && <>{t('rules.example_diff')}: {t('rules.example_diff_detail', { predicted: 2, actual: 1, pts: c.pts_diff_wrong })}<br /></>}
+                {c.pts_diff_wrong !== 0 && <>{t('rules.example_diff', { predicted: 2, actual: 1 })} → <span className="highlight">{c.pts_diff_wrong}</span><br /></>}
                 {t('rules.example_subtotal')}: <span className="highlight">{subtotal}</span><br />
                 {mult > 1 && <>{t('rules.example_multiplier')}: ×{mult}<br /></>}
                 <strong>{t('rules.example_total')}: <span className="highlight">{subtotal * mult} pts</span></strong>
@@ -207,7 +207,7 @@ function PosicionesRules({ config, t }) {
         <h3>{t('rules.example_title')}</h3>
         <div className="rules-example">
           <p>
-            <strong>{t('rules.pos_example_setup')}</strong>
+            <strong>{t('rules.pos_example_setup', { mult_world_1st: c.mult_world_1st })}</strong>
           </p>
           <p style={{ marginTop: '0.5rem' }}>
             {t('rules.pos_example_detail', {

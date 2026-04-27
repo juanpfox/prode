@@ -384,61 +384,65 @@ export default function TournamentsPage() {
           </div>
         )}
 
-        <div className="card card-sm" style={{ marginBottom: '1.5rem' }}>
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
-            {t('tournaments.enter_code_label')}
-          </p>
-          <form onSubmit={handleJoin} style={{ display: 'flex', gap: '0.5rem' }}>
-            <input className="input" placeholder={t('tournaments.enter_code')}
-              value={joinCode} onChange={e => setJoinCode(e.target.value.toUpperCase())}
-              maxLength={8} style={{ flex: 1, fontFamily: 'monospace', letterSpacing: '0.1em' }} />
-            <button className="btn btn-primary btn-sm" type="submit" disabled={joining || !joinCode}>
-              {joining ? '…' : t('tournaments.join_btn')}
-            </button>
-          </form>
-        </div>
-
-        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
-          {['mine', 'public'].map(k => (
-            <button key={k} className={`btn btn-sm ${tab === k ? 'btn-primary' : 'btn-ghost'}`}
-              onClick={() => setTab(k)}>
-              {t(`tournaments.tab_${k}`)}
-            </button>
-          ))}
-        </div>
-
-        {loading ? (
-          <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '2rem' }}>{t('common.loading')}</p>
-        ) : tab === 'mine' ? (
-          myTournaments.length === 0 ? (
-            <div className="home-empty card card-sm">
-              <span style={{ fontSize: '2rem' }}>🏟️</span>
-              <p style={{ color: 'var(--text-muted)' }}>{t('tournaments.empty')}</p>
+        {!showCreate && (
+          <>
+            <div className="card card-sm" style={{ marginBottom: '1.5rem' }}>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
+                {t('tournaments.enter_code_label')}
+              </p>
+              <form onSubmit={handleJoin} style={{ display: 'flex', gap: '0.5rem' }}>
+                <input className="input" placeholder={t('tournaments.enter_code')}
+                  value={joinCode} onChange={e => setJoinCode(e.target.value.toUpperCase())}
+                  maxLength={8} style={{ flex: 1, fontFamily: 'monospace', letterSpacing: '0.1em' }} />
+                <button className="btn btn-primary btn-sm" type="submit" disabled={joining || !joinCode}>
+                  {joining ? '…' : t('tournaments.join_btn')}
+                </button>
+              </form>
             </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              {myTournaments.map(tr => (
-                <TournamentCard
-                  key={tr.id}
-                  tournament={tr}
-                  onDeleteSuccess={() => loadData()}
-                />
+
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+              {['mine', 'public'].map(k => (
+                <button key={k} className={`btn btn-sm ${tab === k ? 'btn-primary' : 'btn-ghost'}`}
+                  onClick={() => setTab(k)}>
+                  {t(`tournaments.tab_${k}`)}
+                </button>
               ))}
             </div>
-          )
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            {publicTournaments.length === 0
-              ? <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '2rem' }}>—</p>
-              : publicTournaments.map(tr => (
-                  <TournamentCard
-                    key={tr.id}
-                    tournament={tr}
-                    onDeleteSuccess={() => loadData()}
-                  />
-                ))
-            }
-          </div>
+
+            {loading ? (
+              <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '2rem' }}>{t('common.loading')}</p>
+            ) : tab === 'mine' ? (
+              myTournaments.length === 0 ? (
+                <div className="home-empty card card-sm">
+                  <span style={{ fontSize: '2rem' }}>🏟️</span>
+                  <p style={{ color: 'var(--text-muted)' }}>{t('tournaments.empty')}</p>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  {myTournaments.map(tr => (
+                    <TournamentCard
+                      key={tr.id}
+                      tournament={tr}
+                      onDeleteSuccess={() => loadData()}
+                    />
+                  ))}
+                </div>
+              )
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                {publicTournaments.length === 0
+                  ? <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '2rem' }}>—</p>
+                  : publicTournaments.map(tr => (
+                      <TournamentCard
+                        key={tr.id}
+                        tournament={tr}
+                        onDeleteSuccess={() => loadData()}
+                      />
+                    ))
+                }
+              </div>
+            )}
+          </>
         )}
       </div>
     </AppShell>

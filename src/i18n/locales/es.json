@@ -294,7 +294,7 @@
     "example_prediction_label": "Tu pronóstico:",
     "example_correct_winner": "Ganador correcto",
     "example_exact_one": "Gol exacto de 1 equipo",
-    "example_diff": "Dif. goles: pronosticaste {{predicted}}, real {{actual}} → {{pts}}",
+    "example_diff": "Dif. goles: pronosticaste {{predicted}}, real {{actual}}",
     "example_subtotal": "Subtotal",
     "example_multiplier": "Multiplicador",
     "example_total": "Total",
