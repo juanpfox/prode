@@ -51,8 +51,20 @@ export default function TournamentDetailPage() {
         .from('scores')
         .select('user_id, total_points, matches_scored, users(display_name)')
         .eq('tournament_id', id)
-        .order('total_points', { ascending: false })
-      setScores(scs ?? [])
+
+      // Merge scores with approved players to show everyone even with 0 points
+      const approvedPlayers = pls?.filter(p => p.status === 'approved') ?? []
+      const mergedScores = approvedPlayers.map(p => {
+        const scoreEntry = scs?.find(s => s.user_id === p.user_id)
+        return {
+          user_id: p.user_id,
+          total_points: scoreEntry?.total_points ?? 0,
+          matches_scored: scoreEntry?.matches_scored ?? 0,
+          users: { display_name: p.users?.display_name ?? 'Usuario' }
+        }
+      }).sort((a, b) => b.total_points - a.total_points || a.users.display_name.localeCompare(b.users.display_name))
+
+      setScores(mergedScores)
 
       const me = pls?.find(p => p.user_id === user.id)
       let myCurrentStatus = me?.status ?? null

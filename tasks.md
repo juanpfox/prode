@@ -29,6 +29,8 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
   - [x] **Simplificar creación de torneos: Solo World Cup**
     - [x] Eliminar selector de competición en el form de creación.
     - [x] Forzar `competition_id` a World Cup 2026 por defecto.
+  - [x] **Mejora de Ranking: Mostrar participantes con 0 puntos**
+    - [x] Modificar `TournamentDetailPage.jsx` y `LeaderboardPage.jsx` para incluir a todos los jugadores aprobados en la tabla de puntos, inicializando en 0 si no hay registros.
 
 ## Fase 3: Monetización e Integraciones Externas
 

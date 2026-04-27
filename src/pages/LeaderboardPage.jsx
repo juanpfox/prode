@@ -31,14 +31,31 @@ export default function LeaderboardPage() {
   useEffect(() => {
     if (!selected) return
     setLoadingScores(true)
-    supabase.from('scores')
-      .select('user_id, total_points, matches_scored, users(display_name)')
-      .eq('tournament_id', selected)
-      .order('total_points', { ascending: false })
-      .then(({ data }) => {
-        setScores(data ?? [])
-        setLoadingScores(false)
-      })
+
+    Promise.all([
+      supabase.from('scores')
+        .select('user_id, total_points, matches_scored, users(display_name)')
+        .eq('tournament_id', selected),
+      supabase.from('tournament_players')
+        .select('user_id, status, users(display_name)')
+        .eq('tournament_id', selected).eq('status', 'approved')
+    ]).then(([scRes, plRes]) => {
+      const scs = scRes.data ?? []
+      const pls = plRes.data ?? []
+
+      const mergedScores = pls.map(p => {
+        const scoreEntry = scs.find(s => s.user_id === p.user_id)
+        return {
+          user_id: p.user_id,
+          total_points: scoreEntry?.total_points ?? 0,
+          matches_scored: scoreEntry?.matches_scored ?? 0,
+          users: { display_name: p.users?.display_name ?? 'Usuario' }
+        }
+      }).sort((a, b) => b.total_points - a.total_points || a.users.display_name.localeCompare(b.users.display_name))
+
+      setScores(mergedScores)
+      setLoadingScores(false)
+    })
   }, [selected])
 
   const MEDALS = ['🥇', '🥈', '🥉']
