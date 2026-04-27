@@ -33,7 +33,7 @@ export default function TournamentsPage() {
   const [createForm, setCreateForm] = useState({
     name: '',
     prize: '',
-    competition_id: searchParams.get('comp') ?? '',
+    competition_id: '00000000-0000-0000-0000-000000000001',
     mode: '',
     is_public: false,
     requires_approval: false,
@@ -219,17 +219,7 @@ export default function TournamentsPage() {
                 value={createForm.prize} maxLength={100}
                 onChange={e => setCreateForm(f => ({ ...f, prize: e.target.value }))}
                 style={{ fontSize: '0.9rem' }} />
-              <select className="input" value={createForm.competition_id} required
-                onChange={e => setCreateForm(f => ({
-                  ...f,
-                  competition_id: e.target.value,
-                  mode: ''
-                }))}>
-                <option value="">{t('tournaments.select_competition')}</option>
-                {competitions.map(c => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
-                ))}
-              </select>
+              {/* Competition selection removed — Always World Cup 2026 */}
 
               {/* Mode selector — only for World Cup */}
               {createForm.competition_id && competitions.find(c => c.id === createForm.competition_id)?.type === 'world_cup' && (

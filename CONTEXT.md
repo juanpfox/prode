@@ -19,8 +19,8 @@
 App multitorneo y multiusuario para el Mundial 2026 y Champions League. Diseñada para ser mobile-first/PWA, permitiendo a los usuarios crear torneos, invitar amigos y competir por puntos basados en predicciones.
 
 ### Competiciones activas
-- **World Cup 2026:** Soporta modos "Posiciones" y "Partidos".
-- **Champions League 2025/26:** Soporta modo "Partidos".
+- **World Cup 2026:** Única competición disponible para creación de nuevos torneos. Soporta modos "Posiciones" y "Partidos".
+- **Champions League 2025/26:** Soportada para torneos existentes (Modo "Partidos").
 
 ---
 
