@@ -49,6 +49,10 @@ export default function App() {
           <Route path="/posiciones"                element={<LeaderboardPage />} />
           <Route path="/perfil"                    element={<ProfilePage />} />
           
+          <Route path="/:slug"                     element={<TournamentDetailPage />} />
+          <Route path="/:slug/pronosticos"         element={<PredictionsPage />} />
+          <Route path="/:slug/jugador/:userId"      element={<PlayerPredictionsPage />} />
+
           {/* Admin Routes */}
           {isAdmin && (
             <>

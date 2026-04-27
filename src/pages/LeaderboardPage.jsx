@@ -18,7 +18,7 @@ export default function LeaderboardPage() {
 
   useEffect(() => {
     supabase.from('tournament_players')
-      .select('tournaments(id, name)')
+      .select('tournaments(id, name, slug)')
       .eq('user_id', user.id).eq('status', 'approved')
       .then(({ data }) => {
         const ts = data?.map(tp => tp.tournaments).filter(Boolean) ?? []
@@ -95,7 +95,10 @@ export default function LeaderboardPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 {scores.map((s, i) => (
                   <div key={s.user_id} className="card card-sm"
-                    onClick={() => navigate(`/torneo/${selected}/jugador/${s.user_id}`)}
+                    onClick={() => {
+                      const selTr = myTournaments.find(t => t.id === selected)
+                      navigate(`/${selTr?.slug || selected}/jugador/${s.user_id}`)
+                    }}
                     style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer',
                       background: s.user_id === user.id ? 'var(--primary-subtle)' : undefined,
                       border: s.user_id === user.id ? '1px solid var(--primary)' : undefined }}>

@@ -70,7 +70,7 @@ const ANIM = "0.35s cubic-bezier(0.4, 0, 0.2, 1)"
 
 export default function PlayerPredictionsPage() {
   const { t, i18n } = useTranslation()
-  const { id: tournamentId, userId: targetUserId } = useParams()
+  const { id: paramId, slug: paramSlug, userId: targetUserId } = useParams()
   const navigate = useNavigate()
   const { user } = useAuth()
 
@@ -99,16 +99,25 @@ export default function PlayerPredictionsPage() {
     return () => window.removeEventListener("resize", handleResize)
   }, [])
 
-  useEffect(() => { loadAll() }, [tournamentId, targetUserId])
+  useEffect(() => { loadAll() }, [paramId, paramSlug, targetUserId])
 
   async function loadAll() {
     setLoading(true)
     try {
-      const { data: tr } = await supabase
-        .from("tournaments")
-        .select("*, competitions(name, type, available_modes)")
-        .eq("id", tournamentId).single()
+      const identifier = paramId || paramSlug
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(identifier)
+      
+      let qTour = supabase
+        .from('tournaments')
+        .select('*, competitions(name, type, available_modes)')
+      
+      if (isUUID) qTour = qTour.eq('id', identifier)
+      else qTour = qTour.eq('slug', identifier)
+
+      const { data: tr } = await qTour.single()
+      if (!tr) return
       setTournament(tr)
+      const tournamentId = tr.id
 
       const { data: tp } = await supabase
         .from("tournament_players")

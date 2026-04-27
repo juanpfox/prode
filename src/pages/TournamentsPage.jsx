@@ -21,7 +21,8 @@ export default function TournamentsPage() {
   const [showCreate, setShowCreate] = useState(!!searchParams.get('comp') || !!searchParams.get('new'))
   const [joinCode, setJoinCode] = useState('')
   const [joining, setJoining] = useState(false)
-  const SCORING_DEFAULTS = {
+  const RESERVED_SLUGS = ['perfil', 'posiciones', 'torneos', 'admin', 'login', 'registro', 'invitacion', 'guest', 'guest2', 'perfil-publico']
+const SCORING_DEFAULTS = {
     pts_win: 3, pts_exact_both: 3, pts_exact_one: 1,
     pts_diff_correct: 1, pts_diff_wrong: -1,
     mult_r16: 2, mult_qf: 3, mult_sf: 4, mult_final: 6,
@@ -32,6 +33,7 @@ export default function TournamentsPage() {
   }
   const [createForm, setCreateForm] = useState({
     name: '',
+    slug: '',
     prize: '',
     competition_id: '00000000-0000-0000-0000-000000000001',
     mode: '',
@@ -55,7 +57,7 @@ export default function TournamentsPage() {
           .select(`
             role, 
             tournaments(
-              id, name, mode, invite_code, competition_id, prize, is_featured,
+              id, name, slug, mode, invite_code, competition_id, prize, is_featured,
               competitions(name, type),
               creator:users!tournaments_created_by_fkey(display_name),
               participants:tournament_players(count)
@@ -64,7 +66,7 @@ export default function TournamentsPage() {
           .eq('user_id', user.id).eq('status', 'approved'),
         supabase.from('tournaments')
           .select(`
-            id, name, mode, invite_code, competition_id, is_public, prize, is_featured,
+            id, name, slug, mode, invite_code, competition_id, is_public, prize, is_featured,
             competitions(name, type),
             creator:users!tournaments_created_by_fkey(display_name),
             participants:tournament_players(count)
@@ -101,6 +103,19 @@ export default function TournamentsPage() {
     const isWorldCup = selectedComp?.type === 'world_cup'
     const effectiveMode = isWorldCup ? createForm.mode : 'partidos'
     if (!createForm.name.trim() || !createForm.competition_id || !effectiveMode) return
+    
+    const slugValue = createForm.slug.trim().toLowerCase()
+    if (slugValue) {
+      if (!/^[a-z0-9_-]+$/.test(slugValue)) {
+        setError(t('tournaments.slug_error_format'))
+        return
+      }
+      if (RESERVED_SLUGS.includes(slugValue)) {
+        setError(t('tournaments.slug_error_taken'))
+        return
+      }
+    }
+
     setCreating(true)
     setError(null)
     try {
@@ -108,6 +123,7 @@ export default function TournamentsPage() {
         .from('tournaments')
         .insert({
           name: createForm.name.trim(),
+          slug: slugValue || null,
           prize: createForm.prize.trim() || null,
           competition_id: createForm.competition_id,
           created_by: user.id,
@@ -116,7 +132,10 @@ export default function TournamentsPage() {
           requires_approval: createForm.requires_approval
         })
         .select('id').single()
-      if (err) throw err
+      if (err) {
+        if (err.code === '23505') throw new Error(t('tournaments.slug_error_taken'))
+        throw err
+      }
       // Override tournament_config with custom scoring if changed from defaults
       const scoringPayload = { ...createForm.scoring }
       const hasCustomScoring = Object.keys(scoringPayload).some(k => scoringPayload[k] !== SCORING_DEFAULTS[k])
@@ -124,9 +143,9 @@ export default function TournamentsPage() {
         await supabase.from('tournament_config').update(scoringPayload).eq('tournament_id', data.id)
       }
       setShowCreate(false)
-      setCreateForm({ name: '', prize: '', competition_id: '', mode: '', is_public: false, requires_approval: false, scoring: { ...SCORING_DEFAULTS } })
+      setCreateForm({ name: '', slug: '', prize: '', competition_id: '', mode: '', is_public: false, requires_approval: false, scoring: { ...SCORING_DEFAULTS } })
       await loadData()
-      navigate(`/torneo/${data.id}`)
+      navigate(`/${slugValue || data.id}`)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -153,7 +172,7 @@ export default function TournamentsPage() {
 
       if (existing) {
         if (existing.status === 'approved') {
-          navigate(`/torneo/${tournament.id}`)
+          navigate(`/${tournament.slug || tournament.id}`)
           return
         }
         setJoinMsg(t('tournaments.already_requested'))
@@ -174,7 +193,7 @@ export default function TournamentsPage() {
         : t('tournaments.joined_success', { name: tournament.name })
       )
       if (!tournament.requires_approval) {
-        setTimeout(() => navigate(`/torneo/${tournament.id}`), 1500)
+        setTimeout(() => navigate(`/${tournament.slug || tournament.id}`), 1500)
       }
       setJoinCode('')
       await loadData()
@@ -215,6 +234,23 @@ export default function TournamentsPage() {
               <input className="input" placeholder={t('tournaments.name_placeholder')}
                 value={createForm.name} required
                 onChange={e => setCreateForm(f => ({ ...f, name: e.target.value }))} />
+              
+              <div style={{ position: 'relative' }}>
+                <input 
+                  className="input" 
+                  placeholder={t('tournaments.slug_placeholder')}
+                  value={createForm.slug}
+                  onChange={e => {
+                    const val = e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, '')
+                    setCreateForm(f => ({ ...f, slug: val }))
+                  }}
+                  style={{ fontSize: '0.9rem' }}
+                />
+                <p style={{ fontSize: '0.675rem', color: 'var(--text-muted)', marginTop: '0.3rem', marginLeft: '0.5rem' }}>
+                  {t('tournaments.slug_help')}<strong>{createForm.slug || t('tournaments.slug_placeholder')}</strong>
+                </p>
+              </div>
+
               <input className="input" placeholder={t('tournaments.prize_placeholder')}
                 value={createForm.prize} maxLength={100}
                 onChange={e => setCreateForm(f => ({ ...f, prize: e.target.value }))}

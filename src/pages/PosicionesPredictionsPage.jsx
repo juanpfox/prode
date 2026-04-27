@@ -282,7 +282,7 @@ export default function PosicionesPredictionsPage({ tournament }) {
   return (
     <AppShell saveIndicator={saveStatus}>
       <div className="animate-fade-in">
-        <button className="btn btn-ghost btn-sm" onClick={() => navigate(`/torneo/${tournamentId}`)}
+        <button className="btn btn-ghost btn-sm" onClick={() => navigate(`/${tournament?.slug || tournament?.id}`)}
           style={{ marginBottom: '1rem' }}>
           ← {tournament?.name}
         </button>

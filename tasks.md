@@ -75,6 +75,15 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
   - [x] Crear cuenta `guest2@prodemundial.dev` en Supabase Auth y perfil en public.
   - [x] Implementar ruta `/guest2` para login automático sin contraseña.
   - [x] Otorgar permisos de admin a guest2.
+- [x] **Sub-URLs personalizadas para torneos (Slugs)**
+  - [x] Migración DB: agregar columna `slug` única y con validación regex.
+  - [x] Traducciones: agregar labels y errores para el campo slug.
+  - [x] UI Creación: agregar campo slug con validación en tiempo real.
+  - [x] UI Configuración: permitir editar el slug del torneo.
+  - [x] Routing: soportar rutas dinámicas `/:slug`, `/:slug/pronosticos`, etc.
+  - [x] Navegación: actualizar links para usar el slug si existe.
+  - [x] Validación: prevenir uso de palabras reservadas como slugs.
+  - [x] Asegurar que las redirecciones y links usen el slug cuando esté disponible.
 
 ---
 

@@ -64,7 +64,7 @@ class PredictionErrorBoundary extends Component {
 
 export default function PredictionsPage() {
   const { t, i18n } = useTranslation()
-  const { id: tournamentId } = useParams()
+  const { id: paramId, slug: paramSlug } = useParams()
   const navigate = useNavigate()
   const { user } = useAuth()
   const lang = i18n.language?.startsWith('es') ? 'es' : 'en'
@@ -141,7 +141,7 @@ export default function PredictionsPage() {
   const pendingChanges = useRef({})
   const timeoutRef = useRef(null)
 
-  useEffect(() => { loadAll() }, [tournamentId, user])
+  useEffect(() => { loadAll() }, [paramId, paramSlug, user])
 
   // Clear timeout on unmount
   useEffect(() => {
@@ -153,11 +153,20 @@ export default function PredictionsPage() {
   async function loadAll() {
     setLoading(true)
     try {
-      const { data: tr } = await supabase
+      const identifier = paramId || paramSlug
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(identifier)
+      
+      let qTour = supabase
         .from('tournaments')
         .select('*, competitions(name, type, available_modes)')
-        .eq('id', tournamentId).single()
+      
+      if (isUUID) qTour = qTour.eq('id', identifier)
+      else qTour = qTour.eq('slug', identifier)
+
+      const { data: tr } = await qTour.single()
+      if (!tr) return
       setTournament(tr)
+      const tournamentId = tr.id
 
       const { data: tp } = await supabase
         .from('tournament_players')
@@ -291,7 +300,7 @@ export default function PredictionsPage() {
       <div className="home-empty card card-sm" style={{ marginTop: '2rem' }}>
         <span style={{ fontSize: '2rem' }}>🔒</span>
         <p style={{ color: 'var(--text-muted)' }}>{t('predictions.no_access')}</p>
-        <button className="btn btn-ghost btn-sm" onClick={() => navigate(`/torneo/${tournamentId}`)}>
+        <button className="btn btn-ghost btn-sm" onClick={() => navigate(`/${tournament?.slug || tournament?.id}`)}>
           ← {t('common.back')}
         </button>
       </div>
@@ -370,7 +379,7 @@ export default function PredictionsPage() {
       <div className="animate-fade-in">
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <button className="btn btn-ghost btn-sm" onClick={() => navigate(`/torneo/${tournamentId}`)}>
+            <button className="btn btn-ghost btn-sm" onClick={() => navigate(`/${tournament?.slug || tournament?.id}`)}>
               ← {tournament?.name}
             </button>
             <div>

@@ -7,9 +7,11 @@ import AppShell from '../components/AppShell'
 import ConfigTab from '../components/ConfigTab'
 import RulesPage from '../components/RulesPage'
 
+const RESERVED_SLUGS = ['perfil', 'posiciones', 'torneos', 'admin', 'login', 'registro', 'invitacion', 'guest', 'guest2', 'perfil-publico']
+
 export default function TournamentDetailPage() {
   const { t } = useTranslation()
-  const { id } = useParams()
+  const { id: paramId, slug: paramSlug } = useParams()
   const navigate = useNavigate()
   const { user } = useAuth()
 
@@ -24,22 +26,41 @@ export default function TournamentDetailPage() {
   const [showInviteCode, setShowInviteCode] = useState(false)
   const [updating, setUpdating] = useState(false)
   const [editName, setEditName] = useState('')
+  const [editSlug, setEditSlug] = useState('')
   const [editPrize, setEditPrize] = useState('')
   const [showBanned, setShowBanned] = useState(false)
   const [confirmLeave, setConfirmLeave] = useState(false)
 
-  useEffect(() => { loadTournament() }, [id])
+  useEffect(() => { loadTournament() }, [paramId, paramSlug])
 
   async function loadTournament() {
     setLoading(true)
     try {
-      const { data: tr } = await supabase
+      const identifier = paramId || paramSlug
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(identifier)
+      
+      let query = supabase
         .from('tournaments')
         .select('*, competitions(name, type, status, available_modes)')
-        .eq('id', id).single()
+      
+      if (isUUID) {
+        query = query.eq('id', identifier)
+      } else {
+        query = query.eq('slug', identifier)
+      }
+
+      const { data: tr } = await query.single()
+      
+      if (!tr) {
+        setTournament(null)
+        return
+      }
+
+      const id = tr.id
       setTournament(tr)
-      setEditName(tr?.name ?? '')
-      setEditPrize(tr?.prize ?? '')
+      setEditName(tr.name ?? '')
+      setEditSlug(tr.slug ?? '')
+      setEditPrize(tr.prize ?? '')
 
       const { data: pls } = await supabase
         .from('tournament_players')
@@ -75,7 +96,7 @@ export default function TournamentDetailPage() {
           .eq('tournament_id', id)
           .eq('user_id', user.id)
         myCurrentStatus = 'approved'
-        me.status = 'approved'
+        if (me) me.status = 'approved'
       }
 
       setMyRole(me?.role ?? null)
@@ -91,7 +112,7 @@ export default function TournamentDetailPage() {
       const { error } = await supabase
         .from('tournaments')
         .update({ is_public: isPublic })
-        .eq('id', id)
+        .eq('id', tournament.id)
       if (error) throw error
       setTournament(prev => ({ ...prev, is_public: isPublic }))
     } catch {
@@ -108,11 +129,46 @@ export default function TournamentDetailPage() {
       const { error } = await supabase
         .from('tournaments')
         .update({ name: editName.trim() })
-        .eq('id', id)
+        .eq('id', tournament.id)
       if (error) throw error
       setTournament(prev => ({ ...prev, name: editName.trim() }))
     } catch {
       alert(t('common.error_generic'))
+    } finally {
+      setUpdating(false)
+    }
+  }
+
+  async function updateSlug() {
+    const slugValue = editSlug.trim().toLowerCase()
+    if (slugValue === (tournament.slug ?? '')) return
+    if (slugValue) {
+      if (!/^[a-z0-9_-]+$/.test(slugValue)) {
+        alert(t('tournaments.slug_error_format'))
+        return
+      }
+      if (RESERVED_SLUGS.includes(slugValue)) {
+        alert(t('tournaments.slug_error_taken'))
+        return
+      }
+    }
+    setUpdating(true)
+    try {
+      const { error } = await supabase
+        .from('tournaments')
+        .update({ slug: slugValue || null })
+        .eq('id', tournament.id)
+      if (error) {
+        if (error.code === '23505') throw new Error(t('tournaments.slug_error_taken'))
+        throw error
+      }
+      setTournament(prev => ({ ...prev, slug: slugValue || null }))
+      // If we are on the slug route, we might want to navigate to the new slug
+      if (paramSlug) {
+        navigate(`/${slugValue || tournament.id}`, { replace: true })
+      }
+    } catch (err) {
+      alert(err.message || t('common.error_generic'))
     } finally {
       setUpdating(false)
     }
@@ -126,7 +182,7 @@ export default function TournamentDetailPage() {
       const { error } = await supabase
         .from('tournaments')
         .update({ prize: trimmed || null })
-        .eq('id', id)
+        .eq('id', tournament.id)
       if (error) throw error
       setTournament(prev => ({ ...prev, prize: trimmed || null }))
     } catch {
@@ -380,7 +436,7 @@ export default function TournamentDetailPage() {
           <button
             className="btn btn-primary"
             style={{ width: '100%', marginBottom: '1.25rem', fontSize: '1rem', padding: '0.875rem' }}
-            onClick={() => navigate(`/torneo/${id}/pronosticos`)}>
+            onClick={() => navigate(`/${tournament.slug || tournament.id}/pronosticos`)}>
             {tournament.mode === 'posiciones' ? '🏆' : '⚽'} {t('predictions.go_predict')}
           </button>
         )}
@@ -418,7 +474,7 @@ export default function TournamentDetailPage() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                     {scores.map((s, i) => (
                       <div key={s.user_id} className="card card-sm"
-                        onClick={() => navigate(`/torneo/${id}/jugador/${s.user_id}`)}
+                        onClick={() => navigate(`/${tournament.slug || tournament.id}/jugador/${s.user_id}`)}
                         style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer',
                           background: s.user_id === user.id ? 'var(--primary-subtle)' : undefined,
                           border: s.user_id === user.id ? '1px solid var(--primary)' : undefined }}>
@@ -470,6 +526,29 @@ export default function TournamentDetailPage() {
                       {updating ? '…' : t('common.save')}
                     </button>
                   </div>
+
+                  <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem', flexDirection: 'column' }}>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <input
+                        className="input"
+                        value={editSlug}
+                        onChange={e => setEditSlug(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''))}
+                        placeholder={t('tournaments.slug_placeholder')}
+                        style={{ flex: 1, fontSize: '0.9rem' }}
+                      />
+                      <button
+                        className="btn btn-primary btn-sm"
+                        onClick={updateSlug}
+                        disabled={updating || editSlug.trim().toLowerCase() === (tournament.slug ?? '')}
+                      >
+                        {updating ? '…' : t('common.save')}
+                      </button>
+                    </div>
+                    <p style={{ fontSize: '0.675rem', color: 'var(--text-muted)', marginLeft: '0.5rem' }}>
+                      {t('tournaments.slug_help')}<strong>{editSlug || t('tournaments.slug_placeholder')}</strong>
+                    </p>
+                  </div>
+
                   <div style={{ display: 'flex', gap: '0.5rem' }}>
                     <input
                       className="input"

@@ -60,6 +60,7 @@ Pronóstico de **resultado exacto**.
 - [X] Sistema de tie-break por `initial_position` en tablas de grupo
 - [X] Pestañas de configuración de puntos (Creación + Edición) y reglas dinámicas
 - [X] Sistema de Torneos Destacados (Admin only) y ordenamiento prioritario
+- [X] Sub-URLs personalizadas para torneos (Slugs) — ej: `prode.mundial.com/mi-torneo`
 - [ ] Elegir e integrar API de resultados automáticos (API-Football)
 - [ ] Implementar lógica de puntos automática en Supabase (Edge Functions / Triggers)
 - [ ] Crear bot/ping para evitar pausa de Supabase Free
