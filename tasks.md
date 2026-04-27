@@ -31,6 +31,12 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
     - [x] Forzar `competition_id` a World Cup 2026 por defecto.
   - [x] **Mejora de Ranking: Mostrar participantes con 0 puntos**
     - [x] Modificar `TournamentDetailPage.jsx` y `LeaderboardPage.jsx` para incluir a todos los jugadores aprobados en la tabla de puntos, inicializando en 0 si no hay registros.
+  - [x] **Renombrar "Ranking" a "Posiciones"**
+    - [x] Actualizar traducciones en `es.json` y `pt.json`.
+    - [x] Cambiar la ruta `/ranking` por `/posiciones` en `App.jsx` y links de navegación.
+    - [x] Actualizar comentarios y labels hardcodeados.
+
+
   - [x] **Bug Fix: Equipos reales en bracket de playoffs**
     - [x] Modificar `simulatorWC2026.js` para que, cuando un partido de playoff ya tiene resultado real cargado en la DB, use los equipos reales (`home_team`/`away_team`) en lugar de calcularlos desde las predicciones del usuario.
     - [x] Modificar `simulatorUCL.js` para que el partido final de UCL use los equipos reales de la DB cuando están disponibles, y `areSFsResolved` retorne true cuando el final ya tiene equipos asignados.

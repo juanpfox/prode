@@ -50,7 +50,7 @@ export default function AppShell({ children, saveIndicator, wide }) {
         {(user?.email === 'guest@prodemundial.dev' || user?.email === 'juanpatriciofox@gmail.com') && (
           <NavItem icon="🎯" label={t('nav.admin_results')} active={pathname.startsWith('/admin/resultados')} onClick={() => navigate('/admin/resultados')} />
         )}
-        <NavItem icon="📊" label={t('nav.leaderboard')} active={pathname === '/ranking'}        onClick={() => navigate('/ranking')} />
+        <NavItem icon="📊" label={t('nav.leaderboard')} active={pathname === '/posiciones'}        onClick={() => navigate('/posiciones')} />
       </nav>
     </div>
   )

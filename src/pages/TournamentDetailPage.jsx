@@ -385,7 +385,7 @@ export default function TournamentDetailPage() {
           </button>
         )}
 
-        {/* Tabs: Ranking | Reglas | Configuración (admin) */}
+        {/* Tabs: Posiciones | Reglas | Configuración (admin) */}
         {isApproved && (
           <>
             <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '1px solid var(--border)', marginBottom: '1.25rem', paddingBottom: '0.25rem', overflowX: 'auto' }}>
@@ -661,7 +661,7 @@ export default function TournamentDetailPage() {
               </section>
             )}
 
-            {/* Leave tournament — player only (not admin), shown below ranking */}
+            {/* Leave tournament — player only (not admin), shown below posiciones */}
             {tab === 'leaderboard' && myRole !== 'admin' && (
               <div style={{ marginTop: '2rem' }}>
                 {!confirmLeave ? (

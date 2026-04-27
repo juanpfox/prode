@@ -45,7 +45,7 @@ export default function App() {
           <Route path="/torneo/:id"                element={<TournamentDetailPage />} />
           <Route path="/torneo/:id/pronosticos"    element={<PredictionsPage />} />
           <Route path="/torneo/:id/jugador/:userId"  element={<PlayerPredictionsPage />} />
-          <Route path="/ranking"                   element={<LeaderboardPage />} />
+          <Route path="/posiciones"                element={<LeaderboardPage />} />
           <Route path="/perfil"                    element={<ProfilePage />} />
           
           {/* Admin Routes */}

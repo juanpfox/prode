@@ -175,7 +175,7 @@ export default function PlayerPredictionsPage() {
       <div className="home-empty card card-sm" style={{ marginTop: "2rem" }}>
         <span style={{ fontSize: "2rem" }}>🔒</span>
         <p style={{ color: "var(--text-muted)" }}>{t("predictions.no_access")}</p>
-        <button className="btn btn-ghost btn-sm" onClick={() => navigate("/ranking")}>← {t("common.back")}</button>
+        <button className="btn btn-ghost btn-sm" onClick={() => navigate("/posiciones")}>← {t("common.back")}</button>
       </div>
     </AppShell>
   )
@@ -217,7 +217,7 @@ export default function PlayerPredictionsPage() {
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between",
               flexWrap: "wrap", gap: "1rem", marginBottom: "1.5rem" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-              <button className="btn btn-ghost btn-sm" onClick={() => navigate("/ranking")}>
+              <button className="btn btn-ghost btn-sm" onClick={() => navigate("/posiciones")}>
                 ← {t("nav.leaderboard")}
               </button>
               <div>
