@@ -36,6 +36,7 @@
     "title": "Meus Torneios",
     "create": "Criar torneio",
     "join": "Entrar em um torneio",
+    "select_to_play": "Escolha o torneio em que você quer jogar",
     "empty": "Você não participa de nenhum torneio ainda",
     "players": "{{count}} jogador",
     "players_plural": "{{count}} jogadores",

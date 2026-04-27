@@ -61,6 +61,7 @@
     "pending_msg": "Tu solicitud está pendiente de aprobación",
     "tab_mine": "Mis torneos",
     "tab_public": "Todos",
+    "select_to_play": "Elegí el torneo en el que querés jugar",
     "already_requested": "Ya enviaste una solicitud a este torneo",
     "join_requested": "Solicitud enviada a \"{{name}}\". Esperá la aprobación del admin.",
     "joined_success": "¡Te uniste con éxito a \"{{name}}\"!",

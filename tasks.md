@@ -67,6 +67,10 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
   - [x] Implementar el toggle de estrella en `TournamentCard` (solo para admins de la app).
   - [x] Actualizar la lógica de `HomePage` para mostrar torneos destacados primero para usuarios nuevos.
   - [x] Asegurar que el orden de los torneos respete la categoría de destacados.
+- [x] **Home Page: Mejorar onboarding para nuevos usuarios**
+  - [x] Ocultar email en el dashboard cuando no hay torneos.
+  - [x] Reemplazar título "Todos" por "Elegí el torneo en el que querés jugar" (i18n).
+  - [x] Ocultar sección "Mis Torneos" y estado vacío cuando el usuario no participa en nada todavía.
 
 ---
 

@@ -61,6 +61,7 @@
     "pending_msg": "Your request is pending approval",
     "tab_mine": "My tournaments",
     "tab_public": "All",
+    "select_to_play": "Choose the tournament you want to play in",
     "already_requested": "You already sent a request to this tournament",
     "join_requested": "Request sent to \"{{name}}\". Wait for admin approval.",
     "joined_success": "Successfully joined \"{{name}}\"!",

@@ -74,9 +74,11 @@ export default function HomePage() {
 
   return (
     <AppShell>
-      <div style={{ marginTop: '0.4rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.625rem', marginBottom: '1.5rem' }}>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>{user?.email}</p>
-      </div>
+      {(!loading && myTournaments.length > 0) && (
+        <div style={{ marginTop: '0.4rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.625rem', marginBottom: '1.5rem' }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>{user?.email}</p>
+        </div>
+      )}
 
       {loading ? (
         <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '3rem' }}>{t('common.loading')}</p>
@@ -84,11 +86,10 @@ export default function HomePage() {
         <>
           {myTournaments.length === 0 ? (
             <>
-              {/* Section: Public Tournaments (shown first if no user tournaments) */}
               {publicTournaments.length > 0 && (
                 <section className="animate-slide-up" style={{ marginBottom: '2.5rem' }}>
                   <h3 style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--text)', marginBottom: '1.25rem', opacity: 0.9 }}>
-                    {t('tournaments.tab_public')}
+                    {t('tournaments.select_to_play')}
                   </h3>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
                     {publicTournaments.map(tr => (
@@ -100,29 +101,6 @@ export default function HomePage() {
                   </div>
                 </section>
               )}
-
-              {/* Section: My Tournaments (Empty State shown after) */}
-              <section style={{ marginBottom: '2.5rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.125rem' }}>
-                  <h3 style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--text)' }}>
-                    {t('tournaments.title')}
-                  </h3>
-                  <button className="btn btn-primary btn-sm" onClick={() => navigate('/torneos?new=1')}>
-                    {t('tournaments.create')}
-                  </button>
-                </div>
-
-                <div className="home-empty card card-sm" style={{ background: 'var(--surface-2)', border: '1px dashed var(--border)' }}>
-                  <span style={{ fontSize: '2.25rem', marginBottom: '0.5rem' }}>🏟️</span>
-                  <p style={{ color: 'var(--text-muted)', fontWeight: 500, fontSize: '0.9375rem' }}>{t('tournaments.empty')}</p>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', opacity: 0.8, marginBottom: '1rem' }}>
-                    {t('tournaments.enter_code_label')}
-                  </p>
-                  <button className="btn btn-ghost btn-sm" onClick={() => navigate('/torneos')}>
-                    🔍 {t('tournaments.join')}
-                  </button>
-                </div>
-              </section>
             </>
           ) : (
             <>
