@@ -336,6 +336,9 @@ const SCORING_DEFAULTS = {
                 </p>
               </div>
 
+              <h3 style={{ fontWeight: 700, fontSize: '0.9rem', marginTop: '0.25rem', marginBottom: '-0.25rem' }}>
+                {t('tournaments.prize_label', 'Premio para el ganador')}
+              </h3>
               <input className="input" placeholder={t('tournaments.prize_placeholder')}
                 value={createForm.prize} maxLength={100}
                 onChange={e => setCreateForm(f => ({ ...f, prize: e.target.value }))}

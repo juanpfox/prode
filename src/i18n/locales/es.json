@@ -91,6 +91,7 @@
     "leave_confirm_btn": "Sí, salir",
     "invite_btn": "Invitar",
     "prize_placeholder": "Ej: Asado, Trofeo, Gloria eterna...",
+    "prize_label": "Premio para el ganador",
     "slug_label": "URL del torneo",
     "slug_placeholder": "nombre-de-tu-torneo",
     "slug_hint": "Solo minúsculas, números, guiones y guiones bajos.",

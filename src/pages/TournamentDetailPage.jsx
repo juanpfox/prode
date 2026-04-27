@@ -635,7 +635,10 @@ export default function TournamentDetailPage() {
                     </p>
                   </div>
 
-                  <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+                  <h3 style={{ fontWeight: 700, fontSize: '0.9rem', marginTop: '1rem', marginBottom: '0.5rem' }}>
+                    {t('tournaments.prize_label', 'Premio para el ganador')}
+                  </h3>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
                     <input
                       className="input"
                       value={editPrize}
