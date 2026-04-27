@@ -307,7 +307,7 @@ export default function PredictionsPage() {
   const groupLetters = ['A','B','C','D','E','F','G','H','I','J','K','L']
 
   // ── TABLE CALCULATION (for Group View) ───────────────────
-  function calculateGroupTable(groupMatches, preds) {
+  function calculateGroupTable(groupMatches, preds, useRealResults = false) {
     const table = {}
     groupMatches.forEach(m => {
       // Initialize rows if they don't exist
@@ -318,9 +318,21 @@ export default function PredictionsPage() {
         table[m.away_team_id] = { id: m.away_team_id, code: m.away_team.code, name: m.away_team.name, initial_position: m.away_team.initial_position, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0, pts: 0 }
       }
 
-      const p = preds[m.id]
-      if (p && p.home_goals !== '' && p.away_goals !== '') {
-        const hg = parseInt(p.home_goals), ag = parseInt(p.away_goals)
+      let hg, ag;
+      if (useRealResults) {
+        if (m.home_goals !== null && m.away_goals !== null) {
+          hg = m.home_goals
+          ag = m.away_goals
+        }
+      } else {
+        const p = preds[m.id]
+        if (p && p.home_goals !== '' && p.away_goals !== '') {
+          hg = parseInt(p.home_goals)
+          ag = parseInt(p.away_goals)
+        }
+      }
+
+      if (hg !== undefined && ag !== undefined) {
         table[m.home_team_id].pj++
         table[m.away_team_id].pj++
         table[m.home_team_id].gf += hg; table[m.home_team_id].gc += ag
@@ -432,9 +444,15 @@ export default function PredictionsPage() {
                 ))}
               </div>
             </div>
-            <div className="table-column">
+            <div className="table-column" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               <GroupTable 
+                title={t('predictions.table.predicted_title')}
                 rows={calculateGroupTable(groupMatches.filter(m => m.home_team?.group_name === activeGroup), predictions)}
+                t={t}
+              />
+              <GroupTable 
+                title={t('predictions.table.real_title')}
+                rows={calculateGroupTable(groupMatches.filter(m => m.home_team?.group_name === activeGroup), predictions, true)}
                 t={t}
               />
             </div>
@@ -866,11 +884,11 @@ function BracketTree({ byStage, bracketStages, simulatedBracket, sfResolved, tou
   )
 }
 
-function GroupTable({ rows, t }) {
+function GroupTable({ rows, t, title }) {
   return (
     <div className="card card-sm" style={{ padding: 0 }}>
       <div style={{ padding: '0.75rem 0.875rem', borderBottom: '1px solid var(--border)' }}>
-        <h3 style={{ fontSize: '0.875rem', fontWeight: 800 }}>{t('nav.leaderboard')}</h3>
+        <h3 style={{ fontSize: '0.875rem', fontWeight: 800 }}>{title || t('nav.leaderboard')}</h3>
       </div>
       <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', fontSize: '0.75rem', borderCollapse: 'collapse' }}>

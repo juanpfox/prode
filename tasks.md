@@ -35,6 +35,10 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
     - [x] Actualizar traducciones en `es.json` y `pt.json`.
     - [x] Cambiar la ruta `/ranking` por `/posiciones` en `App.jsx` y links de navegación.
     - [x] Actualizar comentarios y labels hardcodeados.
+  - [x] **Vista Grupos: Agregar tabla de Posiciones Real**
+    - [x] Implementar cálculo de tabla basado en resultados reales en `PredictionsPage.jsx`.
+    - [x] Mostrar ambas tablas (Pronóstico y Real) con sus respectivos títulos.
+    - [x] Actualizar traducciones.
 
 
   - [x] **Bug Fix: Equipos reales en bracket de playoffs**
