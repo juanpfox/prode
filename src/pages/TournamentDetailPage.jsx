@@ -31,6 +31,8 @@ export default function TournamentDetailPage() {
   const [showBanned, setShowBanned] = useState(false)
   const [confirmLeave, setConfirmLeave] = useState(false)
 
+  const id = tournament?.id
+
   useEffect(() => { loadTournament() }, [paramId, paramSlug])
 
   async function loadTournament() {

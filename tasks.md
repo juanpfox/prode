@@ -47,6 +47,8 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
     - [x] Actualizar traducciones.
 
 
+   - [x] **Bug Fix: Tournament Config Page empty**
+    - [x] Fix ReferenceError in `TournamentDetailPage.jsx` by defining the `id` variable correctly at the component level.
   - [x] **Bug Fix: Equipos reales en bracket de playoffs**
     - [x] Modificar `simulatorWC2026.js` para que, cuando un partido de playoff ya tiene resultado real cargado en la DB, use los equipos reales (`home_team`/`away_team`) en lugar de calcularlos desde las predicciones del usuario.
     - [x] Modificar `simulatorUCL.js` para que el partido final de UCL use los equipos reales de la DB cuando están disponibles, y `areSFsResolved` retorne true cuando el final ya tiene equipos asignados.
