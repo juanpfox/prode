@@ -295,11 +295,13 @@ const SCORING_DEFAULTS = {
                 <div className="input" style={{ 
                   display: 'flex', alignItems: 'center', gap: '0.25rem', paddingRight: '0.5rem',
                   border: slugStatus === 'taken' ? '1px solid var(--error, #dc2626)' : 
-                          slugStatus === 'available' ? '1px solid var(--success, #16a34a)' : undefined
+                          slugStatus === 'available' ? '1px solid var(--success, #16a34a)' : undefined,
+                  minWidth: 0
                 }}>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem', userSelect: 'none' }}>prodemundial.pages.dev/</span>
+                  <span className="hide-mobile" style={{ color: 'var(--text-muted)', fontSize: '0.85rem', userSelect: 'none', whiteSpace: 'nowrap' }}>prodemundial.pages.dev/</span>
+                  <span className="show-mobile" style={{ color: 'var(--text-muted)', fontSize: '0.85rem', userSelect: 'none', whiteSpace: 'nowrap' }}>prode.../</span>
                   <input 
-                    style={{ flex: 1, background: 'none', border: 'none', color: 'inherit', fontSize: '0.9rem', padding: 0, outline: 'none' }}
+                    style={{ flex: 1, background: 'none', border: 'none', color: 'inherit', fontSize: '0.9rem', padding: 0, outline: 'none', minWidth: 0 }}
                     placeholder={t('tournaments.slug_placeholder')}
                     value={createForm.slug}
                     onChange={e => {

@@ -693,14 +693,20 @@ body {
 /* ============================================================
    RESPONSIVE
    ============================================================ */
-@media (min-width: 640px) {
+@media (min-width: 641px) {
   .container { padding-inline: 1.5rem; }
   .card { padding: 2rem; }
   .app-nav  { display: none; }
   .app-content { padding-bottom: 1.5rem; }
   .header-hide-mobile { display: inline-flex; }
+  .hide-mobile { display: inline-block; }
+  .show-mobile { display: none; }
 }
-@media (max-width: 480px) { .header-hide-mobile { display: none; } }
+@media (max-width: 640px) {
+  .header-hide-mobile { display: none; }
+  .hide-mobile { display: none; }
+  .show-mobile { display: inline-block; }
+}
 
 .predictions-layout-grid {
   display: grid;

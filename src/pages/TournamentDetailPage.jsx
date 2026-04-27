@@ -567,15 +567,17 @@ export default function TournamentDetailPage() {
                     {t('tournaments.slug_label', 'URL del torneo')}
                   </h3>
                   <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem', flexDirection: 'column' }}>
-                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
                       <div className="input" style={{ 
-                        flex: 1, display: 'flex', alignItems: 'center', gap: '0.25rem', paddingRight: '0.5rem',
+                        flex: '1 1 240px', display: 'flex', alignItems: 'center', gap: '0.25rem', paddingRight: '0.5rem',
                         border: slugStatus === 'taken' ? '1px solid var(--error, #dc2626)' : 
-                                slugStatus === 'available' ? '1px solid var(--success, #16a34a)' : undefined
+                                slugStatus === 'available' ? '1px solid var(--success, #16a34a)' : undefined,
+                        minWidth: 0
                       }}>
-                        <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem', userSelect: 'none' }}>prodemundial.pages.dev/</span>
+                        <span className="hide-mobile" style={{ color: 'var(--text-muted)', fontSize: '0.85rem', userSelect: 'none', whiteSpace: 'nowrap' }}>prodemundial.pages.dev/</span>
+                        <span className="show-mobile" style={{ color: 'var(--text-muted)', fontSize: '0.85rem', userSelect: 'none', whiteSpace: 'nowrap' }}>prode.../</span>
                         <input
-                          style={{ flex: 1, background: 'none', border: 'none', color: 'inherit', fontSize: '0.9rem', padding: 0, outline: 'none' }}
+                          style={{ flex: 1, background: 'none', border: 'none', color: 'inherit', fontSize: '0.9rem', padding: 0, outline: 'none', minWidth: 0 }}
                           value={editSlug}
                           onChange={e => setEditSlug(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''))}
                           placeholder={t('tournaments.slug_placeholder')}
@@ -593,7 +595,7 @@ export default function TournamentDetailPage() {
                             setCopied(true)
                             setTimeout(() => setCopied(false), 2000)
                           }}
-                          style={{ padding: '0.25rem', color: copied ? 'var(--primary)' : 'inherit' }}
+                          style={{ padding: '0.25rem', color: copied ? 'var(--primary)' : 'inherit', flexShrink: 0 }}
                         >
                           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
@@ -603,6 +605,7 @@ export default function TournamentDetailPage() {
                       <button
                         className="btn btn-primary btn-sm"
                         onClick={updateSlug}
+                        style={{ flex: window.innerWidth < 480 ? '1' : 'none' }}
                         disabled={updating || editSlug.trim().toLowerCase() === (tournament.slug ?? '') || slugStatus === 'taken' || slugStatus === 'checking'}
                       >
                         {updating ? '…' : t('common.save')}
