@@ -745,7 +745,7 @@ export default function TournamentDetailPage() {
                   {/* Approved players */}
                   <div className="card card-sm">
                     <h4 style={{ fontWeight: 700, fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
-                      👥 {t('tournaments.tab_mine')} ({approved.length})
+                      👥 {t('tournaments.participants')} ({approved.length})
                     </h4>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                       {approved.map((p) => (
