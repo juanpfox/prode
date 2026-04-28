@@ -48,9 +48,11 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
   - [x] **Limpiar fichas de torneos**
     - [x] Eliminar nombre de competición y modo de juego en `TournamentCard.jsx`.
     - [x] Eliminar nombre de competición y modo de juego en el header de `TournamentDetailPage.jsx`.
-
-
-   - [x] **Bug Fix: Tournament Config Page empty**
+  - [x] **Bug Fix: Cloudflare Deployment Failure (PWA Assets Limit)**
+    - [x] Identificar el error de límite de tamaño de archivos en `vite-plugin-pwa` mediante los logs de Cloudflare.
+    - [x] Aumentar `maximumFileSizeToCacheInBytes` a 10MB en `vite.config.js` para permitir el precacheo de sprites de avatares e imágenes de branding.
+    - [x] Verificar el build localmente.
+  - [x] **Bug Fix: Tournament Config Page empty**
     - [x] Fix ReferenceError in `TournamentDetailPage.jsx` by defining the `id` variable correctly at the component level.
   - [x] **Bug Fix: Equipos reales en bracket de playoffs**
     - [x] Modificar `simulatorWC2026.js` para que, cuando un partido de playoff ya tiene resultado real cargado en la DB, use los equipos reales (`home_team`/`away_team`) en lugar de calcularlos desde las predicciones del usuario.
