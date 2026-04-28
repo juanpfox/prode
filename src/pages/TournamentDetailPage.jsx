@@ -552,7 +552,7 @@ export default function TournamentDetailPage() {
                       <AvatarSelector 
                         selectedId={editAvatarUrl} 
                         onSelect={updateAvatar} 
-                        categories={['teams', 'others']}
+                        categories={['teams', 'others', 'animals']}
                       />
                     </div>
                   </div>

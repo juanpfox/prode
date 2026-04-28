@@ -356,7 +356,7 @@ const SCORING_DEFAULTS = {
                   <AvatarSelector 
                     selectedId={createForm.avatar_url} 
                     onSelect={id => setCreateForm(f => ({ ...f, avatar_url: id }))}
-                    categories={['teams', 'others']}
+                    categories={['teams', 'others', 'animals']}
                   />
                 </div>
               </div>
