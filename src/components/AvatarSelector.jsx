@@ -78,7 +78,7 @@ export default function AvatarSelector({ selectedId, onSelect, categories = null
               className={`avatar-category-btn ${activeCategoryId === cat.id ? 'active' : ''}`}
               onClick={() => setActiveCategoryId(cat.id)}
             >
-              {cat.icon} {cat.label}
+              <span className="avatar-cat-icon">{cat.icon}</span><span className="avatar-cat-label">{cat.label}</span>
             </button>
           ))}
         </div>
@@ -112,3 +112,4 @@ export default function AvatarSelector({ selectedId, onSelect, categories = null
     </div>
   )
 }
+
