@@ -20,6 +20,10 @@ export const AVATAR_CATEGORIES = [
 // any bleed from neighboring icons, while overflow:hidden on .avatar-item clips it.
 const BG_SIZE = 400
 
+const SHEET_CONFIG = {
+  others: { xOffset: 0.1, yOffset: 1.3 }
+}
+
 export const getAvatarStyle = (avatarId) => {
   if (!avatarId || !avatarId.includes(':')) return {}
   
@@ -29,9 +33,11 @@ export const getAvatarStyle = (avatarId) => {
   const col = index % 4
   const row = Math.floor(index / 4)
   
+  const config = SHEET_CONFIG[sheet] || { xOffset: 0, yOffset: 0 }
+  
   // For N items across, position values are: 0, 100/(N-1), 200/(N-1), 300/(N-1) = 100
-  const x = col * (100 / 3)
-  const y = row * (100 / 3)
+  const x = (col * (100 / 3)) + config.xOffset
+  const y = (row * (100 / 3)) + config.yOffset
   
   return {
     backgroundImage: `url(/avatars/${sheet}.png)`,
