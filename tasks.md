@@ -103,12 +103,19 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
     - [x] Crear componente `AvatarSelector` con visualización tipo grid y categorías.
   - [x] Implementar la lógica de selección en la edición de perfil.
   - [x] Asegurar que el avatar se muestre en los rankings y perfiles de usuario.
+  - [x] Agregar celebs2.png a la categoría de Famosos.
   - [x] Validar dimensiones (1x1) y estilo caricaturesco.
   - [x] **Bug Fix: Centrado de Avatares**
     - [x] Ajustar `background-size` y `transform: scale` para centrar perfectamente los iconos y eliminar bordes sangrantes en todas las categorías.
   - [x] **Rediseño: Hero de Página de Inicio**
     - [x] Reemplazar título, subtítulo y badge por la imagen `prodeImage.png`.
     - [x] Ajustar estilos CSS para asegurar responsividad y visualización premium.
+  - [x] **Avatares para Torneos**
+    - [x] Agregar columna `avatar_url` (o similar) a la tabla `tournaments`.
+    - [x] Integrar `AvatarSelector` en el flujo de creación de torneos.
+    - [x] Integrar `AvatarSelector` en la configuración del torneo.
+    - [x] Asegurar que el avatar se visualice en las `TournamentCard` y en el detalle del torneo.
+    - [x] Filtrar categorías de avatares para torneos (usar `teams` y `others`).
 
 ---
 

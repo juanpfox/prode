@@ -6,7 +6,7 @@ import { supabase } from '../lib/supabase'
 import AppShell from '../components/AppShell'
 import ConfigTab from '../components/ConfigTab'
 import RulesPage from '../components/RulesPage'
-import { Avatar } from '../components/AvatarSelector'
+import AvatarSelector, { Avatar } from '../components/AvatarSelector'
 
 const RESERVED_SLUGS = ['perfil', 'posiciones', 'torneos', 'admin', 'login', 'registro', 'invitacion', 'guest', 'guest2', 'perfil-publico']
 
@@ -28,6 +28,7 @@ export default function TournamentDetailPage() {
   const [editName, setEditName] = useState('')
   const [editSlug, setEditSlug] = useState('')
   const [editPrize, setEditPrize] = useState('')
+  const [editAvatarUrl, setEditAvatarUrl] = useState(null)
   const [showBanned, setShowBanned] = useState(false)
   const [confirmLeave, setConfirmLeave] = useState(false)
 
@@ -63,6 +64,7 @@ export default function TournamentDetailPage() {
       setEditName(tr.name ?? '')
       setEditSlug(tr.slug ?? '')
       setEditPrize(tr.prize ?? '')
+      setEditAvatarUrl(tr.avatar_url ?? null)
 
       const { data: pls } = await supabase
         .from('tournament_players')
@@ -224,6 +226,23 @@ export default function TournamentDetailPage() {
         .eq('id', tournament.id)
       if (error) throw error
       setTournament(prev => ({ ...prev, prize: trimmed || null }))
+    } catch {
+      alert(t('common.error_generic'))
+    } finally {
+      setUpdating(false)
+    }
+  }
+
+  async function updateAvatar(newUrl) {
+    setUpdating(true)
+    setEditAvatarUrl(newUrl)
+    try {
+      const { error } = await supabase
+        .from('tournaments')
+        .update({ avatar_url: newUrl })
+        .eq('id', id)
+      if (error) throw error
+      setTournament(prev => ({ ...prev, avatar_url: newUrl }))
     } catch {
       alert(t('common.error_generic'))
     } finally {
@@ -403,9 +422,13 @@ export default function TournamentDetailPage() {
         {/* Header */}
         <div className="card card-sm" style={{ marginBottom: '1.25rem' }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.5rem' }}>
-            <div style={{ flex: 1 }}>
-              <h2 style={{ fontWeight: 800, fontSize: '1.125rem', color: 'var(--text)' }}>{tournament.name}</h2>
-
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', flex: 1 }}>
+              <Avatar id={tournament.avatar_url} size="lg" />
+              <div style={{ minWidth: 0 }}>
+                <h2 style={{ fontWeight: 800, fontSize: '1.125rem', color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {tournament.name}
+                </h2>
+              </div>
             </div>
             {/* Copy invitation button */}
             {isApproved && (
@@ -522,6 +545,18 @@ export default function TournamentDetailPage() {
 
                 {/* Tournament settings: name, prize, visibility, join method */}
                 <div className="card card-sm" style={{ marginBottom: '1rem' }}>
+                  <h3 style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '0.75rem' }}>{t('tournaments.avatar_label', 'Avatar del torneo')}</h3>
+                  <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '1.5rem' }}>
+                    <Avatar id={editAvatarUrl} size="lg" />
+                    <div style={{ flex: 1 }}>
+                      <AvatarSelector 
+                        selectedId={editAvatarUrl} 
+                        onSelect={updateAvatar} 
+                        categories={['teams', 'others']}
+                      />
+                    </div>
+                  </div>
+
                   <h3 style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '0.5rem' }}>{t('tournaments.tournament_name')}</h3>
                   <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
                     <input

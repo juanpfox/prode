@@ -23,7 +23,7 @@ export default function HomePage() {
             .select(`
               role, 
               tournaments(
-                id, name, invite_code, mode, competition_id, is_public, is_featured,
+                id, name, invite_code, mode, competition_id, is_public, is_featured, avatar_url,
                 competitions(name, type), 
                 creator:users!tournaments_created_by_fkey(display_name),
                 participants:tournament_players(count)
@@ -32,7 +32,7 @@ export default function HomePage() {
             .eq('user_id', user.id).eq('status', 'approved'),
           supabase.from('tournaments')
             .select(`
-              id, name, invite_code, mode, competition_id, is_public, is_featured,
+              id, name, invite_code, mode, competition_id, is_public, is_featured, avatar_url,
               competitions(name, type),
               creator:users!tournaments_created_by_fkey(display_name),
               participants:tournament_players(count)

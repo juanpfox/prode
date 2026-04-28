@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../hooks/useAuth'
+import { Avatar } from './AvatarSelector'
 
 export default function TournamentCard({ tournament, onDeleteSuccess }) {
   const { t } = useTranslation()
@@ -98,6 +99,8 @@ export default function TournamentCard({ tournament, onDeleteSuccess }) {
     <div className="card card-sm animate-fade-in" 
       style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '1rem', paddingRight: '0.75rem' }}>
       
+      <Avatar id={tournament.avatar_url} size="md" />
+
       {/* Clickable Area: Tournament Info */}
       <div 
         style={{ flex: 1, cursor: 'pointer', minWidth: 0 }}

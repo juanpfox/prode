@@ -6,7 +6,7 @@ export const AVATAR_CATEGORIES = [
   { id: 'animals', label: 'Animales', icon: '🐶', sheets: ['animals'] },
   { id: 'players', label: 'Jugadores', icon: '⚽', sheets: ['players', 'players2'] },
   { id: 'teams', label: 'Clubes', icon: '🏟️', sheets: ['teams'] },
-  { id: 'celebs', label: 'Famosos', icon: '🌟', sheets: ['celebs'] },
+  { id: 'celebs', label: 'Famosos', icon: '🌟', sheets: ['celebs', 'celebs2'] },
   { id: 'others', label: 'Otros', icon: '🎭', sheets: ['others'] }
 ]
 
@@ -56,34 +56,42 @@ export function Avatar({ id, size = 'md', className = '' }) {
   )
 }
 
-export default function AvatarSelector({ selectedId, onSelect }) {
-  const [activeCategoryId, setActiveCategoryId] = useState('people')
+export default function AvatarSelector({ selectedId, onSelect, categories = null }) {
+  const filteredCategories = categories 
+    ? AVATAR_CATEGORIES.filter(cat => categories.includes(cat.id))
+    : AVATAR_CATEGORIES
 
-  const activeCategory = AVATAR_CATEGORIES.find(c => c.id === activeCategoryId)
+  const [activeCategoryId, setActiveCategoryId] = useState(filteredCategories[0]?.id || 'people')
+
+  const activeCategory = filteredCategories.find(c => c.id === activeCategoryId)
+
+  if (filteredCategories.length === 0) return null
 
   return (
     <div className="avatar-selector">
-      <div className="avatar-categories">
-        {AVATAR_CATEGORIES.map(cat => (
-          <button
-            key={cat.id}
-            type="button"
-            className={`avatar-category-btn ${activeCategoryId === cat.id ? 'active' : ''}`}
-            onClick={() => setActiveCategoryId(cat.id)}
-          >
-            {cat.icon} {cat.label}
-          </button>
-        ))}
-      </div>
+      {filteredCategories.length > 1 && (
+        <div className="avatar-categories">
+          {filteredCategories.map(cat => (
+            <button
+              key={cat.id}
+              type="button"
+              className={`avatar-category-btn ${activeCategoryId === cat.id ? 'active' : ''}`}
+              onClick={() => setActiveCategoryId(cat.id)}
+            >
+              {cat.icon} {cat.label}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="avatar-grid">
-        {activeCategory.sheets.map(sheet => {
+        {activeCategory?.sheets.map(sheet => {
           // Fix for animals sheet where Row 3 is a duplicate of Row 2.
           // We use indices 0-7 (Rows 1-2) and 12-15 (Row 4).
           let indices = Array.from({ length: 12 }, (_, i) => i)
           if (sheet === 'animals') {
             indices = [0, 1, 2, 3, 4, 5, 6, 7, 12, 13, 14, 15]
-          } else if (['celebs', 'players', 'players2', 'people', 'people2', 'teams', 'others'].includes(sheet)) {
+          } else if (['celebs', 'celebs2', 'players', 'players2', 'people', 'people2', 'teams', 'others'].includes(sheet)) {
             indices = Array.from({ length: 16 }, (_, i) => i)
           }
           

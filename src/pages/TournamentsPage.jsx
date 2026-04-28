@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase'
 import AppShell from '../components/AppShell'
 import TournamentCard from '../components/TournamentCard'
 import ConfigTab from '../components/ConfigTab'
+import AvatarSelector, { Avatar } from '../components/AvatarSelector'
 import '../components/config-rules.css'
 
 export default function TournamentsPage() {
@@ -40,6 +41,7 @@ const SCORING_DEFAULTS = {
     mode: '',
     is_public: false,
     requires_approval: false,
+    avatar_url: null,
     scoring: { ...SCORING_DEFAULTS },
   })
   const [scoringOpenSections, setScoringOpenSections] = useState({})
@@ -58,7 +60,7 @@ const SCORING_DEFAULTS = {
           .select(`
             role, 
             tournaments(
-              id, name, slug, mode, invite_code, competition_id, prize, is_featured,
+              id, name, slug, mode, invite_code, competition_id, prize, is_featured, avatar_url,
               competitions(name, type),
               creator:users!tournaments_created_by_fkey(display_name),
               participants:tournament_players(count)
@@ -67,7 +69,7 @@ const SCORING_DEFAULTS = {
           .eq('user_id', user.id).eq('status', 'approved'),
         supabase.from('tournaments')
           .select(`
-            id, name, slug, mode, invite_code, competition_id, is_public, prize, is_featured,
+            id, name, slug, mode, invite_code, competition_id, is_public, prize, is_featured, avatar_url,
             competitions(name, type),
             creator:users!tournaments_created_by_fkey(display_name),
             participants:tournament_players(count)
@@ -173,7 +175,8 @@ const SCORING_DEFAULTS = {
           created_by: user.id,
           mode: effectiveMode,
           is_public: createForm.is_public,
-          requires_approval: createForm.requires_approval
+          requires_approval: createForm.requires_approval,
+          avatar_url: createForm.avatar_url
         })
         .select('id').single()
       if (err) {
@@ -187,7 +190,7 @@ const SCORING_DEFAULTS = {
         await supabase.from('tournament_config').update(scoringPayload).eq('tournament_id', data.id)
       }
       setShowCreate(false)
-      setCreateForm({ name: '', slug: '', prize: '', competition_id: '', mode: '', is_public: false, requires_approval: false, scoring: { ...SCORING_DEFAULTS } })
+      setCreateForm({ name: '', slug: '', prize: '', competition_id: '', mode: '', is_public: false, requires_approval: false, avatar_url: null, scoring: { ...SCORING_DEFAULTS } })
       await loadData()
       navigate(`/${slugValue || data.id}`)
     } catch (err) {
@@ -343,6 +346,21 @@ const SCORING_DEFAULTS = {
                 value={createForm.prize} maxLength={100}
                 onChange={e => setCreateForm(f => ({ ...f, prize: e.target.value }))}
                 style={{ fontSize: '0.9rem' }} />
+
+              <h3 style={{ fontWeight: 700, fontSize: '0.9rem', marginTop: '0.25rem', marginBottom: '0.5rem' }}>
+                {t('tournaments.avatar_label', 'Avatar del torneo')}
+              </h3>
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '0.5rem' }}>
+                <Avatar id={createForm.avatar_url} size="lg" />
+                <div style={{ flex: 1 }}>
+                  <AvatarSelector 
+                    selectedId={createForm.avatar_url} 
+                    onSelect={id => setCreateForm(f => ({ ...f, avatar_url: id }))}
+                    categories={['teams', 'others']}
+                  />
+                </div>
+              </div>
+
               {/* Competition selection removed — Always World Cup 2026 */}
 
               {/* Mode selector — only for World Cup */}
