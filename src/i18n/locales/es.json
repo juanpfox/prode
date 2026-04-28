@@ -174,7 +174,17 @@
       "third_place": "Tercer puesto",
       "final": "Final"
     },
-    "no_playoff_matches": "No hay partidos de playoffs cargados aún"
+    "no_playoff_matches": "No hay partidos de playoffs cargados aún",
+    "sync": {
+      "save_all_toggle": "Guardar en todos mis torneos",
+      "copy_btn": "Copiar pronósticos",
+      "copy_from_label": "Copiar desde",
+      "copy_to_label": "Copiar hacia",
+      "copy_action": "Copiar",
+      "copy_done": "¡Pronósticos copiados!",
+      "copy_error": "Error al copiar",
+      "copy_locked_note": "Solo se copian partidos no bloqueados"
+    }
   },
   "posiciones": {
     "hint": "Arrastrá los equipos para ordenarlos dentro de cada grupo. Luego elegí el podio.",
