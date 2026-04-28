@@ -423,7 +423,7 @@ export default function TournamentDetailPage() {
         <div className="card card-sm" style={{ marginBottom: '1.25rem' }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.5rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', flex: 1 }}>
-              <Avatar id={tournament.avatar_url} size="lg" />
+              <Avatar id={tournament.avatar_url} size="lg" placeholder="🏆" />
               <div style={{ minWidth: 0 }}>
                 <h2 style={{ fontWeight: 800, fontSize: '1.125rem', color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {tournament.name}
@@ -547,7 +547,7 @@ export default function TournamentDetailPage() {
                 <div className="card card-sm" style={{ marginBottom: '1rem' }}>
                   <h3 style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '0.75rem' }}>{t('tournaments.avatar_label', 'Avatar del torneo')}</h3>
                   <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '1.5rem' }}>
-                    <Avatar id={editAvatarUrl} size="lg" />
+                    <Avatar id={editAvatarUrl} size="lg" placeholder="🏆" />
                     <div style={{ flex: 1 }}>
                       <AvatarSelector 
                         selectedId={editAvatarUrl} 

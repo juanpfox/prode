@@ -64,7 +64,7 @@ Pronóstico de **resultado exacto**.
 - [x] Simplificación de UI: eliminación de etiquetas de competición y modo en fichas de torneos.
 - [x] Sistema de Avatares Personalizados (Catálogo de 100+ iconos caricaturizados, incluyendo Famosos).
 - [x] Rediseño del Hero en Landing Page (Uso de imagen de marca `prodeImage.png`).
-- [x] Avatares para Torneos (Uso de categorías 'Clubes' y 'Otros').
+- [x] Avatares para Torneos (Uso de categorías 'Clubes' y 'Otros', con 🏆 como fallback por defecto).
 - [ ] Elegir e integrar API de resultados automáticos (API-Football)
 - [ ] Implementar lógica de puntos automática en Supabase (Edge Functions / Triggers)
 - [ ] Crear bot/ping para evitar pausa de Supabase Free

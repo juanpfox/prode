@@ -351,7 +351,7 @@ const SCORING_DEFAULTS = {
                 {t('tournaments.avatar_label', 'Avatar del torneo')}
               </h3>
               <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '0.5rem' }}>
-                <Avatar id={createForm.avatar_url} size="lg" />
+                <Avatar id={createForm.avatar_url} size="lg" placeholder="🏆" />
                 <div style={{ flex: 1 }}>
                   <AvatarSelector 
                     selectedId={createForm.avatar_url} 
