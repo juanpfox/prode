@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '../hooks/useAuth'
 import ThemeToggle from '../components/ThemeToggle'
 import LangSelector from '../components/LangSelector'
+import prodeImage from '../assets/prodeImage.png'
 import './LoginPage.css'
 
 export default function LoginPage() {
@@ -53,13 +54,7 @@ export default function LoginPage() {
       <div className="login-center">
         {/* Hero */}
         <div className="login-hero animate-fade-in">
-          <div className="login-ball">⚽</div>
-          <h1 className="login-title">{t('auth.title')}</h1>
-          <p className="login-subtitle">{t('auth.subtitle')}</p>
-
-          <div className="login-badges">
-            <span className="badge badge-green">🏆 World Cup 2026</span>
-          </div>
+          <img src={prodeImage} alt="Prode Mundial" className="login-hero-image" />
         </div>
 
         {/* Card */}

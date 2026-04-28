@@ -96,6 +96,20 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
     - [x] Eliminar display de códigos de invitación y campos de ingreso por código.
     - [x] Actualizar traducciones (ES, EN, PT, FR, DE).
 
+## Fase 5: Perfil y Personalización
+
+  - [x] **Sistema de Avatares Personalizados**
+    - [x] Generar catálogo de imágenes (Personas, Animales, Jugadores, Clubes, Famosos).
+    - [x] Crear componente `AvatarSelector` con visualización tipo grid y categorías.
+  - [x] Implementar la lógica de selección en la edición de perfil.
+  - [x] Asegurar que el avatar se muestre en los rankings y perfiles de usuario.
+  - [x] Validar dimensiones (1x1) y estilo caricaturesco.
+  - [x] **Bug Fix: Centrado de Avatares**
+    - [x] Ajustar `background-size` y `transform: scale` para centrar perfectamente los iconos y eliminar bordes sangrantes en todas las categorías.
+  - [x] **Rediseño: Hero de Página de Inicio**
+    - [x] Reemplazar título, subtítulo y badge por la imagen `prodeImage.png`.
+    - [x] Ajustar estilos CSS para asegurar responsividad y visualización premium.
+
 ---
 
 > **Nota para Agentes:** Cuando completen un ítem principal, generen y almacenen artefactos (capturas de pantalla, grabaciones de browser, diffs de código o walkthroughs) resumiendo los logros, actualicen este archivo y **hagan un commit atómico** de los cambios antes de pasar al próximo hito.

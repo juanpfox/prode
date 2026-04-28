@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase'
 import AppShell from '../components/AppShell'
 import ConfigTab from '../components/ConfigTab'
 import RulesPage from '../components/RulesPage'
+import { Avatar } from '../components/AvatarSelector'
 
 const RESERVED_SLUGS = ['perfil', 'posiciones', 'torneos', 'admin', 'login', 'registro', 'invitacion', 'guest', 'guest2', 'perfil-publico']
 
@@ -65,13 +66,13 @@ export default function TournamentDetailPage() {
 
       const { data: pls } = await supabase
         .from('tournament_players')
-        .select('user_id, role, status, users(display_name)')
+        .select('user_id, role, status, users(display_name, avatar_url)')
         .eq('tournament_id', id)
       setPlayers(pls ?? [])
 
       const { data: scs } = await supabase
         .from('scores')
-        .select('user_id, total_points, matches_scored, users(display_name)')
+        .select('user_id, total_points, matches_scored, users(display_name, avatar_url)')
         .eq('tournament_id', id)
 
       // Merge scores with approved players to show everyone even with 0 points
@@ -82,7 +83,10 @@ export default function TournamentDetailPage() {
           user_id: p.user_id,
           total_points: scoreEntry?.total_points ?? 0,
           matches_scored: scoreEntry?.matches_scored ?? 0,
-          users: { display_name: p.users?.display_name ?? 'Usuario' }
+          users: { 
+            display_name: p.users?.display_name ?? 'Usuario',
+            avatar_url: p.users?.avatar_url
+          }
         }
       }).sort((a, b) => b.total_points - a.total_points || a.users.display_name.localeCompare(b.users.display_name))
 
@@ -489,6 +493,7 @@ export default function TournamentDetailPage() {
                         <span style={{ fontWeight: 800, fontSize: '1.1rem', width: '1.75rem', textAlign: 'center' }}>
                           {['🥇', '🥈', '🥉'][i] ?? i + 1}
                         </span>
+                        <Avatar id={s.users?.avatar_url} size="sm" />
                         <span style={{ flex: 1, fontWeight: 600 }}>{s.users?.display_name ?? 'Usuario'}</span>
                         <div style={{ textAlign: 'right' }}>
                           <p style={{ fontWeight: 800, color: 'var(--primary)', fontSize: '1rem' }}>
@@ -723,6 +728,7 @@ export default function TournamentDetailPage() {
                       {approved.map((p) => (
                         <div key={p.user_id}
                           style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                          <Avatar id={p.users?.avatar_url} size="xs" />
                           <span style={{ flex: 1, fontWeight: 600, fontSize: '0.9rem' }}>
                             {p.users?.display_name ?? 'Usuario'}
                             {p.user_id === user.id && (

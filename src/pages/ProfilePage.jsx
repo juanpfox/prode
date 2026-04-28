@@ -3,12 +3,14 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabase'
 import AppShell from '../components/AppShell'
+import AvatarSelector, { Avatar } from '../components/AvatarSelector'
 
 export default function ProfilePage() {
   const { t } = useTranslation()
   const { user, refreshProfile, signOut } = useAuth()
   const [profile, setProfile] = useState(null)
   const [displayName, setDisplayName] = useState('')
+  const [avatarId, setAvatarId] = useState('')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [myTournaments, setMyTournaments] = useState([])
@@ -18,6 +20,7 @@ export default function ProfilePage() {
       .then(({ data }) => {
         setProfile(data)
         setDisplayName(data?.display_name ?? '')
+        setAvatarId(data?.avatar_url ?? '')
       })
     supabase.from('tournament_players')
       .select('role, status, tournaments(id, name, competitions(name))')
@@ -29,7 +32,12 @@ export default function ProfilePage() {
     e.preventDefault()
     if (!displayName.trim()) return
     setSaving(true)
-    await supabase.from('users').update({ display_name: displayName.trim() }).eq('id', user.id)
+    await supabase.from('users')
+      .update({ 
+        display_name: displayName.trim(),
+        avatar_url: avatarId
+      })
+      .eq('id', user.id)
     await refreshProfile()
     setSaving(false)
     setSaved(true)
@@ -44,9 +52,12 @@ export default function ProfilePage() {
       <div className="animate-fade-in">
         <h2 className="home-section-title" style={{ marginBottom: '1.25rem' }}>{t('nav.profile')}</h2>
 
-        <div className="card card-sm" style={{ marginBottom: '1.25rem' }}>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginBottom: '0.2rem' }}>Email</p>
-          <p style={{ fontWeight: 600, wordBreak: 'break-all' }}>{user.email}</p>
+        <div className="card card-sm" style={{ marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <Avatar id={avatarId} size="lg" />
+          <div>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginBottom: '0.2rem' }}>Email</p>
+            <p style={{ fontWeight: 600, wordBreak: 'break-all' }}>{user.email}</p>
+          </div>
         </div>
 
         <div className="card card-sm" style={{ marginBottom: '1.25rem' }}>
@@ -55,7 +66,11 @@ export default function ProfilePage() {
             <input className="input" value={displayName} maxLength={32}
               onChange={e => setDisplayName(e.target.value)}
               placeholder={t('profile.display_name_placeholder')} />
-            <button className="btn btn-primary btn-sm" type="submit" disabled={saving}>
+
+            <label style={{ fontWeight: 600, fontSize: '0.875rem', marginTop: '0.5rem' }}>Avatar</label>
+            <AvatarSelector selectedId={avatarId} onSelect={setAvatarId} />
+
+            <button className="btn btn-primary btn-sm" type="submit" disabled={saving} style={{ marginTop: '0.5rem' }}>
               {saved ? `✓ ${t('profile.saved')}` : saving ? t('common.loading') : t('profile.save')}
             </button>
           </form>

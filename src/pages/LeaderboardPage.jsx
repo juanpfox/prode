@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabase'
 import AppShell from '../components/AppShell'
+import { Avatar } from '../components/AvatarSelector'
 
 export default function LeaderboardPage() {
   const { t } = useTranslation()
@@ -34,10 +35,10 @@ export default function LeaderboardPage() {
 
     Promise.all([
       supabase.from('scores')
-        .select('user_id, total_points, matches_scored, users(display_name)')
+        .select('user_id, total_points, matches_scored, users(display_name, avatar_url)')
         .eq('tournament_id', selected),
       supabase.from('tournament_players')
-        .select('user_id, status, users(display_name)')
+        .select('user_id, status, users(display_name, avatar_url)')
         .eq('tournament_id', selected).eq('status', 'approved')
     ]).then(([scRes, plRes]) => {
       const scs = scRes.data ?? []
@@ -49,7 +50,10 @@ export default function LeaderboardPage() {
           user_id: p.user_id,
           total_points: scoreEntry?.total_points ?? 0,
           matches_scored: scoreEntry?.matches_scored ?? 0,
-          users: { display_name: p.users?.display_name ?? 'Usuario' }
+          users: { 
+            display_name: p.users?.display_name ?? 'Usuario',
+            avatar_url: p.users?.avatar_url
+          }
         }
       }).sort((a, b) => b.total_points - a.total_points || a.users.display_name.localeCompare(b.users.display_name))
 
@@ -105,6 +109,7 @@ export default function LeaderboardPage() {
                     <span style={{ fontWeight: 800, fontSize: '1.1rem', width: '1.75rem', textAlign: 'center' }}>
                       {MEDALS[i] ?? i + 1}
                     </span>
+                    <Avatar id={s.users?.avatar_url} size="sm" />
                     <span style={{ flex: 1, fontWeight: 600 }}>{s.users?.display_name ?? 'Usuario'}</span>
                     <div style={{ textAlign: 'right' }}>
                       <p style={{ fontWeight: 800, color: 'var(--primary)', fontSize: '1rem' }}>

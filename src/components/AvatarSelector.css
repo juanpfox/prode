@@ -1,0 +1,94 @@
+.avatar-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.avatar-categories {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  scrollbar-width: none;
+}
+
+.avatar-categories::-webkit-scrollbar {
+  display: none;
+}
+
+.avatar-category-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.avatar-category-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+  gap: 0.75rem;
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 0.25rem;
+}
+
+.avatar-item {
+  aspect-ratio: 1/1;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: var(--card-bg);
+  overflow: hidden;
+  position: relative;
+}
+
+.avatar-item:hover {
+  transform: scale(1.05);
+  border-color: var(--border-color);
+}
+
+.avatar-item.active {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--card-bg) inset;
+}
+
+/* Avatar Sprite System */
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  image-rendering: -webkit-optimize-contrast;
+  transform: scale(1.15); /* Reverted to 1.15 for better balance with new spaced sheet */
+  transform-origin: center;
+}
+
+/* Sizes */
+.avatar-size-xs { width: 24px; height: 24px; border-width: 1px; }
+.avatar-size-sm { width: 32px; height: 32px; border-width: 1.5px; }
+.avatar-size-md { width: 48px; height: 48px; border-width: 2px; }
+.avatar-size-lg { width: 64px; height: 64px; border-width: 3px; }
+.avatar-size-xl { width: 96px; height: 96px; border-width: 4px; }
+
+.avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  background: var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: var(--text-muted);
+}

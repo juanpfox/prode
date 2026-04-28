@@ -5,6 +5,7 @@ import { useAuth } from "../hooks/useAuth"
 import { supabase } from "../lib/supabase"
 import AppShell from "../components/AppShell"
 import { simulateWorldCupBracket } from "../utils/simulatorWC2026"
+import { Avatar } from "../components/AvatarSelector"
 
 const FIFA_TO_ISO2 = {
   ARG: "ar", BRA: "br", FRA: "fr", GER: "de", ITA: "it", ESP: "es", POR: "pt", NED: "nl",
@@ -127,7 +128,7 @@ export default function PlayerPredictionsPage() {
 
       const { data: tu } = await supabase
         .from("users")
-        .select("display_name")
+        .select("display_name, avatar_url")
         .eq("id", targetUserId).single()
       setTargetUser(tu)
 
@@ -256,8 +257,9 @@ export default function PlayerPredictionsPage() {
                 ← {t("nav.leaderboard")}
               </button>
               <div>
-                <h2 className="home-section-title" style={{ margin: 0, fontSize: "1.2rem" }}>
-                  👤 {targetUser?.display_name ?? "Jugador"}
+                <h2 className="home-section-title" style={{ margin: 0, fontSize: "1.2rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  <Avatar id={targetUser?.avatar_url} size="sm" />
+                  {targetUser?.display_name ?? "Jugador"}
                 </h2>
                 <p style={{ color: "var(--text-muted)", fontSize: "0.75rem", marginTop: "0.1rem" }}>
                   {tournament?.name}

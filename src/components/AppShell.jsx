@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import ThemeToggle from './ThemeToggle'
 import LangSelector from './LangSelector'
+import { Avatar } from './AvatarSelector'
 
 export default function AppShell({ children, saveIndicator, wide }) {
   const { t } = useTranslation()
@@ -34,8 +35,9 @@ export default function AppShell({ children, saveIndicator, wide }) {
               🎯 {t('admin.results')}
             </button>
           )}
-          <button className="btn btn-ghost btn-sm" onClick={() => navigate('/perfil')}>
-            👤 <span className="header-hide-mobile">{profile?.display_name || t('nav.profile')}</span>
+          <button className="btn btn-ghost btn-sm" onClick={() => navigate('/perfil')} style={{ paddingLeft: '0.25rem' }}>
+            <Avatar id={profile?.avatar_url} size="xs" />
+            <span className="header-hide-mobile" style={{ marginLeft: '0.4rem' }}>{profile?.display_name || t('nav.profile')}</span>
           </button>
         </div>
       </header>
