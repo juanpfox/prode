@@ -160,7 +160,17 @@
       "third_place": "Third place",
       "final": "Final"
     },
-    "no_playoff_matches": "No playoff matches available yet"
+    "no_playoff_matches": "No playoff matches available yet",
+    "sync": {
+      "save_all_toggle": "Save to all my tournaments",
+      "copy_btn": "Copy predictions",
+      "copy_from_label": "Copy from",
+      "copy_to_label": "Copy to",
+      "copy_action": "Copy",
+      "copy_done": "Predictions copied!",
+      "copy_error": "Error copying",
+      "copy_locked_note": "Only unlocked matches are copied"
+    }
   },
   "posiciones": {
     "hint": "Drag teams to rank them within each group. Then pick the world podium.",
