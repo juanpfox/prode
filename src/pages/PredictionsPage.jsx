@@ -80,6 +80,14 @@ export default function PredictionsPage() {
   const [view, setView] = useState(() => (new Date() >= new Date('2026-06-28T00:00:00-03:00') ? 'playoffs' : 'groups')) // 'dates' | 'groups' | 'playoffs'
   const [activeGroup, setActiveGroup] = useState('A')
 
+  // Multi-tournament sync
+  const [siblingTournaments, setSiblingTournaments] = useState([])
+  const [saveToAll, setSaveToAll] = useState(false)
+  const [copyPanelOpen, setCopyPanelOpen] = useState(false)
+  const [copyFromId, setCopyFromId] = useState('')
+  const [copyToId, setCopyToId] = useState('')
+  const [copyStatus, setCopyStatus] = useState(null) // null | 'copying' | 'done' | 'error'
+
   // Pagination + swipe for playoffs view
   const [bracketOffset, setBracketOffset] = useState(0)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640)
@@ -168,6 +176,22 @@ export default function PredictionsPage() {
       setTournament(tr)
       const tournamentId = tr.id
 
+      // Fetch sibling tournaments (same competition + mode, user approved)
+      const { data: siblingPlayers } = await supabase
+        .from('tournament_players')
+        .select('tournament_id, tournaments(id, name, competition_id, mode)')
+        .eq('user_id', user.id)
+        .eq('status', 'approved')
+        .neq('tournament_id', tr.id)
+      const siblings = (siblingPlayers ?? [])
+        .map(s => s.tournaments)
+        .filter(t => t && t.competition_id === tr.competition_id && t.mode === tr.mode)
+      setSiblingTournaments(siblings)
+      if (siblings.length > 0) {
+        setCopyFromId(siblings[0].id)
+        setCopyToId(siblings[0].id)
+      }
+
       const { data: tp } = await supabase
         .from('tournament_players')
         .select('status, role')
@@ -248,24 +272,30 @@ export default function PredictionsPage() {
     pendingChanges.current = {}
     setSaving(true)
 
+    const targetIds = saveToAll && siblingTournaments.length > 0
+      ? [tournament?.id, ...siblingTournaments.map(t => t.id)]
+      : [tournament?.id]
+
     try {
-      const payloads = Object.keys(changesToSave).map(matchId => {
-        // Merge pending changes with the existing predictions state for this match
-        const currentPred = predictions[matchId] ?? {}
-        const merged = { ...currentPred, ...changesToSave[matchId] }
-        
-        const home = merged.home_goals !== '' && merged.home_goals !== undefined ? parseInt(merged.home_goals) : 0
-        const away = merged.away_goals !== '' && merged.away_goals !== undefined ? parseInt(merged.away_goals) : 0
-        
-        return {
-          tournament_id: tournamentId,
-          user_id: user.id,
-          match_id: matchId,
-          home_goals: home,
-          away_goals: away,
-          pen_pick: merged.pen_pick || null,
-        }
-      })
+      const payloads = targetIds.flatMap(tid =>
+        Object.keys(changesToSave).map(matchId => {
+          // Merge pending changes with the existing predictions state for this match
+          const currentPred = predictions[matchId] ?? {}
+          const merged = { ...currentPred, ...changesToSave[matchId] }
+          
+          const home = merged.home_goals !== '' && merged.home_goals !== undefined ? parseInt(merged.home_goals) : 0
+          const away = merged.away_goals !== '' && merged.away_goals !== undefined ? parseInt(merged.away_goals) : 0
+          
+          return {
+            tournament_id: tid,
+            user_id: user.id,
+            match_id: matchId,
+            home_goals: home,
+            away_goals: away,
+            pen_pick: merged.pen_pick || null,
+          }
+        })
+      )
 
       if (payloads.length > 0) {
         await supabase.from('match_predictions').upsert(payloads, { onConflict: 'tournament_id,user_id,match_id' })
@@ -281,6 +311,77 @@ export default function PredictionsPage() {
     } finally {
       setSaving(false)
     }
+  }
+
+  async function handleCopyFrom(sourceTournamentId) {
+    if (!sourceTournamentId) return
+    setCopyStatus('copying')
+    try {
+      const { data: sourcePreds } = await supabase
+        .from('match_predictions')
+        .select('match_id, home_goals, away_goals, pen_pick')
+        .eq('tournament_id', sourceTournamentId)
+        .eq('user_id', user.id)
+
+      if (!sourcePreds?.length) { setCopyStatus('done'); return }
+
+      const unlockedMatchIds = new Set(matches.filter(m => !isLocked(m)).map(m => m.id))
+      const payloads = sourcePreds
+        .filter(p => unlockedMatchIds.has(p.match_id))
+        .map(p => ({
+          tournament_id: tournament?.id,
+          user_id: user.id,
+          match_id: p.match_id,
+          home_goals: p.home_goals ?? 0,
+          away_goals: p.away_goals ?? 0,
+          pen_pick: p.pen_pick ?? null,
+        }))
+
+      if (payloads.length > 0) {
+        await supabase.from('match_predictions').upsert(payloads, { onConflict: 'tournament_id,user_id,match_id' })
+        const newPreds = { ...predictions }
+        for (const p of payloads) {
+          newPreds[p.match_id] = {
+            home_goals: p.home_goals ?? '',
+            away_goals: p.away_goals ?? '',
+            pen_pick: p.pen_pick ?? '',
+          }
+        }
+        setPredictions(newPreds)
+      }
+      setCopyStatus('done')
+    } catch (err) {
+      console.error('Copy from error', err)
+      setCopyStatus('error')
+    }
+    setTimeout(() => setCopyStatus(null), 3000)
+  }
+
+  async function handleCopyTo(targetTournamentId) {
+    if (!targetTournamentId) return
+    setCopyStatus('copying')
+    try {
+      const unlockedMatchIds = new Set(matches.filter(m => !isLocked(m)).map(m => m.id))
+      const payloads = Object.entries(predictions)
+        .filter(([matchId]) => unlockedMatchIds.has(matchId))
+        .map(([matchId, pred]) => ({
+          tournament_id: targetTournamentId,
+          user_id: user.id,
+          match_id: matchId,
+          home_goals: pred.home_goals !== '' ? parseInt(pred.home_goals) : 0,
+          away_goals: pred.away_goals !== '' ? parseInt(pred.away_goals) : 0,
+          pen_pick: pred.pen_pick || null,
+        }))
+
+      if (payloads.length > 0) {
+        await supabase.from('match_predictions').upsert(payloads, { onConflict: 'tournament_id,user_id,match_id' })
+      }
+      setCopyStatus('done')
+    } catch (err) {
+      console.error('Copy to error', err)
+      setCopyStatus('error')
+    }
+    setTimeout(() => setCopyStatus(null), 3000)
   }
 
   const byStage = {}
@@ -406,6 +507,127 @@ export default function PredictionsPage() {
              </div>
           </div>
         </div>
+
+        {/* ── Multi-tournament sync bar ── */}
+        {siblingTournaments.length > 0 && (
+          <div style={{ marginBottom: '1rem', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.5rem' }}>
+            {/* Save-to-all toggle */}
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer',
+              background: saveToAll ? 'var(--primary-subtle)' : 'var(--surface-2)',
+              border: `1px solid ${saveToAll ? 'var(--primary)' : 'var(--border)'}`,
+              borderRadius: 'var(--r-full)', padding: '0.35rem 0.75rem', transition: 'all var(--t-fast)',
+              fontSize: '0.8rem', fontWeight: 600, color: saveToAll ? 'var(--primary)' : 'var(--text-muted)',
+              userSelect: 'none' }}>
+              <input
+                type="checkbox"
+                checked={saveToAll}
+                onChange={e => setSaveToAll(e.target.checked)}
+                style={{ display: 'none' }}
+              />
+              <span style={{ fontSize: '1rem' }}>{saveToAll ? '🔗' : '⛓️'}</span>
+              {t('predictions.sync.save_all_toggle')}
+              {/* Toggle pill */}
+              <span style={{
+                display: 'inline-flex', alignItems: 'center',
+                width: '2rem', height: '1rem',
+                background: saveToAll ? 'var(--primary)' : 'var(--border-strong)',
+                borderRadius: 'var(--r-full)', padding: '0 2px',
+                transition: 'background var(--t-fast)', marginLeft: '0.25rem',
+              }}>
+                <span style={{
+                  width: '0.75rem', height: '0.75rem',
+                  background: 'white', borderRadius: '50%',
+                  transform: saveToAll ? 'translateX(1rem)' : 'translateX(0)',
+                  transition: 'transform var(--t-fast)',
+                }} />
+              </span>
+            </label>
+
+            {/* Copy button */}
+            <button
+              className="btn btn-ghost btn-sm"
+              onClick={() => setCopyPanelOpen(o => !o)}
+              style={{ fontSize: '0.8rem', gap: '0.35rem', borderRadius: 'var(--r-full)',
+                background: copyPanelOpen ? 'var(--surface-3)' : undefined }}
+            >
+              📋 {t('predictions.sync.copy_btn')}
+            </button>
+
+            {copyStatus && (
+              <span style={{ fontSize: '0.75rem', color: copyStatus === 'done' ? 'var(--primary)' : copyStatus === 'error' ? 'var(--danger, #e53e3e)' : 'var(--text-muted)' }}>
+                {copyStatus === 'copying' && '⏳ ' + t('common.loading')}
+                {copyStatus === 'done' && '✅ ' + t('predictions.sync.copy_done')}
+                {copyStatus === 'error' && '❌ ' + t('predictions.sync.copy_error')}
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* ── Copy panel ── */}
+        {siblingTournaments.length > 0 && copyPanelOpen && (
+          <div className="card card-sm" style={{ marginBottom: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', position: 'relative' }}>
+            <button onClick={() => setCopyPanelOpen(false)}
+              style={{ position: 'absolute', top: '0.5rem', right: '0.75rem', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1.1rem', lineHeight: 1 }}>
+              ✕
+            </button>
+            <p style={{ fontWeight: 700, fontSize: '0.85rem', margin: 0 }}>📋 {t('predictions.sync.copy_btn')}</p>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0 }}>
+              ⚠️ {t('predictions.sync.copy_locked_note')}
+            </p>
+
+            {/* Copy FROM */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', minWidth: '5rem' }}>
+                {t('predictions.sync.copy_from_label')}
+              </span>
+              <select
+                value={copyFromId}
+                onChange={e => setCopyFromId(e.target.value)}
+                style={{ flex: 1, minWidth: '8rem', padding: '0.35rem 0.5rem', borderRadius: 'var(--r-md)',
+                  border: '1px solid var(--border)', background: 'var(--surface)', color: 'var(--text)',
+                  fontSize: '0.85rem' }}
+              >
+                {siblingTournaments.map(t2 => (
+                  <option key={t2.id} value={t2.id}>{t2.name}</option>
+                ))}
+              </select>
+              <button
+                className="btn btn-primary btn-sm"
+                disabled={copyStatus === 'copying' || !copyFromId}
+                onClick={() => handleCopyFrom(copyFromId)}
+                style={{ fontSize: '0.8rem' }}
+              >
+                {t('predictions.sync.copy_action')} →
+              </button>
+            </div>
+
+            {/* Copy TO */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', minWidth: '5rem' }}>
+                {t('predictions.sync.copy_to_label')}
+              </span>
+              <select
+                value={copyToId}
+                onChange={e => setCopyToId(e.target.value)}
+                style={{ flex: 1, minWidth: '8rem', padding: '0.35rem 0.5rem', borderRadius: 'var(--r-md)',
+                  border: '1px solid var(--border)', background: 'var(--surface)', color: 'var(--text)',
+                  fontSize: '0.85rem' }}
+              >
+                {siblingTournaments.map(t2 => (
+                  <option key={t2.id} value={t2.id}>{t2.name}</option>
+                ))}
+              </select>
+              <button
+                className="btn btn-ghost btn-sm"
+                disabled={copyStatus === 'copying' || !copyToId}
+                onClick={() => handleCopyTo(copyToId)}
+                style={{ fontSize: '0.8rem' }}
+              >
+                → {t('predictions.sync.copy_action')}
+              </button>
+            </div>
+          </div>
+        )}
 
         {view === 'groups' && (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem', marginBottom: '1.5rem', alignItems: 'center' }}>
@@ -1259,6 +1481,7 @@ function PredResult({ match, pred, t, config }) {
     </div>
   )
 }
+
 
 
 
