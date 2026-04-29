@@ -68,7 +68,7 @@ export default function TournamentCard({ tournament, onDeleteSuccess }) {
     <div className="card card-sm animate-fade-in" 
       style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '1rem', paddingRight: '0.75rem' }}>
       
-      <Avatar id={tournament.avatar_url} size="md" placeholder="\u{1F3C6}" />
+      <Avatar id={tournament.avatar_url} size="md" placeholder="🏆" />
 
       {/* Clickable Area: Tournament Info */}
       <div 
@@ -86,7 +86,7 @@ export default function TournamentCard({ tournament, onDeleteSuccess }) {
             whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
             maxWidth: '100%'
           }}>
-            <span style={{ marginRight: '0.25rem' }}>\u{1F3C5}</span>
+            <span style={{ marginRight: '0.25rem' }}>🏅</span>
             {tournament.prize}
           </p>
         )}
