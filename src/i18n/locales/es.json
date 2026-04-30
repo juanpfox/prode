@@ -13,6 +13,12 @@
     "sign_in_google": "Ingresar con Google",
     "email_required": "Primero escribí tu correo y luego hacé clic en el botón"
   },
+  "countdown": {
+    "title": "EL MUNDIAL COMIENZA EN:",
+    "months": "MES",
+    "days": "DIAS",
+    "hours": "HS"
+  },
   "common": {
     "loading": "Cargando...",
     "sign_out": "Cerrar sesión",

@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth'
 import ThemeToggle from '../components/ThemeToggle'
 import LangSelector from '../components/LangSelector'
 import prodeImage from '../assets/prodeImage.png'
+import WorldCupCountdown from '../components/WorldCupCountdown'
 import './LoginPage.css'
 
 export default function LoginPage() {
@@ -56,6 +57,8 @@ export default function LoginPage() {
         <div className="login-hero animate-fade-in">
           <img src={prodeImage} alt="Prode Mundial" className="login-hero-image" />
         </div>
+
+        <WorldCupCountdown />
 
         {/* Card */}
         <div className="login-card card animate-slide-up">

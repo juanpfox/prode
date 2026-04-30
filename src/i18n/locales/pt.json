@@ -13,6 +13,12 @@
     "sign_in_google": "Entrar com o Google",
     "email_required": "Primeiro digite seu e-mail e depois clique no botão"
   },
+  "countdown": {
+    "title": "A COPA DO MUNDO COMEÇA EM:",
+    "months": "MÊS",
+    "days": "DIAS",
+    "hours": "HS"
+  },
   "common": {
     "loading": "Carregando...",
     "sign_out": "Sair",

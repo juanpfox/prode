@@ -13,6 +13,12 @@
     "sign_in_google": "Sign in with Google",
     "email_required": "Please enter your email first, then click the button"
   },
+  "countdown": {
+    "title": "WORLD CUP BEGINS IN:",
+    "months": "MONTH",
+    "days": "DAYS",
+    "hours": "HRS"
+  },
   "common": {
     "loading": "Loading...",
     "sign_out": "Sign out",

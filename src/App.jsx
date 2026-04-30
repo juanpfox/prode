@@ -49,6 +49,10 @@ export default function App() {
           <Route path="/posiciones"                element={<LeaderboardPage />} />
           <Route path="/perfil"                    element={<ProfilePage />} />
           
+          {/* Guest login paths - Redirect to home if already logged in */}
+          <Route path="/guest"                     element={<Navigate to="/" replace />} />
+          <Route path="/guest2"                    element={<Navigate to="/" replace />} />
+
           <Route path="/:slug"                     element={<TournamentDetailPage />} />
           <Route path="/:slug/pronosticos"         element={<PredictionsPage />} />
           <Route path="/:slug/jugador/:userId"      element={<PlayerPredictionsPage />} />

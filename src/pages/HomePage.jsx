@@ -5,6 +5,7 @@ import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabase'
 import AppShell from '../components/AppShell'
 import TournamentCard from '../components/TournamentCard'
+import WorldCupCountdown from '../components/WorldCupCountdown'
 
 export default function HomePage() {
   const { t } = useTranslation()
@@ -79,6 +80,8 @@ export default function HomePage() {
           <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>{user?.email}</p>
         </div>
       )}
+
+      <WorldCupCountdown />
 
       {loading ? (
         <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '3rem' }}>{t('common.loading')}</p>
