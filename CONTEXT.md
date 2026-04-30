@@ -65,6 +65,7 @@ Pronóstico de **resultado exacto**.
 - [x] Sistema de Avatares Personalizados (Catálogo de 100+ iconos caricaturizados, incluyendo Famosos).
 - [x] Rediseño del Hero en Landing Page (Uso de imagen de marca `prodeImage.png`).
 - [x] Avatares para Torneos (Uso de categorías 'Clubes', 'Otros' y 'Animales', con 🏆 como fallback por defecto).
+- [x] Contador regresivo al Mundial 2026 en Login y Home.
 - [ ] Elegir e integrar API de resultados automáticos (API-Football)
 - [ ] Implementar lógica de puntos automática en Supabase (Edge Functions / Triggers)
 - [ ] Crear bot/ping para evitar pausa de Supabase Free

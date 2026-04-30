@@ -59,6 +59,9 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
     - [x] Modificar `simulatorUCL.js` para que el partido final de UCL use los equipos reales de la DB cuando están disponibles, y `areSFsResolved` retorne true cuando el final ya tiene equipos asignados.
     - [x] Fix: el simulador WC ya no bloquea el bracket completo cuando no hay predicciones de grupos, siempre que existan resultados reales de playoffs.
     - [x] Fix: pasar `tournament` y `sfResolved` como props a `BracketTree` en `PredictionsPage.jsx` (bug pre-existente de scope).
+    - [x] **Bug Fix: Guest Routing & 406 Error**
+      - [x] Corregir colisión de rutas entre `/guest` y `/:slug` en `App.jsx`.
+      - [x] Cambiar `.single()` por `.maybeSingle()` en `TournamentDetailPage.jsx` para evitar errores 406 cuando no se encuentra un torneo.
 
 ## Fase 3: Monetización e Integraciones Externas
 
@@ -97,6 +100,10 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
     - [x] Implementar copiado de mensaje con URL (tipo Zoom).
     - [x] Eliminar display de códigos de invitación y campos de ingreso por código.
     - [x] Actualizar traducciones (ES, EN, PT, FR, DE).
+- [x] **Sincronización de predicciones multitorneo**
+  - [x] Implementar barra de sincronización en `PredictionsPage`.
+  - [x] Permitir copiar predicciones desde/hacia otros torneos de la misma competición.
+  - [x] Soportar guardado automático en todos los torneos hermanos (toggle "Guardar en todos").
 
 ## Fase 5: Perfil y Personalización
 
@@ -119,6 +126,13 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
     - [x] Asegurar que el avatar se visualice en las `TournamentCard` y en el detalle del torneo.
     - [x] Filtrar categorías de avatares para torneos (usar `teams`, `others` y `animals`).
     - [x] Usar 🏆 como emoji por defecto para torneos sin avatar.
+
+- [x] **Countdown al Mundial 2026**
+  - [x] Crear componente `WorldCupCountdown` con lógica de tiempo real.
+  - [x] Implementar diseño premium con glassmorphism según mockup.
+  - [x] Agregar el contador a la página de Login.
+  - [x] Agregar el contador a la página de Inicio (Home).
+  - [x] Soportar i18n para los labels del contador.
 
 ---
 
