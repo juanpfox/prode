@@ -151,6 +151,18 @@ export default function PredictionsPage() {
 
   useEffect(() => { loadAll() }, [paramId, paramSlug, user])
 
+  // Refresh match results whenever the user switches to the playoffs view,
+  // so that admin-entered results are always up to date in the simulator.
+  useEffect(() => {
+    if (view !== 'playoffs' || !tournament?.competition_id) return
+    supabase
+      .from('matches')
+      .select('*, home_team:teams!home_team_id(name, code, group_name, initial_position), away_team:teams!away_team_id(name, code, group_name, initial_position)')
+      .eq('competition_id', tournament.competition_id)
+      .order('kickoff_at')
+      .then(({ data }) => { if (data) setMatches(data) })
+  }, [view, tournament?.competition_id])
+
   // Clear timeout on unmount
   useEffect(() => {
     return () => {
