@@ -155,7 +155,15 @@
       "e": "D",
       "p": "L",
       "dif": "Dif",
-      "pts": "Pts"
+      "pts": "Pts",
+      "stage": "Stage",
+      "goals": "Goals",
+      "home_team": "Home Team",
+      "away_team": "Away Team",
+      "winner": "Winner",
+      "pens": "Penalties",
+      "pen_winner": "Penalty Winner",
+      "group": "Group"
     },
     "stages": {
       "group": "Group stage",

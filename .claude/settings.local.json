@@ -18,7 +18,11 @@
       "mcp__Claude_in_Chrome__browser_batch",
       "mcp__Claude_in_Chrome__computer",
       "mcp__1455668c-96a1-4cdd-bd0d-f3ba7b4679de__deploy_edge_function",
-      "mcp__1455668c-96a1-4cdd-bd0d-f3ba7b4679de__list_projects"
+      "mcp__1455668c-96a1-4cdd-bd0d-f3ba7b4679de__list_projects",
+      "Bash(git stash *)",
+      "Bash(python -c \"import openpyxl; print\\('ok'\\)\")",
+      "Bash(python -c \"import xlrd; print\\('xlrd ok'\\)\")",
+      "Bash(pip install *)"
     ]
   }
 }

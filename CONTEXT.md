@@ -70,6 +70,7 @@ Pronóstico de **resultado exacto**.
 - [ ] Implementar lógica de puntos automática en Supabase (Edge Functions / Triggers)
 - [ ] Crear bot/ping para evitar pausa de Supabase Free
 - [ ] Integración MercadoPago para quitar límites de torneos/jugadores
+- [ ] Exportar resultados de competiciones a XLSX (Admin)
 
 ---
 

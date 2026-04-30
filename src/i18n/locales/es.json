@@ -169,7 +169,15 @@
       "real_title": "Posiciones Real",
       "best_thirds_title": "Mejores Terceros",
       "best_thirds_predicted": "Mejores Terceros (Pronóstico)",
-      "best_thirds_real": "Mejores Terceros (Real)"
+      "best_thirds_real": "Mejores Terceros (Real)",
+      "stage": "Etapa",
+      "goals": "Goles",
+      "home_team": "Local",
+      "away_team": "Visitante",
+      "winner": "Ganador",
+      "pens": "Penales",
+      "pen_winner": "Ganador Penales",
+      "group": "Grupo"
     },
     "stages": {
       "group": "Fase de grupos",

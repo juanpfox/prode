@@ -133,6 +133,9 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
   - [x] Agregar el contador a la página de Login.
   - [x] Agregar el contador a la página de Inicio (Home).
   - [x] Soportar i18n para los labels del contador.
+- [x] **Exportar resultados a Excel**
+  - [x] Implementar botón de descarga en `AdminResultsEntryPage`.
+  - [x] Generar archivo XLSX con todos los resultados de la competición.
 
 ---
 

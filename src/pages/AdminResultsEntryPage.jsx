@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
+import * as XLSX from 'xlsx'
 import { useTranslation } from 'react-i18next'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
@@ -125,10 +126,7 @@ export default function AdminResultsEntryPage() {
     })
   }, [bracketOffset])
 
-  useEffect(() => { loadData() }, [competitionId])
-  useEffect(() => { return () => { if (timeoutRef.current) clearTimeout(timeoutRef.current) } }, [])
-
-  async function loadData() {
+  const loadData = useCallback(async () => {
     setLoading(true)
     try {
       const { data: comp } = await supabase.from('competitions').select('*').eq('id', competitionId).single()
@@ -146,7 +144,10 @@ export default function AdminResultsEntryPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [competitionId])
+
+  useEffect(() => { loadData() }, [loadData])
+  useEffect(() => { return () => { if (timeoutRef.current) clearTimeout(timeoutRef.current) } }, [])
 
   function updateMatch(matchId, field, value) {
     setMatches(prev => prev.map(m => {
@@ -261,6 +262,33 @@ export default function AdminResultsEntryPage() {
     }
   }
 
+  const handleDownloadExcel = () => {
+    const data = matches.map(m => {
+      const homeName = t(`teams.${m.home_team?.code}`, { defaultValue: m.home_team?.name ?? '?' })
+      const awayName = t(`teams.${m.away_team?.code}`, { defaultValue: m.away_team?.name ?? '?' })
+      const kickoff = new Date(m.kickoff_at)
+      
+      return {
+        [t('predictions.table.stage', { defaultValue: 'Etapa' })]: t(`predictions.stages.${m.stage}`),
+        [t('common.date', { defaultValue: 'Fecha' })]: kickoff.toLocaleDateString(),
+        [t('common.time', { defaultValue: 'Hora' })]: kickoff.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        [t('predictions.table.group', { defaultValue: 'Grupo' })]: m.home_team?.group_name || '-',
+        [t('predictions.table.home_team', { defaultValue: 'Local' })]: homeName,
+        [t('predictions.table.goals', { defaultValue: 'Goles' }) + ' L']: m.home_goals,
+        [t('predictions.table.goals', { defaultValue: 'Goles' }) + ' V']: m.away_goals,
+        [t('predictions.table.away_team', { defaultValue: 'Visitante' })]: awayName,
+        [t('predictions.table.winner', { defaultValue: 'Ganador' })]: m.winner || '-',
+        [t('predictions.table.pens', { defaultValue: 'Penales' })]: m.went_to_pens ? 'SÍ' : 'NO',
+        [t('predictions.table.pen_winner', { defaultValue: 'Ganador Penales' })]: m.pen_winner || '-'
+      }
+    })
+
+    const ws = XLSX.utils.json_to_sheet(data)
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, "Resultados")
+    XLSX.writeFile(wb, `${competition?.name || 'resultados'}.xlsx`)
+  }
+
   if (loading) return (
     <AppShell>
       <p style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '3rem' }}>{t('common.loading')}</p>
@@ -316,6 +344,14 @@ export default function AdminResultsEntryPage() {
                 style={{ fontSize: '0.75rem', padding: '0.35rem 0.6rem', opacity: recalcStatus === 'loading' ? 0.6 : 1 }}
               >
                 {recalcStatus === 'loading' ? '⏳' : recalcStatus === 'done' ? '✅' : recalcStatus === 'error' ? '❌' : '🔄'} Recalcular pts
+              </button>
+              <button
+                className="btn btn-sm btn-ghost"
+                onClick={handleDownloadExcel}
+                title="Descargar resultados en formato Excel"
+                style={{ fontSize: '0.75rem', padding: '0.35rem 0.6rem', color: 'var(--primary)', borderColor: 'var(--primary)' }}
+              >
+                📊 Excel
               </button>
               <button className={`btn btn-sm ${view === 'groups' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setView('groups')} style={{ fontSize: '0.75rem', padding: '0.35rem 0.6rem' }}>
                 {t('predictions.views.groups')}
@@ -510,7 +546,6 @@ export default function AdminResultsEntryPage() {
 
 // ─── AdminBracketTree — same layout as BracketTree in PredictionsPage ────────
 function AdminBracketTree({ byStage, bracketStages, simulatedBracket, sfResolved, competition, updateMatch, t, colPct, translatePct, offset, visibleCount }) {
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 640
   const cardRef = useRef(null)
   const [cardH, setCardH] = useState(null)
 
