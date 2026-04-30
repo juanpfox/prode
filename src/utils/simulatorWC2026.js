@@ -4,7 +4,9 @@ import wc2026_combinations from '../data/wc2026_combinations.json'
 function getR32Mappings(combKey) {
   const comb = wc2026_combinations[combKey]
   if (!comb) {
-    console.warn('Combination not found for:', combKey)
+    if (combKey.length === 8) {
+      console.warn('Combination not found for:', combKey)
+    }
     return {}
   }
   return {

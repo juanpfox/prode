@@ -116,7 +116,7 @@ export default function TournamentCard({ tournament, onDeleteSuccess }) {
               </svg>
               <span>{predStats.submitted}/{predStats.total}</span>
               {predStats.submitted === predStats.total && (
-                <span style={{ fontSize: '0.7rem' }}>\u2705</span>
+                <span style={{ fontSize: '0.7rem' }}>✅</span>
               )}
             </div>
           )}

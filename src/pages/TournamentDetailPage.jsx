@@ -52,7 +52,7 @@ export default function TournamentDetailPage() {
         query = query.eq('slug', identifier)
       }
 
-      const { data: tr } = await query.single()
+      const { data: tr } = await query.maybeSingle()
       
       if (!tr) {
         setTournament(null)
