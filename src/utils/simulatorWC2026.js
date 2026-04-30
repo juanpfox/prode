@@ -84,6 +84,9 @@ function _simulateWorldCupBracketInner(matches, preds) {
 
   // 1. Calculate the Group Table
   const tables = {}
+  // matchResults[homeId][awayId] = {hg, ag} — used for head-to-head tiebreaker
+  const matchResults = {}
+
   groupMatches.forEach(m => {
     if (!tables[m.home_team_id] && m.home_team) {
       tables[m.home_team_id] = { ...m.home_team, id: m.home_team_id, pj: 0, pts: 0, gf: 0, gc: 0 }
@@ -94,11 +97,11 @@ function _simulateWorldCupBracketInner(matches, preds) {
 
     const p = preds[m.id]
     const hasDbResult = m.home_goals !== null && m.away_goals !== null
-    
+
     if ((p && p.home_goals !== '' && p.away_goals !== '') || hasDbResult) {
       const hg = hasDbResult ? parseInt(m.home_goals) : parseInt(p.home_goals)
       const ag = hasDbResult ? parseInt(m.away_goals) : parseInt(p.away_goals)
-      
+
       const home = tables[m.home_team_id]
       const away = tables[m.away_team_id]
       if (home && away) {
@@ -108,12 +111,48 @@ function _simulateWorldCupBracketInner(matches, preds) {
         if (hg > ag) { home.pts += 3 }
         else if (hg < ag) { away.pts += 3 }
         else { home.pts += 1; away.pts += 1 }
+
+        if (!matchResults[m.home_team_id]) matchResults[m.home_team_id] = {}
+        if (!matchResults[m.away_team_id]) matchResults[m.away_team_id] = {}
+        matchResults[m.home_team_id][m.away_team_id] = { hg, ag }
+        matchResults[m.away_team_id][m.home_team_id] = { hg: ag, ag: hg }
       }
     }
   })
 
   // Add goal difference logic
   Object.values(tables).forEach(t => { t.dg = t.gf - t.gc })
+
+  // Head-to-head stats for a team within a subset (FIFA tiebreaker rule)
+  const h2hStats = (teamId, subset) => {
+    let pts = 0, gf = 0, gc = 0
+    for (const other of subset) {
+      if (other.id === teamId) continue
+      const r = matchResults[teamId]?.[other.id]
+      if (!r) continue
+      gf += r.hg; gc += r.ag
+      if (r.hg > r.ag) pts += 3
+      else if (r.hg === r.ag) pts += 1
+    }
+    return { pts, dg: gf - gc, gf }
+  }
+
+  // Sort a group applying: overall pts → h2h pts/DG/GF → overall DG/GF → initial_position
+  const sortGroupTeams = (teamsList) => {
+    return [...teamsList].sort((a, b) => {
+      if (b.pts !== a.pts) return b.pts - a.pts
+      // Head-to-head among all teams tied on same points
+      const tied = teamsList.filter(t => t.pts === a.pts)
+      if (tied.length > 1) {
+        const ha = h2hStats(a.id, tied)
+        const hb = h2hStats(b.id, tied)
+        if (hb.pts !== ha.pts) return hb.pts - ha.pts
+        if (hb.dg !== ha.dg) return hb.dg - ha.dg
+        if (hb.gf !== ha.gf) return hb.gf - ha.gf
+      }
+      return (b.dg - a.dg) || (b.gf - a.gf) || (a.initial_position - b.initial_position)
+    })
+  }
 
   // 2. Separate into groups
   const groups = {}
@@ -123,14 +162,14 @@ function _simulateWorldCupBracketInner(matches, preds) {
   })
 
   const groupLetters = ['A','B','C','D','E','F','G','H','I','J','K','L']
-  
+
   const placeholders = {} // e.g. "1A" -> { id, name, code, ... }
   const thirdPlaces = []
 
   groupLetters.forEach(letter => {
     if (!groups[letter]) return
-    const sorted = groups[letter].sort((a,b) => b.pts - a.pts || b.dg - a.dg || b.gf - a.gf || (a.initial_position - b.initial_position))
-    
+    const sorted = sortGroupTeams(groups[letter])
+
     placeholders['1' + letter] = sorted[0]
     placeholders['2' + letter] = sorted[1]
     if (sorted[2]) {
