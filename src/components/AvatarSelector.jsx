@@ -47,7 +47,9 @@ export const getAvatarStyle = (avatarId) => {
 }
 
 export function Avatar({ id, size = 'md', className = '', placeholder = '👤' }) {
-  if (!id) {
+  const finalId = id || (placeholder && placeholder.includes(':') ? placeholder : null)
+  
+  if (!finalId) {
     return (
       <div className={`avatar-item avatar-size-${size} ${className}`}>
         <div className="avatar-placeholder">{placeholder}</div>
@@ -57,7 +59,7 @@ export function Avatar({ id, size = 'md', className = '', placeholder = '👤' }
 
   return (
     <div className={`avatar-item avatar-size-${size} ${className}`}>
-      <div className="avatar-img" style={getAvatarStyle(id)} />
+      <div className="avatar-img" style={getAvatarStyle(finalId)} />
     </div>
   )
 }

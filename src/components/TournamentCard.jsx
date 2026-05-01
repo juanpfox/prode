@@ -68,7 +68,7 @@ export default function TournamentCard({ tournament, onDeleteSuccess }) {
     <div className="card card-sm animate-fade-in" 
       style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '1rem', paddingRight: '0.75rem' }}>
       
-      <Avatar id={tournament.avatar_url} size="md" placeholder="🏆" />
+      <Avatar id={tournament.avatar_url} size="md" placeholder="others:1" />
 
       {/* Clickable Area: Tournament Info */}
       <div 

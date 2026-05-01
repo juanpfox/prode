@@ -125,7 +125,7 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
     - [x] Integrar `AvatarSelector` en la configuración del torneo.
     - [x] Asegurar que el avatar se visualice en las `TournamentCard` y en el detalle del torneo.
     - [x] Filtrar categorías de avatares para torneos (usar `teams`, `others` y `animals`).
-    - [x] Usar 🏆 como emoji por defecto para torneos sin avatar.
+    - [x] Usar el avatar de trofeo (others:1) como placeholder por defecto para torneos sin avatar.
 
 - [x] **Countdown al Mundial 2026**
   - [x] Crear componente `WorldCupCountdown` con lógica de tiempo real.
