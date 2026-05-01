@@ -688,18 +688,44 @@ function calcMatchPoints(match, pred, config) {
   const correctWinner = predWinner === realWinner
   const stageMultMap = { group: 1, r32: 1, r16: config.mult_r16 ?? 2, qf: config.mult_qf ?? 3, sf: config.mult_sf ?? 4, third_place: 1, final: config.mult_final ?? 6 }
   const mult = stageMultMap[match.stage] ?? 1
-  let pts = 0
-  if (correctWinner) pts += realWinner === "draw" ? (config.pts_draw ?? 1) : (config.pts_win ?? 3)
-  if (exactBoth) { pts += config.pts_exact_both ?? 3 } else {
+  
+  let ptsWinner = 0
+  let ptsExactBoth = 0
+  let ptsExactOne = 0
+  let ptsDiff = 0
+  let distance = 0
+  
+  if (correctWinner) ptsWinner = realWinner === "draw" ? (config.pts_draw ?? 1) : (config.pts_win ?? 3)
+  
+  if (exactBoth) { 
+    ptsExactBoth = config.pts_exact_both ?? 3 
+  } else {
     let exactOne = 0
     if (pHome === rHome) exactOne++
     if (pAway === rAway) exactOne++
-    pts += exactOne * (config.pts_exact_one ?? 1)
+    ptsExactOne = exactOne * (config.pts_exact_one ?? 1)
   }
+  
   if (config.pts_diff_correct) {
-    pts += config.pts_diff_correct - Math.abs((pHome - pAway) - (rHome - rAway))
+    distance = Math.abs((pHome - pAway) - (rHome - rAway))
+    ptsDiff = config.pts_diff_correct - distance
   }
-  return pts * mult
+  
+  const subtotal = ptsWinner + ptsExactBoth + ptsExactOne + ptsDiff
+  const total = subtotal * mult
+  
+  return {
+    total,
+    breakdown: {
+      ptsWinner,
+      ptsExactBoth,
+      ptsExactOne,
+      ptsDiff,
+      distance,
+      subtotal,
+      mult
+    }
+  }
 }
 
 function PredResult({ match, pred, t, config }) {
@@ -710,20 +736,68 @@ function PredResult({ match, pred, t, config }) {
   const realWinner = match.winner
   const correctWinner = predWinner === realWinner
   const correctDraw = correctWinner && realWinner === "draw"
-  const pts = calcMatchPoints(match, pred, config)
+  const ptsObj = calcMatchPoints(match, pred, config)
+  const pts = ptsObj?.total
+  const breakdown = ptsObj?.breakdown
+
   return (
-    <div style={{ marginTop: "0.5rem", padding: "0.375rem 0.625rem", background: "var(--surface-2)",
+    <div className="pred-tooltip-wrapper" style={{ marginTop: "0.5rem", padding: "0.375rem 0.625rem", background: "var(--surface-2)",
         borderRadius: "var(--r-sm)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
       <span style={{ fontSize: "0.9rem" }}>{exactBoth ? "🎯" : correctWinner ? "✅" : "❌"}</span>
       <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", flex: 1 }}>
         {t("predictions.result")}: {rHome}-{rAway}
         {exactBoth ? ` · ${t("predictions.exact")}` : correctDraw ? ` · ${t("predictions.draw_ok")}` : correctWinner ? ` · ${t("predictions.winner_ok")}` : ` · ${t("predictions.miss")}`}
       </span>
-      {pts !== null && (
+      {pts !== null && pts !== undefined && (
         <span style={{ fontSize: "0.75rem", fontWeight: 700,
-            color: pts > 0 ? "var(--primary)" : "var(--text-subtle)", whiteSpace: "nowrap" }}>
+            color: pts > 0 ? "var(--primary)" : "var(--text-subtle)", whiteSpace: "nowrap", cursor: "help" }}>
           {pts > 0 ? `+${pts} pts` : `${pts} pts`}
         </span>
+      )}
+
+      {breakdown && (
+        <div className="pred-tooltip">
+          {breakdown.ptsWinner > 0 && (
+            <div className="pred-tooltip-row">
+              <span>{t('rules.example_correct_winner')}</span>
+              <span style={{ color: 'var(--primary)', fontWeight: 600 }}>+{breakdown.ptsWinner}</span>
+            </div>
+          )}
+          {breakdown.ptsExactBoth > 0 && (
+            <div className="pred-tooltip-row">
+              <span>{t('rules.match_exact_both')}</span>
+              <span style={{ color: 'var(--primary)', fontWeight: 600 }}>+{breakdown.ptsExactBoth}</span>
+            </div>
+          )}
+          {breakdown.ptsExactOne > 0 && (
+            <div className="pred-tooltip-row">
+              <span>{t('rules.example_exact_one')}</span>
+              <span style={{ color: 'var(--primary)', fontWeight: 600 }}>+{breakdown.ptsExactOne}</span>
+            </div>
+          )}
+          {config?.pts_diff_correct != null && (
+            <div className="pred-tooltip-row">
+              <span>{t('rules.example_diff', { predicted: pHome - pAway, actual: rHome - rAway })}</span>
+              <span style={{ color: breakdown.ptsDiff > 0 ? 'var(--primary)' : breakdown.ptsDiff < 0 ? 'var(--danger)' : 'inherit', fontWeight: 600 }}>
+                {breakdown.ptsDiff > 0 ? '+' : ''}{breakdown.ptsDiff}
+              </span>
+            </div>
+          )}
+          <div className="pred-tooltip-row">
+            <span>{t('rules.example_subtotal')}</span>
+            <span style={{ fontWeight: 600 }}>{breakdown.subtotal}</span>
+          </div>
+          {breakdown.mult > 1 && (
+            <div className="pred-tooltip-row">
+              <span>{t('rules.example_multiplier')}</span>
+              <span style={{ fontWeight: 600 }}>×{breakdown.mult}</span>
+            </div>
+          )}
+          <div className="pred-tooltip-row total">
+            <span>{t('rules.example_total')}</span>
+            <span style={{ color: pts > 0 ? 'var(--primary)' : 'inherit' }}>{pts > 0 ? `+${pts}` : pts} pts</span>
+          </div>
+        </div>
       )}
     </div>
   )

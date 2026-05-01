@@ -62,6 +62,10 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
     - [x] **Bug Fix: Guest Routing & 406 Error**
       - [x] Corregir colisión de rutas entre `/guest` y `/:slug` en `App.jsx`.
       - [x] Cambiar `.single()` por `.maybeSingle()` en `TournamentDetailPage.jsx` para evitar errores 406 cuando no se encuentra un torneo.
+  - [x] **Tooltip de cálculo de puntos en pronósticos**
+    - [x] Modificar `calcMatchPoints` para devolver el desglose del cálculo.
+    - [x] Crear componente CSS de tooltip en `index.css`.
+    - [x] Implementar el tooltip en `PredictionsPage.jsx` y `PlayerPredictionsPage.jsx` al pasar el mouse por los puntos de cada ficha.
 
 ## Fase 3: Monetización e Integraciones Externas
 
