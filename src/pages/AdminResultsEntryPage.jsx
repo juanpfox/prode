@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase'
 import AppShell from '../components/AppShell'
 import { simulateWorldCupBracket } from '../utils/simulatorWC2026'
 import { simulateChampionsLeagueBracket, areSFsResolved } from '../utils/simulatorUCL'
+import { recalculatePosiciones } from '../utils/calcPosiciones'
 
 // ─── WC2026 bracket tree constants ───────────────────────────────────────────
 const WC2026_CHILDREN = {
@@ -253,6 +254,10 @@ export default function AdminResultsEntryPage() {
         p_competition_id: competitionId
       })
       if (error) throw error
+      
+      // Calculate 'posiciones' mode points locally since the RPC only handles 'partidos'
+      await recalculatePosiciones(competitionId)
+
       setRecalcStatus('done')
       setTimeout(() => setRecalcStatus('idle'), 3000)
     } catch (e) {

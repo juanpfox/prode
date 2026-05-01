@@ -9,9 +9,10 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
   - [x] Desarrollar la integración para traer los resultados de **Champions League** en tiempo real y poblar la base de datos de Supabase (Edge Function `sync-ucl-results`).
   - [ ] Desarrollar la integración para los resultados del **Mundial 2026**.
   - [ ] Validar que los updates de la API no sobreescriban resultados de manera errónea.
-- [ ] **Implementar lógica de puntos automática en Supabase**
+- [x] **Implementar lógica de puntos automática en Supabase / Backend**
   - [x] Configurar un webhook o proceso periódico (Edge Functions / Cron) para obtener los resultados finales (Activo vía GitHub Actions para UCL).
   - [x] Diseñar y programar los triggers de base de datos o lógica serverless para que, al actualizarse el resultado real de un partido, se calculen los puntos automáticamente (`recalculate_all_scores_for_competition`).
+  - [x] Desarrollar la lógica de cálculo de puntos para torneos modo "Posiciones" y acoplarlo al botón "Recalcular pts".
   - [ ] Realizar testing extensivo en ambientes de prueba para asegurar que el cálculo de puntos y la sumatoria de tabla de líderes se actualicen sin errores.
 
 ## Fase 2: Mantenimiento e Infraestructura
