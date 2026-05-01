@@ -22,7 +22,14 @@
       "Bash(git stash *)",
       "Bash(python -c \"import openpyxl; print\\('ok'\\)\")",
       "Bash(python -c \"import xlrd; print\\('xlrd ok'\\)\")",
-      "Bash(pip install *)"
+      "Bash(pip install *)",
+      "WebSearch",
+      "WebFetch(domain:en.wikipedia.org)",
+      "WebFetch(domain:www.fifa.com)",
+      "WebFetch(domain:www.espn.com)",
+      "WebFetch(domain:www.rotowire.com)",
+      "Bash(python full_bracket_sim.py)",
+      "Bash(python -c ' *)"
     ]
   }
 }
