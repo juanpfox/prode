@@ -32,14 +32,14 @@ function getR32Mappings(combKey) {
 // Mapa de los ganadores de rondas anteriores hacia las siguientes rondas
 const LATER_ROUNDS = {
   // Round of 16
-  89: [73, 75],
-  90: [74, 77],
+  89: [74, 77],
+  90: [73, 75],
   91: [76, 78],
   92: [79, 80],
-  93: [81, 84],
-  94: [82, 86],
-  95: [85, 88],
-  96: [83, 87],
+  93: [83, 84],
+  94: [81, 82],
+  95: [86, 88],
+  96: [85, 87],
   // Quarter-Finals
   97: [89, 90],
   98: [91, 92],
