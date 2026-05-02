@@ -185,7 +185,7 @@ export default function PlayerPredictionsPage() {
       <div className="home-empty card card-sm" style={{ marginTop: "2rem" }}>
         <span style={{ fontSize: "2rem" }}>🔒</span>
         <p style={{ color: "var(--text-muted)" }}>{t("predictions.no_access")}</p>
-        <button className="btn btn-ghost btn-sm" onClick={() => navigate("/posiciones")}>← {t("common.back")}</button>
+        <button className="btn btn-ghost btn-sm" onClick={() => navigate(`/${tournament?.slug || tournament?.id}`)}>← {tournament?.name || t('common.back')}</button>
       </div>
     </AppShell>
   )
@@ -253,8 +253,8 @@ export default function PlayerPredictionsPage() {
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between",
               flexWrap: "wrap", gap: "1rem", marginBottom: "1.5rem" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-              <button className="btn btn-ghost btn-sm" onClick={() => navigate("/posiciones")}>
-                ← {t("nav.leaderboard")}
+              <button className="btn btn-ghost btn-sm" onClick={() => navigate(`/${tournament?.slug || tournament?.id}`)}>
+                ← {tournament?.name || t("nav.leaderboard")}
               </button>
               <div>
                 <h2 className="home-section-title" style={{ margin: 0, fontSize: "1.2rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
@@ -739,6 +739,8 @@ function PredResult({ match, pred, t, config }) {
   const ptsObj = calcMatchPoints(match, pred, config)
   const pts = ptsObj?.total
   const breakdown = ptsObj?.breakdown
+
+  const acertoEmpate = config?.pts_empate ?? 3
 
   return (
     <div className="pred-tooltip-wrapper" style={{ marginTop: "0.5rem", padding: "0.375rem 0.625rem", background: "var(--surface-2)",

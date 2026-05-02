@@ -157,6 +157,10 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
   - [x] Eliminar la visualización del correo electrónico en la página de inicio.
   - [x] Mover el contador del mundial al top bar (AppShell) en formato reducido/compacto.
   - [x] Eliminar el contador grande de la página de inicio.
+- [x] **Mejora Navegación: Botón Volver en página Jugador**
+  - [x] Cambiar destino del botón volver de `/posiciones` a la página del torneo.
+  - [x] Mostrar el nombre del torneo en el label del botón (ej: `← Torneo Guest`).
+  - [x] Sincronizar comportamiento con la página de Pronósticos propia.
 
 ---
 
