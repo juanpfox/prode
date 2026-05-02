@@ -61,8 +61,12 @@ export default function AppShell({ children, saveIndicator, wide }) {
       </main>
 
       <nav className="app-nav">
-        <NavItem icon="⚽" label={t('nav.predictions')} active={pathname.endsWith('/pronosticos')} onClick={() => lastTournamentPath ? navigate(`${lastTournamentPath}/pronosticos`) : navigate('/')} />
-        <NavItem icon="📊" label={t('nav.standings')}   active={!!tournamentBasePath && pathname === tournamentBasePath} onClick={() => lastTournamentPath ? navigate(lastTournamentPath) : navigate('/')} />
+        {lastTournamentPath && (
+          <NavItem icon="⚽" label={t('nav.predictions')} active={pathname.endsWith('/pronosticos')} onClick={() => navigate(`${lastTournamentPath}/pronosticos`)} />
+        )}
+        {lastTournamentPath && (
+          <NavItem icon="📊" label={t('nav.standings')}   active={!!tournamentBasePath && pathname === tournamentBasePath} onClick={() => navigate(lastTournamentPath)} />
+        )}
         <NavItem icon="🏆" label={t('nav.tournaments')} active={pathname === '/' || pathname.startsWith('/torneos')} onClick={() => navigate('/')} />
         {isAdmin && (
           <NavItem icon="🎯" label={t('nav.admin_results')} active={pathname.startsWith('/admin/resultados')} onClick={() => navigate('/admin/resultados')} />
