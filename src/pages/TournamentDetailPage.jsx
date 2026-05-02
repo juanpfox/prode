@@ -422,8 +422,8 @@ export default function TournamentDetailPage() {
 
         {/* Header */}
         <div className="card card-sm" style={{ marginBottom: '1.25rem' }}>
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.5rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', flex: 1 }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', flex: 1, minWidth: '200px' }}>
               <Avatar id={tournament.avatar_url} size="lg" placeholder="others:1" />
               <div style={{ minWidth: 0 }}>
                 <h2 style={{ fontWeight: 800, fontSize: '1.125rem', color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -431,18 +431,32 @@ export default function TournamentDetailPage() {
                 </h2>
               </div>
             </div>
-            {/* Copy invitation button */}
-            {isApproved && (
-              <button
-                className="btn btn-ghost btn-sm"
-                onClick={copyInvitation}
-                title={t('tournaments.copy_invitation')}
-                style={{ fontSize: '0.85rem', padding: '0.3rem 0.6rem', display: 'flex', alignItems: 'center', gap: '0.3rem', color: copied ? 'var(--primary)' : 'inherit' }}
-              >
-                <span>{copied ? '✅' : '📨'}</span>
-                <span>{copied ? t('common.saved', '¡Copiado!') : t('tournaments.copy_invitation')}</span>
-              </button>
-            )}
+            
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+              {/* Predictions CTA */}
+              {isApproved && (tournament.mode === 'partidos' || tournament.mode === 'posiciones') && (
+                <button
+                  className="btn btn-primary"
+                  style={{ fontSize: '1.05rem', padding: '0.4rem 0.8rem', display: 'flex', alignItems: 'center', gap: '0.4rem', whiteSpace: 'nowrap', fontWeight: 700 }}
+                  onClick={() => navigate(`/${tournament.slug || tournament.id}/pronosticos`)}>
+                  <span>{tournament.mode === 'posiciones' ? '🏆' : '⚽'}</span>
+                  <span>{t('predictions.go_predict')}</span>
+                </button>
+              )}
+              
+              {/* Copy invitation button */}
+              {isApproved && (
+                <button
+                  className="btn btn-ghost btn-sm"
+                  onClick={copyInvitation}
+                  title={t('tournaments.copy_invitation')}
+                  style={{ fontSize: '0.85rem', padding: '0.3rem 0.6rem', display: 'flex', alignItems: 'center', gap: '0.3rem', color: copied ? 'var(--primary)' : 'inherit', whiteSpace: 'nowrap' }}
+                >
+                  <span>{copied ? '✅' : '📨'}</span>
+                  <span>{copied ? t('common.saved', '¡Copiado!') : t('tournaments.copy_invitation')}</span>
+                </button>
+              )}
+            </div>
           </div>
 
           {isBanned && (
@@ -465,17 +479,9 @@ export default function TournamentDetailPage() {
               {updating ? '…' : t('tournaments.join_btn')}
             </button>
           )}
-        </div>
 
-        {/* Predictions CTA */}
-        {isApproved && (tournament.mode === 'partidos' || tournament.mode === 'posiciones') && (
-          <button
-            className="btn btn-primary"
-            style={{ width: '100%', marginBottom: '1.25rem', fontSize: '1rem', padding: '0.875rem' }}
-            onClick={() => navigate(`/${tournament.slug || tournament.id}/pronosticos`)}>
-            {tournament.mode === 'posiciones' ? '🏆' : '⚽'} {t('predictions.go_predict')}
-          </button>
-        )}
+
+        </div>
 
         {/* Tabs: Posiciones | Reglas | Configuración (admin) */}
         {isApproved && (
