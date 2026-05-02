@@ -70,7 +70,7 @@
     "pending_msg": "Tu solicitud está pendiente de aprobación",
     "participants": "Participantes",
     "tab_mine": "Mis torneos",
-    "tab_public": "Todos",
+    "tab_public": "Unirme a otro torneo",
     "select_to_play": "Elegí el torneo en el que querés jugar",
     "already_requested": "Ya enviaste una solicitud a este torneo",
     "join_requested": "Solicitud enviada a \"{{name}}\". Esperá la aprobación del admin.",
@@ -121,7 +121,9 @@
     "tournaments": "Torneos",
     "leaderboard": "Posiciones",
     "profile": "Perfil",
-    "admin_results": "Resultados"
+    "admin_results": "Resultados",
+    "predictions": "Pronósticos",
+    "standings": "Posiciones"
   },
   "leaderboard": {
     "no_scores": "Aún no hay puntos registrados",

@@ -69,7 +69,7 @@
     "pending_approval": "Pending requests",
     "pending_msg": "Your request is pending approval",
     "tab_mine": "My tournaments",
-    "tab_public": "All",
+    "tab_public": "Join another tournament",
     "select_to_play": "Choose the tournament you want to play in",
     "already_requested": "You already sent a request to this tournament",
     "join_requested": "Request sent to \"{{name}}\". Wait for admin approval.",
@@ -111,7 +111,9 @@
     "tournaments": "Tournaments",
     "leaderboard": "Leaderboard",
     "profile": "Profile",
-    "admin_results": "Results"
+    "admin_results": "Results",
+    "predictions": "Predictions",
+    "standings": "Standings"
   },
   "leaderboard": {
     "no_scores": "No scores yet",

@@ -12,6 +12,11 @@ export default function AppShell({ children, saveIndicator, wide }) {
   const navigate = useNavigate()
   const { pathname } = useLocation()
 
+  const isAdmin = user?.email === 'guest@prodemundial.dev' || user?.email === 'juanpatriciofox@gmail.com'
+  const tournamentBasePath = getTournamentBasePath(pathname)
+  if (tournamentBasePath) sessionStorage.setItem('lastTournamentPath', tournamentBasePath)
+  const lastTournamentPath = tournamentBasePath || sessionStorage.getItem('lastTournamentPath')
+
   return (
     <div className="home-page">
       <header className="app-header">
@@ -56,21 +61,31 @@ export default function AppShell({ children, saveIndicator, wide }) {
       </main>
 
       <nav className="app-nav">
-        <NavItem icon="🏠" label={t('nav.home')}        active={pathname === '/'}               onClick={() => navigate('/')} />
-        <NavItem icon="🏆" label={t('nav.tournaments')} active={pathname.startsWith('/torneo')} onClick={() => navigate('/torneos')} />
-        {(user?.email === 'guest@prodemundial.dev' || user?.email === 'juanpatriciofox@gmail.com') && (
+        <NavItem icon="⚽" label={t('nav.predictions')} active={pathname.endsWith('/pronosticos')} onClick={() => lastTournamentPath ? navigate(`${lastTournamentPath}/pronosticos`) : navigate('/torneos')} />
+        <NavItem icon="📊" label={t('nav.standings')}   active={!!tournamentBasePath && pathname === tournamentBasePath} onClick={() => lastTournamentPath ? navigate(lastTournamentPath) : navigate('/torneos')} />
+<NavItem icon="🏆" label={t('nav.tournaments')} active={pathname.startsWith('/torneos')} onClick={() => navigate('/torneos')} />
+        {isAdmin && (
           <NavItem icon="🎯" label={t('nav.admin_results')} active={pathname.startsWith('/admin/resultados')} onClick={() => navigate('/admin/resultados')} />
         )}
-        <NavItem icon="📊" label={t('nav.leaderboard')} active={pathname === '/posiciones'}        onClick={() => navigate('/posiciones')} />
       </nav>
     </div>
   )
 }
 
+const RESERVED_PATHS = new Set(['torneos', 'posiciones', 'perfil', 'admin', 'invitacion', 'login', 'registro', 'guest', 'guest2'])
+
+function getTournamentBasePath(pathname) {
+  const segments = pathname.split('/').filter(Boolean)
+  if (!segments.length) return null
+  if (segments[0] === 'torneo' && segments[1]) return `/torneo/${segments[1]}`
+  if (!RESERVED_PATHS.has(segments[0])) return `/${segments[0]}`
+  return null
+}
+
 function NavItem({ icon, label, active, onClick }) {
   return (
     <button className={`nav-item${active ? ' active' : ''}`} onClick={onClick}>
-      <span style={{ fontSize: '1.25rem' }}>{icon}</span>
+      <span style={{ fontSize: '1.25rem', lineHeight: 1 }}>{icon}</span>
       <span>{label}</span>
     </button>
   )

@@ -685,17 +685,17 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 0.2rem;
-  padding: 0.5rem 1.25rem;
-  font-size: 0.6875rem;
+  padding: 0.5rem 0.5rem;
+  font-size: 0.625rem;
   font-weight: 600;
   color: var(--text-subtle);
   border-radius: var(--r-md);
   transition: color var(--t-fast);
-  min-width: 56px;
+  min-width: 0;
+  flex: 1;
 }
 .nav-item.active { color: var(--primary); }
 .nav-item svg { width: 22px; height: 22px; }
-
 .app-content {
   flex: 1;
   padding-bottom: calc(var(--nav-h) + var(--safe-bottom) + 0.5rem);
