@@ -75,6 +75,10 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
     - [x] Borrar absolutamente todos los resultados cargados de la competición.
   - [x] **Traducción: Corregir label "My tournaments" en TournamentsPage**
     - [x] Agregar `tab_mine` en `es.json` y verificar consistencia.
+  - [x] **Pestaña "Unirme a otro torneo"**
+    - [x] Reemplazar label "Todos" por "Unirme a otro torneo" en `es.json` y `en.json`.
+    - [x] Filtrar lista de torneos públicos para excluir aquellos en los que el usuario ya participa.
+    - [x] Mantener "Mis torneos" con solo los aprobados mientras se excluyen todos los unidos de la lista pública.
 
 ## Fase 3: Monetización e Integraciones Externas
 

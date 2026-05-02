@@ -55,9 +55,10 @@ const SCORING_DEFAULTS = {
   useEffect(() => { loadData() }, [user])
 
   async function loadData() {
+    if (!user) return
     setLoading(true)
     try {
-      const [{ data: myData }, { data: pubData }, { data: comps }] = await Promise.all([
+      const [{ data: myData }, { data: pubData }, { data: comps }, { data: allJoined }] = await Promise.all([
         supabase.from('tournament_players')
           .select(`
             role, 
@@ -80,22 +81,31 @@ const SCORING_DEFAULTS = {
           .order('is_featured', { ascending: false })
           .order('created_at', { ascending: false }).limit(30),
         supabase.from('competitions').select('id, name, type, status').order('name'),
+        supabase.from('tournament_players').select('tournament_id').eq('user_id', user.id)
       ])
+
+      const joinedIds = new Set(allJoined?.map(tp => tp.tournament_id) ?? [])
+
       setMyTournaments(myData?.map(tp => ({ 
         ...tp.tournaments, 
         role: tp.role,
         creator_name: tp.tournaments.creator?.display_name,
         participants_count: tp.tournaments.participants?.[0]?.count ?? 0
       })) ?? [])
-      setPublicTournaments(pubData?.map(tr => ({
-        ...tr,
-        creator_name: tr.creator?.display_name,
-        participants_count: tr.participants?.[0]?.count ?? 0
-      })).sort((a, b) => {
-        if (a.is_featured && !b.is_featured) return -1;
-        if (!a.is_featured && b.is_featured) return 1;
-        return 0;
-      }) ?? [])
+
+      setPublicTournaments(pubData
+        ?.filter(tr => !joinedIds.has(tr.id))
+        .map(tr => ({
+          ...tr,
+          creator_name: tr.creator?.display_name,
+          participants_count: tr.participants?.[0]?.count ?? 0
+        }))
+        .sort((a, b) => {
+          if (a.is_featured && !b.is_featured) return -1;
+          if (!a.is_featured && b.is_featured) return 1;
+          return 0;
+        }) ?? []
+      )
       setCompetitions(comps ?? [])
     } finally {
       setLoading(false)
