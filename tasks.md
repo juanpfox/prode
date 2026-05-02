@@ -73,6 +73,8 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
   - [x] **Limpieza de resultados World Cup 2026**
     - [x] Borrar resultados cargados desde el 24 de junio de 2026 inclusive en adelante.
     - [x] Conservar resultados anteriores al 24 de junio.
+  - [x] **Traducción: Corregir label "My tournaments" en TournamentsPage**
+    - [x] Agregar `tab_mine` en `es.json` y verificar consistencia.
 
 ## Fase 3: Monetización e Integraciones Externas
 
@@ -167,6 +169,11 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
   - [x] Cambiar destino del botón volver de `/posiciones` a la página del torneo.
   - [x] Mostrar el nombre del torneo en el label del botón (ej: `← Torneo Guest`).
   - [x] Sincronizar comportamiento con la página de Pronósticos propia.
+- [x] **Rediseño Login: Layout Desktop**
+  - [x] Agrupar contador y card de login en contenedor lateral.
+  - [x] Implementar layout de dos columnas en escritorio (Imagen a la izquierda, login a la derecha).
+  - [x] Ajustar responsividad para tablets y móviles.
+
 
 ---
 

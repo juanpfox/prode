@@ -66,6 +66,7 @@ Pronóstico de **resultado exacto**.
 - [x] Rediseño del Hero en Landing Page (Uso de imagen de marca `prodeImage.png`).
 - [x] Avatares para Torneos (Uso de categorías 'Clubes', 'Otros' y 'Animales', con el avatar de trofeo como fallback por defecto).
 - [x] Contador regresivo al Mundial 2026 en Login y Home.
+- [x] Rediseño de la página de Login (Layout Desktop con imagen a la izquierda y form/contador a la derecha).
 - [ ] Elegir e integrar API de resultados automáticos (API-Football)
 - [ ] Implementar lógica de puntos automática en Supabase (Edge Functions / Triggers)
 - [ ] Crear bot/ping para evitar pausa de Supabase Free

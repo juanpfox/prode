@@ -139,3 +139,40 @@
     padding: 2rem;
   }
 }
+
+/* Desktop layout */
+@media (min-width: 1024px) {
+  .login-center {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 4rem;
+    padding: 4rem 2rem;
+    max-width: 1300px;
+  }
+
+  .login-hero {
+    flex: 1.2;
+    text-align: left;
+    align-items: flex-start;
+  }
+
+  .login-hero-image {
+    max-width: 800px;
+    /* Adjust mask for side layout if needed */
+    mask-image: radial-gradient(ellipse at center, black 75%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse at center, black 65%, transparent 85%);
+  }
+
+  .login-side-container {
+    flex: 0 0 420px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: stretch;
+  }
+
+  .login-card {
+    margin: 0;
+  }
+}
