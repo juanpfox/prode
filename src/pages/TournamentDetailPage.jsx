@@ -568,7 +568,7 @@ export default function TournamentDetailPage() {
                             updateAvatar(id); 
                             setSelectingAvatar(false); 
                           }} 
-                          categories={['teams', 'others', 'animals']}
+                          categories={['others', 'teams', 'animals']}
                         />
                       </div>
                     )}

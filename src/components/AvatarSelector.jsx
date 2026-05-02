@@ -66,7 +66,7 @@ export function Avatar({ id, size = 'md', className = '', placeholder = '👤' }
 
 export default function AvatarSelector({ selectedId, onSelect, categories = null }) {
   const filteredCategories = categories 
-    ? AVATAR_CATEGORIES.filter(cat => categories.includes(cat.id))
+    ? categories.map(id => AVATAR_CATEGORIES.find(cat => cat.id === id)).filter(Boolean)
     : AVATAR_CATEGORIES
 
   const [activeCategoryId, setActiveCategoryId] = useState(filteredCategories[0]?.id || 'people')
