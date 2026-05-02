@@ -68,11 +68,11 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
     - [x] Crear componente CSS de tooltip en `index.css`.
     - [x] Implementar el tooltip en `PredictionsPage.jsx` y `PlayerPredictionsPage.jsx` al pasar el mouse por los puntos de cada ficha.
   - [x] **Ajustes en pantalla de creación de torneo**
-    - [x] Swappear orden de modos: Partidos a la izquierda, Posiciones a la derecha.
+    - [x] Swappear orden de modos: Partidos a la izquierda, Posiciones a la derecha. (Descartado: se ocultó el selector).
+    - [x] Ocultar selector de modo de juego (forzado a "Partidos" por defecto).
     - [x] Actualizar descripción de modo Privado: "Solo usuarios con el link directo pueden verlo y unirse".
   - [x] **Limpieza de resultados World Cup 2026**
-    - [x] Borrar resultados cargados desde el 24 de junio de 2026 inclusive en adelante.
-    - [x] Conservar resultados anteriores al 24 de junio.
+    - [x] Borrar absolutamente todos los resultados cargados de la competición.
   - [x] **Traducción: Corregir label "My tournaments" en TournamentsPage**
     - [x] Agregar `tab_mine` en `es.json` y verificar consistencia.
 
