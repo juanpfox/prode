@@ -23,32 +23,45 @@ export default function AvatarPage() {
     }
   }, [user])
 
-  async function handleSave() {
+  async function handleAvatarSelect(newId) {
+    setAvatarId(newId)
     setSaving(true)
+    setSaved(false)
+    
     const { error } = await supabase.from('users')
-      .update({ avatar_url: avatarId })
+      .update({ avatar_url: newId })
       .eq('id', user.id)
     
     if (!error) {
       await refreshProfile()
       setSaved(true)
-      setTimeout(() => {
-        setSaved(false)
-        navigate('/perfil')
-      }, 1000)
-    } else {
-      setSaving(false)
+      setTimeout(() => setSaved(false), 2000)
     }
+    setSaving(false)
   }
 
   return (
     <AppShell>
       <div className="animate-fade-in" style={{ maxWidth: '600px', margin: '0 auto' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-          <button className="btn btn-ghost btn-sm" onClick={() => navigate('/perfil')} style={{ padding: '0.5rem' }}>
-            ←
-          </button>
-          <h2 className="home-section-title" style={{ margin: 0 }}>{t('profile.avatar_selection_title')}</h2>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <button className="btn btn-ghost btn-sm" onClick={() => navigate('/perfil')} style={{ padding: '0.5rem' }}>
+              ←
+            </button>
+            <h2 className="home-section-title" style={{ margin: 0 }}>{t('profile.avatar_selection_title')}</h2>
+          </div>
+          
+          <div style={{ fontSize: '0.875rem', fontWeight: 500, color: saved ? 'var(--primary)' : 'var(--text-muted)', transition: 'all 0.3s' }}>
+            {saving ? (
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div className="spinner-xs" /> {t('predictions.saving_changes')}
+              </span>
+            ) : saved ? (
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                ✓ {t('profile.saved')}
+              </span>
+            ) : null}
+          </div>
         </div>
 
         <div className="card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2rem', padding: '2rem' }}>
@@ -73,25 +86,7 @@ export default function AvatarPage() {
           </div>
 
           <div style={{ width: '100%' }}>
-            <AvatarSelector selectedId={avatarId} onSelect={setAvatarId} />
-          </div>
-
-          <div style={{ width: '100%', display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-            <button 
-              className="btn btn-ghost" 
-              style={{ flex: 1 }} 
-              onClick={() => navigate('/perfil')}
-            >
-              {t('common.cancel')}
-            </button>
-            <button 
-              className="btn btn-primary" 
-              style={{ flex: 2 }} 
-              onClick={handleSave} 
-              disabled={saving || saved}
-            >
-              {saved ? `✓ ${t('profile.saved')}` : saving ? t('common.loading') : t('profile.save')}
-            </button>
+            <AvatarSelector selectedId={avatarId} onSelect={handleAvatarSelect} />
           </div>
         </div>
       </div>

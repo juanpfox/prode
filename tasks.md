@@ -142,7 +142,8 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
   - [x] Crear la página `AvatarPage.jsx` en `src/pages`.
   - [x] Registrar la ruta `/perfil/avatar` en `App.jsx`.
   - [x] Modificar `ProfilePage.jsx` para quitar el selector directo y agregar un link en el avatar y uno debajo.
-  - [x] Asegurar que la nueva página permita seleccionar el avatar y guardarlo (o volver al perfil con el cambio).
+  - [x] Implementar autoguardado al seleccionar un avatar y eliminar botones manuales.
+  - [x] Asegurar que la nueva página permita seleccionar el avatar y guardarlo automáticamente.
 
 ---
 
