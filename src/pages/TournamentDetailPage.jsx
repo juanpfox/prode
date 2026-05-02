@@ -32,10 +32,29 @@ export default function TournamentDetailPage() {
   const [showBanned, setShowBanned] = useState(false)
   const [selectingAvatar, setSelectingAvatar] = useState(false)
   const [confirmLeave, setConfirmLeave] = useState(false)
+  const [showTournamentDropdown, setShowTournamentDropdown] = useState(false)
+  const [userTournaments, setUserTournaments] = useState([])
 
   const id = tournament?.id
 
   useEffect(() => { loadTournament() }, [paramId, paramSlug])
+  useEffect(() => { loadUserTournaments() }, [user])
+  useEffect(() => {
+    if (!showTournamentDropdown) return
+    const close = () => setShowTournamentDropdown(false)
+    document.addEventListener('click', close)
+    return () => document.removeEventListener('click', close)
+  }, [showTournamentDropdown])
+
+  async function loadUserTournaments() {
+    if (!user) return
+    const { data } = await supabase
+      .from('tournament_players')
+      .select('tournaments(id, name, slug, avatar_url)')
+      .eq('user_id', user.id)
+      .eq('status', 'approved')
+    setUserTournaments(data?.map(r => r.tournaments).filter(Boolean) ?? [])
+  }
 
   async function loadTournament() {
     setLoading(true)
@@ -66,6 +85,7 @@ export default function TournamentDetailPage() {
       setEditSlug(tr.slug ?? '')
       setEditPrize(tr.prize ?? '')
       setEditAvatarUrl(tr.avatar_url ?? null)
+      localStorage.setItem('lastTournament', tr.slug || tr.id)
 
       const { data: pls } = await supabase
         .from('tournament_players')
@@ -416,9 +436,55 @@ export default function TournamentDetailPage() {
   return (
     <AppShell>
       <div className="animate-fade-in">
-        <button className="btn btn-ghost btn-sm" onClick={() => navigate('/')} style={{ marginBottom: '1rem' }}>
-          ← {t('common.back')}
-        </button>
+        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap', position: 'relative' }}>
+          {/* Cambiar de torneo */}
+          {userTournaments.filter(t => t.id !== tournament?.id).length > 0 && <div style={{ position: 'relative' }}>
+            <button
+              className="btn btn-ghost btn-sm"
+              onClick={(e) => {
+                e.stopPropagation()
+                if (!showTournamentDropdown) loadUserTournaments()
+                setShowTournamentDropdown(v => !v)
+              }}
+            >
+              Cambiar de torneo ▾
+            </button>
+            {showTournamentDropdown && (
+              <div
+                onClick={e => e.stopPropagation()}
+                style={{
+                  position: 'absolute', top: '100%', left: 0, zIndex: 100,
+                  background: 'var(--surface)', border: '1px solid var(--border)',
+                  borderRadius: 'var(--r-md)', boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+                  minWidth: '200px', padding: '0.25rem 0'
+                }}
+              >
+                {userTournaments.length === 0 && (
+                  <p style={{ padding: '0.5rem 1rem', color: 'var(--text-muted)', fontSize: '0.875rem' }}>Sin otros torneos</p>
+                )}
+                {userTournaments
+                  .filter(t => t.id !== tournament?.id)
+                  .map(t => (
+                    <button
+                      key={t.id}
+                      className="btn btn-ghost btn-sm"
+                      style={{ width: '100%', textAlign: 'left', borderRadius: 0, justifyContent: 'flex-start', padding: '0.5rem 1rem' }}
+                      onClick={() => { setShowTournamentDropdown(false); navigate(`/${t.slug || t.id}`) }}
+                    >
+                      {t.name}
+                    </button>
+                  ))}
+              </div>
+            )}
+          </div>}
+
+          <button className="btn btn-ghost btn-sm" onClick={() => navigate('/torneos?tab=public')}>
+            Unirme a otro torneo
+          </button>
+          <button className="btn btn-ghost btn-sm" onClick={() => navigate('/torneos?new=1')}>
+            Crear torneo nuevo
+          </button>
+        </div>
 
         {/* Header */}
         <div className="card card-sm" style={{ marginBottom: '1.25rem' }}>

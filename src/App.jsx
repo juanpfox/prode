@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from './hooks/useAuth'
 import { useTheme, applyRTL } from './hooks/useTheme'
 import LoginPage from './pages/LoginPage'
@@ -17,6 +17,15 @@ import GuestLoginPage from './pages/GuestLoginPage'
 import Guest2LoginPage from './pages/Guest2LoginPage'
 import AvatarPage from './pages/AvatarPage'
 
+
+function HomeRedirect() {
+  const navigate = useNavigate()
+  useEffect(() => {
+    const last = localStorage.getItem('lastTournament')
+    if (last) navigate(`/${last}`, { replace: true })
+  }, [])
+  return <HomePage />
+}
 
 function LoadingScreen() {
   const { t } = useTranslation()
@@ -43,7 +52,7 @@ export default function App() {
     <BrowserRouter>
       {user ? (
         <Routes>
-          <Route path="/"                          element={<HomePage />} />
+          <Route path="/"                          element={<HomeRedirect />} />
           <Route path="/torneos"                   element={<TournamentsPage />} />
           <Route path="/torneo/:id"                element={<TournamentDetailPage />} />
           <Route path="/torneo/:id/pronosticos"    element={<PredictionsPage />} />

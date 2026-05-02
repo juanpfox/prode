@@ -18,7 +18,7 @@ export default function TournamentsPage() {
   const [myTournaments, setMyTournaments] = useState([])
   const [publicTournaments, setPublicTournaments] = useState([])
   const [loading, setLoading] = useState(true)
-  const [tab, setTab] = useState('mine')
+  const [tab, setTab] = useState(searchParams.get('tab') === 'public' ? 'public' : 'mine')
   const [showCreate, setShowCreate] = useState(!!searchParams.get('comp') || !!searchParams.get('new'))
   const [joinCode, setJoinCode] = useState('')
   const [joining, setJoining] = useState(false)
