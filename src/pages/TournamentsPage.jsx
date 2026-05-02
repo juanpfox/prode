@@ -388,7 +388,7 @@ const SCORING_DEFAULTS = {
                     {t('tournaments.select_mode')}
                   </p>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.625rem' }}>
-                    {['posiciones', 'partidos'].map(m => (
+                    {['partidos', 'posiciones'].map(m => (
                       <button
                         key={m}
                         type="button"

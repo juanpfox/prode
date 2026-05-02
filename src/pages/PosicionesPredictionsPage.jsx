@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabase'
 import AppShell from '../components/AppShell'
@@ -44,7 +44,7 @@ function TeamFlag({ code, size = 20 }) {
 
 export default function PosicionesPredictionsPage({ tournament }) {
   const { t, i18n } = useTranslation()
-  const { id: tournamentId } = useParams()
+  const tournamentId = tournament?.id
   const navigate = useNavigate()
   const { user } = useAuth()
   const lang = i18n.language?.startsWith('es') ? 'es' : 'en'

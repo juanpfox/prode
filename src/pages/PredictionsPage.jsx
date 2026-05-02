@@ -1480,6 +1480,8 @@ function PredResult({ match, pred, t, config }) {
   const pts = ptsObj?.total
   const breakdown = ptsObj?.breakdown
 
+  const acertoEmpate = config?.pts_empate ?? 3
+
   return (
     <div className="pred-tooltip-wrapper" style={{ marginTop: '0.5rem', padding: '0.375rem 0.625rem',
         background: 'var(--surface-2)',

@@ -81,7 +81,7 @@
     "public": "Público",
     "public_desc": "Cualquier usuario puede verlo y unirse",
     "private": "Privado",
-    "private_desc": "Solo usuarios con código pueden unirse",
+    "private_desc": "Solo usuarios con el link directo pueden verlo y unirse",
     "join_method": "Cómo pueden unirse otros jugadores a tu torneo",
     "approval_required": "Aprobación",
     "approval_required_desc": "Tenés que aprobar a cada jugador que solicite entrar al torneo",
