@@ -752,6 +752,8 @@ body {
 @media (min-width: 641px) {
   .container { padding-inline: 1.5rem; }
   .card { padding: 2rem; }
+  .card-sm { padding: 1rem; }
+  .card-lg { padding: 3rem; }
   .app-nav  { display: none; }
   .app-content { padding-bottom: 1.5rem; }
   .header-hide-mobile { display: inline-flex; }
