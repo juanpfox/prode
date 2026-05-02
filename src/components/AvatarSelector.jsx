@@ -47,12 +47,13 @@ export const getAvatarStyle = (avatarId) => {
 }
 
 export function Avatar({ id, size = 'md', className = '', placeholder = '👤' }) {
-  const finalId = id || (placeholder && placeholder.includes(':') ? placeholder : null)
+  const finalId = id || placeholder
+  const isSprite = finalId && finalId.includes(':')
   
-  if (!finalId) {
+  if (!isSprite) {
     return (
       <div className={`avatar-item avatar-size-${size} ${className}`}>
-        <div className="avatar-placeholder">{placeholder}</div>
+        <div className="avatar-placeholder">{finalId}</div>
       </div>
     )
   }
@@ -63,6 +64,7 @@ export function Avatar({ id, size = 'md', className = '', placeholder = '👤' }
     </div>
   )
 }
+
 
 export default function AvatarSelector({ selectedId, onSelect, categories = null }) {
   const filteredCategories = categories 

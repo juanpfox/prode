@@ -173,6 +173,11 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
   - [x] Agrupar contador y card de login en contenedor lateral.
   - [x] Implementar layout de dos columnas en escritorio (Imagen a la izquierda, login a la derecha).
   - [x] Ajustar responsividad para tablets y móviles.
+- [x] **Avatar por defecto para usuarios**
+  - [x] Modificar el componente `Avatar` para que use el emoji 👤 como fallback si no hay avatar seleccionado.
+  - [x] Ajustar el CSS de `avatar-placeholder` para que el tamaño del emoji sea responsivo.
+  - [x] Actualizar la base de datos para establecer 👤 como valor por defecto en la columna `avatar_url` de la tabla `users`.
+  - [x] Actualizar a los usuarios existentes que no tenían avatar elegido.
 
 
 ---
