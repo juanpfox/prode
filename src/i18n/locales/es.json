@@ -14,11 +14,12 @@
     "email_required": "Primero escribí tu correo y luego hacé clic en el botón"
   },
   "countdown": {
+    "remaining_prefix": "Faltan",
     "title": "EL MUNDIAL COMIENZA EN:",
     "months": "MES",
     "days": "DIAS",
     "hours": "HS",
-    "days_short": "d",
+    "days_short": "días",
     "hours_short": "h"
   },
   "common": {

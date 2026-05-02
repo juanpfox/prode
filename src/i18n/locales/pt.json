@@ -14,10 +14,13 @@
     "email_required": "Primeiro digite seu e-mail e depois clique no botão"
   },
   "countdown": {
+    "remaining_prefix": "Faltam",
     "title": "A COPA DO MUNDO COMEÇA EM:",
     "months": "MÊS",
     "days": "DIAS",
-    "hours": "HS"
+    "hours": "HS",
+    "days_short": "dias",
+    "hours_short": "h"
   },
   "common": {
     "loading": "Carregando...",

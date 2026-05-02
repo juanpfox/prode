@@ -13,6 +13,15 @@
     "sign_in_google": "تسجيل الدخول بـ Google",
     "email_required": "يرجى إدخال بريدك الإلكتروني أولاً ثم النقر على الزر"
   },
+  "countdown": {
+    "remaining_prefix": "تبدأ في",
+    "title": "تبدأ كأس العالم في:",
+    "months": "أشهر",
+    "days": "أيام",
+    "hours": "ساعات",
+    "days_short": "أيام",
+    "hours_short": "ساعات"
+  },
   "common": {
     "loading": "جارٍ التحميل...",
     "sign_out": "تسجيل الخروج",

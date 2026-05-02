@@ -15,8 +15,13 @@ export default function AppShell({ children, saveIndicator, wide }) {
   return (
     <div className="home-page">
       <header className="app-header">
-        <div className="app-header-logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-          ⚽ <span>Prode Mundial</span>
+        <div className="app-header-logo" onClick={() => navigate('/')} style={{ cursor: 'pointer', flexDirection: 'column', alignItems: 'flex-start', gap: 0, justifyContent: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            ⚽ <span>Prode Mundial</span>
+          </div>
+          <div className="show-mobile" style={{ marginTop: '-0.1rem', marginLeft: '1rem' }}>
+            <WorldCupCountdown compact={true} hideAvatar={true} />
+          </div>
         </div>
         <div className="app-header-actions">
           {saveIndicator === 'saving' && (
@@ -29,7 +34,9 @@ export default function AppShell({ children, saveIndicator, wide }) {
               ✓ {t('predictions.all_changes_saved')}
             </span>
           )}
-          <WorldCupCountdown compact={true} />
+          <div className="hide-mobile">
+            <WorldCupCountdown compact={true} />
+          </div>
           <LangSelector />
           <ThemeToggle />
           {(user?.email === 'guest@prodemundial.dev' || user?.email === 'juanpatriciofox@gmail.com') && (

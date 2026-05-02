@@ -13,6 +13,15 @@
     "sign_in_google": "Mit Google anmelden",
     "email_required": "Bitte zuerst E-Mail eingeben und dann auf den Button klicken"
   },
+  "countdown": {
+    "remaining_prefix": "In",
+    "title": "DIE WELTMEISTERSCHAFT BEGINNT IN:",
+    "months": "MONATE",
+    "days": "TAGE",
+    "hours": "STD",
+    "days_short": "Tagen",
+    "hours_short": "Std."
+  },
   "common": {
     "loading": "Laden...",
     "sign_out": "Abmelden",

@@ -13,6 +13,15 @@
     "sign_in_google": "Google से साइन इन करें",
     "email_required": "पहले अपना ईमेल दर्ज करें, फिर बटन पर क्लिक करें"
   },
+  "countdown": {
+    "remaining_prefix": "शुरू होने में",
+    "title": "विश्व कप शुरू होने में:",
+    "months": "महीने",
+    "days": "दिन",
+    "hours": "घंटे",
+    "days_short": "दिन",
+    "hours_short": "घंटे"
+  },
   "common": {
     "loading": "लोड हो रहा है...",
     "sign_out": "साइन आउट",

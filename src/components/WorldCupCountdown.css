@@ -21,25 +21,9 @@
   width: 100%;
 }
 
-.wc-countdown-trophy {
-  width: 100px;
-  height: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.wc-countdown-trophy-large {
   flex-shrink: 0;
-  border-radius: 50%;
-  overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.wc-trophy-avatar {
-  width: 100%;
-  height: 100%;
-  background-image: url("/avatars/others.png");
-  background-position: 33.4333% 1.3%;
-  background-size: 400% 400%;
-  transform: scale(1.1); /* Zoom in slightly to match app style */
 }
 
 .wc-countdown-content {
@@ -103,9 +87,9 @@
     gap: 1rem;
   }
   
-  .wc-countdown-trophy {
-    width: 64px;
-    height: 64px;
+  .wc-countdown-trophy-large {
+    width: 64px !important;
+    height: 64px !important;
   }
   
   .wc-countdown-title {
@@ -155,32 +139,9 @@
   background: var(--surface-3);
 }
 
-.wc-countdown-trophy-mini {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  border-radius: 50%;
-  overflow: hidden;
-  background: #34d39920;
-  border: 1px solid #34d39940;
-}
-
-.wc-countdown-trophy-mini .wc-trophy-avatar {
-  transform: scale(0.8);
-}
-
 .wc-countdown-text {
   font-size: 0.875rem;
-  font-weight: 700;
-  color: #ef4444; /* Red as shown in mockup */
+  font-weight: 500;
+  color: var(--text-muted);
   white-space: nowrap;
-}
-
-@media (max-width: 768px) {
-  .wc-countdown-compact .wc-countdown-text {
-    display: none;
-  }
 }

@@ -13,6 +13,15 @@
     "sign_in_google": "Google দিয়ে সাইন ইন করুন",
     "email_required": "প্রথমে আপনার ইমেইল লিখুন, তারপর বোতামে ক্লিক করুন"
   },
+  "countdown": {
+    "remaining_prefix": "শুরু হতে",
+    "title": "বিশ্বকাপ শুরু হতে:",
+    "months": "মাস",
+    "days": "দিন",
+    "hours": "ঘন্টা",
+    "days_short": "দিন",
+    "hours_short": "ঘন্টা"
+  },
   "common": {
     "loading": "লোড হচ্ছে...",
     "sign_out": "সাইন আউট",

@@ -13,6 +13,15 @@
     "sign_in_google": "Se connecter avec Google",
     "email_required": "Veuillez d'abord saisir votre e-mail, puis cliquer sur le bouton"
   },
+  "countdown": {
+    "remaining_prefix": "Dans",
+    "title": "LA COUPE DU MONDE DÉBUTE DANS:",
+    "months": "MOIS",
+    "days": "JOURS",
+    "hours": "H",
+    "days_short": "jours",
+    "hours_short": "h"
+  },
   "common": {
     "loading": "Chargement...",
     "sign_out": "Déconnexion",

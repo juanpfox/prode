@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { Avatar } from './AvatarSelector';
 import './WorldCupCountdown.css';
 
-const WorldCupCountdown = ({ compact = false }) => {
+const WorldCupCountdown = ({ compact = false, hideAvatar = false }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [timeLeft, setTimeLeft] = useState({
@@ -15,11 +16,18 @@ const WorldCupCountdown = ({ compact = false }) => {
 
   // Target date: June 11, 2026
   const targetDate = new Date('2026-06-11T18:00:00Z');
+  const [isExpired, setIsExpired] = useState(() => new Date() - targetDate > 2 * 24 * 60 * 60 * 1000);
 
   useEffect(() => {
     const calculateTimeLeft = () => {
       const now = new Date();
       const difference = targetDate - now;
+
+      // Desaparece al segundo día del mundial (48 horas después)
+      if (difference < -2 * 24 * 60 * 60 * 1000) {
+        setIsExpired(true);
+        return;
+      }
 
       if (difference > 0) {
         // Calculate total days remaining
@@ -29,6 +37,9 @@ const WorldCupCountdown = ({ compact = false }) => {
         const seconds = Math.floor((difference / 1000) % 60);
 
         setTimeLeft({ days, hours, minutes, seconds });
+      } else {
+        // Se detiene en 0
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
       }
     };
 
@@ -38,10 +49,12 @@ const WorldCupCountdown = ({ compact = false }) => {
     return () => clearInterval(timer);
   }, []);
 
+  if (isExpired) return null;
+
   if (compact) {
     return (
       <div className="wc-countdown-compact" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-        <Avatar id="others:1" size="sm" className="wc-countdown-trophy-avatar" />
+        {!hideAvatar && <Avatar id="others:1" size="sm" className="wc-countdown-trophy-avatar" />}
         <div className="wc-countdown-text">
           {t('countdown.remaining_prefix', 'Faltan')} {timeLeft.days} {t('countdown.days_short', 'd')} {timeLeft.hours} {t('countdown.hours_short', 'h')}
         </div>
@@ -52,9 +65,7 @@ const WorldCupCountdown = ({ compact = false }) => {
   return (
     <div className="wc-countdown-container">
       <div className="wc-countdown-card">
-        <div className="wc-countdown-trophy">
-          <div className="wc-trophy-avatar" />
-        </div>
+        <Avatar id="others:1" size="xl" className="wc-countdown-trophy-large" />
         <div className="wc-countdown-content">
           <h3 className="wc-countdown-title">{t('countdown.title', 'EL MUNDIAL COMIENZA EN:')}</h3>
           <div className="wc-countdown-timer">
