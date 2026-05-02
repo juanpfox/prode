@@ -139,3 +139,48 @@
 [data-theme="dark"] .wc-countdown-label {
   color: var(--text-muted);
 }
+
+/* Compact version styles */
+.wc-countdown-compact {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--r-lg);
+  transition: all 0.2s ease;
+  margin-right: auto; /* Push others to the right */
+}
+
+.wc-countdown-compact:hover {
+  background: var(--surface-3);
+}
+
+.wc-countdown-trophy-mini {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #34d39920;
+  border: 1px solid #34d39940;
+}
+
+.wc-countdown-trophy-mini .wc-trophy-avatar {
+  transform: scale(0.8);
+}
+
+.wc-countdown-text {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #ef4444; /* Red as shown in mockup */
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .wc-countdown-compact .wc-countdown-text {
+    display: none;
+  }
+}

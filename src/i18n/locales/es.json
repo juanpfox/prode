@@ -17,7 +17,9 @@
     "title": "EL MUNDIAL COMIENZA EN:",
     "months": "MES",
     "days": "DIAS",
-    "hours": "HS"
+    "hours": "HS",
+    "days_short": "d",
+    "hours_short": "h"
   },
   "common": {
     "loading": "Cargando...",

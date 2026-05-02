@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import './WorldCupCountdown.css';
 
-const WorldCupCountdown = () => {
+const WorldCupCountdown = ({ compact = false }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -35,6 +37,17 @@ const WorldCupCountdown = () => {
 
     return () => clearInterval(timer);
   }, []);
+
+  if (compact) {
+    return (
+      <div className="wc-countdown-compact" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+        <Avatar id="others:1" size="sm" className="wc-countdown-trophy-avatar" />
+        <div className="wc-countdown-text">
+          {t('countdown.remaining_prefix', 'Faltan')} {timeLeft.days} {t('countdown.days_short', 'd')} {timeLeft.hours} {t('countdown.hours_short', 'h')}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="wc-countdown-container">

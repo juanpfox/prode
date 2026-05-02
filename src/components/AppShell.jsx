@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth'
 import ThemeToggle from './ThemeToggle'
 import LangSelector from './LangSelector'
 import { Avatar } from './AvatarSelector'
+import WorldCupCountdown from './WorldCupCountdown'
 
 export default function AppShell({ children, saveIndicator, wide }) {
   const { t } = useTranslation()
@@ -28,6 +29,7 @@ export default function AppShell({ children, saveIndicator, wide }) {
               ✓ {t('predictions.all_changes_saved')}
             </span>
           )}
+          <WorldCupCountdown compact={true} />
           <LangSelector />
           <ThemeToggle />
           {(user?.email === 'guest@prodemundial.dev' || user?.email === 'juanpatriciofox@gmail.com') && (

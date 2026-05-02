@@ -75,14 +75,6 @@ export default function HomePage() {
 
   return (
     <AppShell>
-      {(!loading && myTournaments.length > 0) && (
-        <div style={{ marginTop: '0.4rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.625rem', marginBottom: '1.5rem' }}>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>{user?.email}</p>
-        </div>
-      )}
-
-      <WorldCupCountdown />
-
       {loading ? (
         <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '3rem' }}>{t('common.loading')}</p>
       ) : (

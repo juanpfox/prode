@@ -17,7 +17,9 @@
     "title": "WORLD CUP BEGINS IN:",
     "months": "MONTH",
     "days": "DAYS",
-    "hours": "HRS"
+    "hours": "HRS",
+    "days_short": "d",
+    "hours_short": "h"
   },
   "common": {
     "loading": "Loading...",
