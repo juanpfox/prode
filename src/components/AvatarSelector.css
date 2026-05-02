@@ -125,3 +125,14 @@
     display: inline;
   }
 }
+
+.avatar-link {
+  display: block;
+  border-radius: 50%;
+}
+
+.avatar-link:hover .avatar-item {
+  transform: scale(1.05);
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25);
+}

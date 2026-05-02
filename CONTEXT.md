@@ -62,7 +62,7 @@ Pronóstico de **resultado exacto**.
 - [X] Sistema de Torneos Destacados (Admin only) y ordenamiento prioritario
 - [X] Sub-URLs personalizadas para torneos (Slugs) — ej: `prode.mundial.com/mi-torneo`
 - [x] Simplificación de UI: eliminación de etiquetas de competición y modo en fichas de torneos.
-- [x] Sistema de Avatares Personalizados (Catálogo de 100+ iconos caricaturizados, incluyendo Famosos).
+- [x] Sistema de Avatares Personalizados (Catálogo de 100+ iconos caricaturizados, incluyendo Famosos) con página de selección dedicada.
 - [x] Rediseño del Hero en Landing Page (Uso de imagen de marca `prodeImage.png`).
 - [x] Avatares para Torneos (Uso de categorías 'Clubes', 'Otros' y 'Animales', con el avatar de trofeo como fallback por defecto).
 - [x] Contador regresivo al Mundial 2026 en Login y Home.
