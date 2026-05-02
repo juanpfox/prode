@@ -436,7 +436,7 @@ export default function TournamentDetailPage() {
   return (
     <AppShell>
       <div className="animate-fade-in">
-        <div className="hide-mobile" style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap', position: 'relative' }}>
+        <div className="hide-mobile" style={{ gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap', position: 'relative' }}>
           {/* Cambiar de torneo */}
           {userTournaments.filter(t => t.id !== tournament?.id).length > 0 && <div style={{ position: 'relative' }}>
             <button

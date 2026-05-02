@@ -757,7 +757,7 @@ body {
   .app-nav  { display: none; }
   .app-content { padding-bottom: 1.5rem; }
   .header-hide-mobile { display: inline-flex; }
-  .hide-mobile { display: inline-block; }
+  .hide-mobile { display: flex; }
   .show-mobile { display: none; }
 }
 @media (max-width: 640px) {
