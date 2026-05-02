@@ -11,6 +11,7 @@ const MATCH_FIELDS = [
   { key: 'pts_diferencia_exacta',    label: 'config.pts_diferencia_exacta',    min: 0 },
   { key: 'pts_descuento_diferencia', label: 'config.pts_descuento_diferencia', min: 0 },
   { key: 'pts_goleada',              label: 'config.pts_goleada',              min: 0 },
+  { key: 'pts_penales',              label: 'config.pts_penales',              min: 0 },
 ]
 
 const MATCH_MULT_FIELDS = [

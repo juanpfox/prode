@@ -14,7 +14,6 @@ export default function ProfilePage() {
   const [avatarId, setAvatarId] = useState('')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
-  const [myTournaments, setMyTournaments] = useState([])
 
   useEffect(() => {
     supabase.from('users').select('*').eq('id', user.id).single()
@@ -23,10 +22,6 @@ export default function ProfilePage() {
         setDisplayName(data?.display_name ?? '')
         setAvatarId(data?.avatar_url ?? '')
       })
-    supabase.from('tournament_players')
-      .select('role, status, tournaments(id, name, competitions(name))')
-      .eq('user_id', user.id)
-      .then(({ data }) => setMyTournaments(data ?? []))
   }, [user])
 
   async function handleSave(e) {
@@ -45,8 +40,6 @@ export default function ProfilePage() {
     setTimeout(() => setSaved(false), 2000)
   }
 
-  const approved = myTournaments.filter(tp => tp.status === 'approved')
-  const pending  = myTournaments.filter(tp => tp.status === 'pending')
 
   return (
     <AppShell>
@@ -81,27 +74,6 @@ export default function ProfilePage() {
           </form>
         </div>
 
-        {profile && (
-          <div className="card card-sm" style={{ marginBottom: '1.25rem' }}>
-            <p style={{ fontWeight: 700, marginBottom: '0.75rem', fontSize: '0.875rem' }}>{t('profile.stats')}</p>
-            <div style={{ display: 'flex', gap: '1.5rem' }}>
-              <div>
-                <p style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--primary)' }}>{approved.length}</p>
-                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{t('profile.stat_active_tournaments')}</p>
-              </div>
-              <div>
-                <p style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--primary)' }}>{profile.tournaments_created ?? 0}</p>
-                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{t('profile.stat_created')}</p>
-              </div>
-              {pending.length > 0 && (
-                <div>
-                  <p style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--warning)' }}>{pending.length}</p>
-                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{t('profile.stat_pending')}</p>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
 
         <button className="btn btn-ghost btn-sm" style={{ width: '100%', marginTop: '0.5rem', color: 'var(--text-muted)' }}
           onClick={signOut}>

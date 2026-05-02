@@ -301,6 +301,8 @@
     "simulator_title": "Simulador de puntos",
     "simulator_pred": "Tu pronóstico",
     "simulator_real": "Resultado real",
+    "simulator_pens": "¿Penales?",
+    "pts_penales": "Ganador de penales correcto",
     "pts_ganador": "Ganador correcto",
     "pts_empate": "Empate correcto",
     "pts_resultado_exacto": "Resultado exacto",

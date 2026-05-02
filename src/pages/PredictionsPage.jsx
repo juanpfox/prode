@@ -1454,7 +1454,10 @@ function calcMatchPoints(match, pred, config) {
   }
 
   subtotal += bonusExacto
-  return { total: subtotal * mult, breakdown: { ...breakdown, bonusExacto, subtotal, mult } }
+  const bonusPenales = (match.went_to_pens && pred.pen_pick && pred.pen_pick === match.pen_winner)
+    ? (config.pts_penales ?? 2) : 0
+  subtotal += bonusPenales
+  return { total: subtotal * mult, breakdown: { ...breakdown, bonusExacto, bonusPenales, subtotal, mult } }
 }
 
 function PredResult({ match, pred, t, config }) {
@@ -1521,6 +1524,12 @@ function PredResult({ match, pred, t, config }) {
             <div className="pred-tooltip-row">
               <span>{t('rules.resultado_exacto')}</span>
               <span style={{ color: 'var(--primary)', fontWeight: 600 }}>+{breakdown.bonusExacto}</span>
+            </div>
+          )}
+          {breakdown.bonusPenales > 0 && (
+            <div className="pred-tooltip-row">
+              <span>{t('config.pts_penales')}</span>
+              <span style={{ color: 'var(--primary)', fontWeight: 600 }}>+{breakdown.bonusPenales}</span>
             </div>
           )}
           {breakdown.case === 'ganador_mal' && breakdown.penalizacion < 0 && (

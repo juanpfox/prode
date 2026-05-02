@@ -287,6 +287,8 @@
     "simulator_title": "Score simulator",
     "simulator_pred": "Your prediction",
     "simulator_real": "Actual result",
+    "simulator_pens": "Penalties?",
+    "pts_penales": "Correct penalty winner",
     "pts_ganador": "Correct winner",
     "pts_empate": "Correct draw",
     "pts_resultado_exacto": "Exact result",

@@ -26,6 +26,9 @@ export function SimuladorPuntosBody({ config, t }) {
   const [simP, setSimP] = useState({ home: 2, away: 0 })
   const [simR, setSimR] = useState({ home: 3, away: 0 })
   const [stage, setStage] = useState('group')
+  const [wentToPens, setWentToPens] = useState(false)
+  const [penPick, setPenPick] = useState(null)
+  const [penWinner, setPenWinner] = useState(null)
 
   const stageMultMap = {
     group: 1, r32: 1,
@@ -50,6 +53,9 @@ export function SimuladorPuntosBody({ config, t }) {
   const extraGoleada           = config?.pts_goleada              ?? 1
   const minAbsGoles = extraGoleada * Math.min(Math.abs(difP), Math.abs(difR))
 
+  const bonusPenales = wentToPens && penPick && penWinner && penPick === penWinner
+    ? (config?.pts_penales ?? 2) : 0
+
   let subtotal, caseType = 'miss_empate', ptsGanador = 0, bonoDif = 0, penalizacion = 0
   if (difP === 0 && difR === 0) {
     subtotal = acertoEmpate; caseType = 'empate'
@@ -63,7 +69,7 @@ export function SimuladorPuntosBody({ config, t }) {
     subtotal = Math.min(0, -descuento * Math.abs(difP - difR) + acertoGanador)
     penalizacion = subtotal; caseType = 'ganador_mal'
   }
-  subtotal += bonusExacto
+  subtotal += bonusExacto + bonusPenales
   const total = subtotal * mult
 
   const stages = [
@@ -105,9 +111,9 @@ export function SimuladorPuntosBody({ config, t }) {
       {/* Match cards */}
       <div style={{ display: 'flex', gap: '0.625rem', flexWrap: 'wrap' }}>
         {[
-          { label: t('config.simulator_pred'), goals: simP, setGoals: setSimP },
-          { label: t('config.simulator_real'), goals: simR, setGoals: setSimR },
-        ].map(({ label, goals, setGoals }) => (
+          { label: t('config.simulator_pred'), goals: simP, setGoals: setSimP, pen: penPick, setPen: setPenPick },
+          { label: t('config.simulator_real'), goals: simR, setGoals: setSimR, pen: penWinner, setPen: setPenWinner },
+        ].map(({ label, goals, setGoals, pen, setPen }) => (
           <div key={label} style={cardStyle}>
             <div style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.04em', marginBottom: '0.5rem' }}>
               {label}
@@ -119,8 +125,37 @@ export function SimuladorPuntosBody({ config, t }) {
               <GoalStep value={goals.away} onChange={v => setGoals(g => ({ ...g, away: v }))} />
               <span style={{ flex: 1, fontSize: '0.8rem', color: 'var(--text-2)', whiteSpace: 'nowrap' }}>Brasil</span>
             </div>
+            {wentToPens && (
+              <div style={{ marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', flexShrink: 0 }}>Pen:</span>
+                {['home', 'away'].map((side, i) => (
+                  <button key={side} type="button" onClick={() => setPen(side)} style={{
+                    flex: 1, padding: '0.2rem 0', borderRadius: 'var(--r-sm)', border: '1.5px solid',
+                    borderColor: pen === side ? 'var(--primary)' : 'var(--border)',
+                    background: pen === side ? 'var(--primary)' : 'transparent',
+                    color: pen === side ? 'var(--primary-fg)' : 'var(--text-muted)',
+                    fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer',
+                  }}>
+                    {i === 0 ? 'ARG' : 'BRA'}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         ))}
+      </div>
+
+      {/* Pens toggle */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <button type="button" onClick={() => { setWentToPens(p => !p); setPenPick(null); setPenWinner(null) }} style={{
+          padding: '0.25rem 0.625rem', borderRadius: 'var(--r-sm)', border: '1.5px solid',
+          borderColor: wentToPens ? 'var(--primary)' : 'var(--border)',
+          background: wentToPens ? 'var(--primary)' : 'transparent',
+          color: wentToPens ? 'var(--primary-fg)' : 'var(--text-muted)',
+          fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', lineHeight: 1.5,
+        }}>
+          {t('config.simulator_pens')}
+        </button>
       </div>
 
       {/* Breakdown */}
@@ -137,6 +172,7 @@ export function SimuladorPuntosBody({ config, t }) {
           <SimRow label={t('rules.penalizacion_diferencia')} value={penalizacion < 0 ? `${penalizacion}` : '0'} negative={penalizacion < 0} />
         )}
         {bonusExacto > 0 && <SimRow label={t('rules.resultado_exacto')} value={`+${bonusExacto}`} positive />}
+        {bonusPenales > 0 && <SimRow label={t('config.pts_penales')} value={`+${bonusPenales}`} positive />}
 
         <div style={{ borderTop: '1px solid var(--border)', paddingTop: '0.375rem', marginTop: '0.125rem' }}>
           <SimRow label={t('rules.example_subtotal')} value={String(subtotal)} />
