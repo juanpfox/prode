@@ -60,8 +60,10 @@ export function SimuladorPuntosBody({ config, t }) {
   let subtotal, caseType = 'miss_empate', ptsGanador = 0, bonoDif = 0, penalizacion = 0, penalizacionEmpate = 0
   if (difP === 0 && difR === 0) {
     const errorGoles = Math.abs(pHome - rHome)
-    penalizacionEmpate = descuentoEmpate * errorGoles
-    subtotal = Math.max(1, acertoEmpate - penalizacionEmpate); caseType = 'empate'
+    const rawPenalizacion = descuentoEmpate * errorGoles
+    subtotal = Math.max(1, acertoEmpate - rawPenalizacion)
+    penalizacionEmpate = acertoEmpate - subtotal
+    caseType = 'empate'
   } else if (difP === 0 || difR === 0) {
     subtotal = 0; caseType = 'miss_empate'
   } else if (Math.sign(difP) === Math.sign(difR)) {

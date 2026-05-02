@@ -705,8 +705,9 @@ function calcMatchPoints(match, pred, config) {
 
   if (difP === 0 && difR === 0) {
     const errorGoles = Math.abs(pHome - rHome)
-    const penalizacionEmpate = descuentoEmpate * errorGoles
-    subtotal = Math.max(1, acertoEmpate - penalizacionEmpate)
+    const rawPenalizacion = descuentoEmpate * errorGoles
+    subtotal = Math.max(1, acertoEmpate - rawPenalizacion)
+    const penalizacionEmpate = acertoEmpate - subtotal
     breakdown = { case: 'empate', penalizacionEmpate }
   } else if (difP === 0 || difR === 0) {
     subtotal = 0
