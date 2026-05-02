@@ -43,9 +43,12 @@
   },
   "tournaments": {
     "title": "Meus Torneios",
+    "tab_mine": "Meus torneios",
+    "tab_public": "Participar de outro torneio",
+    "select_to_join": "Escolha o torneio que você deseja participar",
     "create": "Criar torneio",
     "join": "Entrar em um torneio",
-    "select_to_play": "Escolha o torneio em que você quer jogar",
+    "select_to_play": "Escolha o torneio em que deseja jogar",
     "empty": "Você não participa de nenhum torneio ainda",
     "players_one": "{{count}} jogador",
     "players_other": "{{count}} jogadores",

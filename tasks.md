@@ -125,6 +125,10 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
   - [x] Cambiar la ruta raíz `/` para que renderice `TournamentsPage.jsx` en lugar de `HomePage.jsx`.
   - [x] Actualizar la navegación en `AppShell.jsx` para que el botón de Torneos apunte a `/` y se marque como activo.
   - [x] Redirigir `/torneos` a `/` para unificar la URL.
+  - [x] **Mejora Onboarding: Usuario sin torneos**
+    - [x] Ocultar pestañas "Mis torneos" y "Unirme a otro" si la lista de torneos propios está vacía.
+    - [x] Mostrar mensaje "Elegí el torneo al que queres unirte" como título.
+    - [x] Mostrar lista de torneos públicos directamente.
 
 ## Fase 5: Perfil y Personalización
 

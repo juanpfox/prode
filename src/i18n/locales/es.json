@@ -71,6 +71,7 @@
     "participants": "Participantes",
     "tab_mine": "Mis torneos",
     "tab_public": "Unirme a otro torneo",
+    "select_to_join": "Elegí el torneo al que queres unirte",
     "select_to_play": "Elegí el torneo en el que querés jugar",
     "already_requested": "Ya enviaste una solicitud a este torneo",
     "join_requested": "Solicitud enviada a \"{{name}}\". Esperá la aprobación del admin.",
