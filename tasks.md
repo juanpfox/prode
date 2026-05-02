@@ -187,6 +187,10 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
   - [x] Aplicar fondo gris claro al círculo del avatar por defecto para asegurar visibilidad en modo oscuro.
   - [x] Actualizar la base de datos para establecer 👤 como valor por defecto en la columna `avatar_url` de la tabla `users`.
   - [x] Actualizar a los usuarios existentes que no tenían avatar elegido.
+  - [x] **Bug Fix: Avatares desapareciendo en Producción**
+    - [x] Corregir lógica de detección de sprites para evitar que URLs externas (Google) se procesen como sprites inválidos.
+    - [x] Modificar trigger de base de datos para priorizar el emoji 👤 sobre la foto de perfil de Google en nuevos registros.
+    - [x] Limpiar URLs de perfiles existentes para unificar la visualización inicial.
 
 
 ---

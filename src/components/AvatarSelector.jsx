@@ -29,6 +29,7 @@ export const getAvatarStyle = (avatarId) => {
   
   const [sheet, indexStr] = avatarId.split(':')
   const index = parseInt(indexStr)
+  if (isNaN(index)) return {}
   
   const col = index % 4
   const row = Math.floor(index / 4)
@@ -46,27 +47,49 @@ export const getAvatarStyle = (avatarId) => {
   }
 }
 
+const isSpriteId = (id) => {
+  if (!id || typeof id !== 'string') return false
+  const parts = id.split(':')
+  return parts.length === 2 && !isNaN(parseInt(parts[1])) && !id.startsWith('http')
+}
+
 export function Avatar({ id, size = 'md', className = '', placeholder = '👤' }) {
+  const [imgError, setImgError] = useState(false)
   const finalId = id || placeholder
-  const isSprite = finalId && finalId.includes(':')
   
-  if (!isSprite) {
+  if (isSpriteId(finalId)) {
     return (
       <div className={`avatar-item avatar-size-${size} ${className}`}>
-        <div className="avatar-placeholder">{finalId}</div>
+        <div className="avatar-img" style={getAvatarStyle(finalId)} />
+      </div>
+    )
+  }
+
+  const isUrl = finalId && (typeof finalId === 'string') && (finalId.startsWith('http') || finalId.startsWith('/'))
+
+  if (isUrl && !imgError) {
+    return (
+      <div className={`avatar-item avatar-size-${size} ${className}`}>
+        <img 
+          src={finalId} 
+          alt="" 
+          className="avatar-img" 
+          style={{ transform: 'none', objectFit: 'cover' }} 
+          onError={() => setImgError(true)}
+        />
       </div>
     )
   }
 
   return (
     <div className={`avatar-item avatar-size-${size} ${className}`}>
-      <div className="avatar-img" style={getAvatarStyle(finalId)} />
+      <div className="avatar-placeholder">{isUrl ? placeholder : finalId}</div>
     </div>
   )
 }
 
-
 export default function AvatarSelector({ selectedId, onSelect, categories = null }) {
+
   const filteredCategories = categories 
     ? categories.map(id => AVATAR_CATEGORIES.find(cat => cat.id === id)).filter(Boolean)
     : AVATAR_CATEGORIES
