@@ -67,6 +67,9 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
     - [x] Modificar `calcMatchPoints` para devolver el desglose del cálculo.
     - [x] Crear componente CSS de tooltip en `index.css`.
     - [x] Implementar el tooltip en `PredictionsPage.jsx` y `PlayerPredictionsPage.jsx` al pasar el mouse por los puntos de cada ficha.
+  - [x] **Limpieza de resultados World Cup 2026**
+    - [x] Borrar resultados cargados desde el 24 de junio de 2026 inclusive en adelante.
+    - [x] Conservar resultados anteriores al 24 de junio.
 
 ## Fase 3: Monetización e Integraciones Externas
 
