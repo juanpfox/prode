@@ -138,9 +138,11 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
   - [x] Agregar el contador a la página de Login.
   - [x] Agregar el contador a la página de Inicio (Home).
   - [x] Soportar i18n para los labels del contador.
-- [x] **Exportar resultados a Excel**
-  - [x] Implementar botón de descarga en `AdminResultsEntryPage`.
-  - [x] Generar archivo XLSX con todos los resultados de la competición.
+- [ ] **Mover selección de avatar a página separada**
+  - [ ] Crear la página `AvatarPage.jsx` en `src/pages`.
+  - [ ] Registrar la ruta `/perfil/avatar` en `App.jsx`.
+  - [ ] Modificar `ProfilePage.jsx` para quitar el selector directo y agregar un link en el avatar y uno debajo.
+  - [ ] Asegurar que la nueva página permita seleccionar el avatar y guardarlo (o volver al perfil con el cambio).
 
 ---
 

@@ -1415,64 +1415,46 @@ function calcMatchPoints(match, pred, config) {
   const rAway = match.away_goals
   if (isNaN(pHome) || isNaN(pAway) || rHome === null || rAway === null) return null
 
-  const exactBoth = pHome === rHome && pAway === rAway
-  const predWinner = pHome > pAway ? 'home' : pHome < pAway ? 'away' : 'draw'
-  const realWinner = match.winner
-  const correctWinner = predWinner === realWinner
+  const acertoGanador = config.pts_ganador ?? 1
+  const acertoEmpate = config.pts_empate ?? 3
+  const acertoDiferenciaExacta = config.pts_diferencia_exacta ?? 4
+  const descuento = config.pts_descuento_diferencia ?? 1
+  const extraGoleada = config.pts_goleada ?? 1
 
-  const stage = match.stage
   const stageMultMap = {
     group: 1, r32: 1, r16: config.mult_r16 ?? 2,
     qf: config.mult_qf ?? 3, sf: config.mult_sf ?? 4,
     third_place: 1, final: config.mult_final ?? 6,
   }
-  const mult = stageMultMap[stage] ?? 1
+  const mult = stageMultMap[match.stage] ?? 1
 
-  let ptsWinner = 0
-  let ptsExactBoth = 0
-  let ptsExactOne = 0
-  let ptsDiff = 0
-  let distance = 0
+  const exactResult = pHome === rHome && pAway === rAway
+  const bonusExacto = exactResult ? (config.pts_resultado_exacto ?? 1) : 0
 
-  // Winner / draw
-  if (correctWinner) {
-    ptsWinner = realWinner === 'draw' ? (config.pts_draw ?? 1) : (config.pts_win ?? 3)
-  }
+  const difP = pHome - pAway
+  const difR = rHome - rAway
+  const minAbsGoles = extraGoleada * Math.min(Math.abs(difP), Math.abs(difR))
+  const signoOk = Math.sign(difP) === Math.sign(difR)
 
-  // Exact both goals
-  if (exactBoth) {
-    ptsExactBoth = config.pts_exact_both ?? 3
+  let subtotal, breakdown
+
+  if (difP === 0 && difR === 0) {
+    subtotal = acertoEmpate
+    breakdown = { case: 'empate' }
+  } else if (difP === 0 || difR === 0) {
+    subtotal = 0
+    breakdown = { case: 'miss_empate' }
+  } else if (signoOk) {
+    const bonoDif = Math.max(0, acertoDiferenciaExacta - acertoGanador - descuento * Math.abs(difP - difR) + minAbsGoles)
+    subtotal = acertoGanador + bonoDif
+    breakdown = { case: 'ganador_ok', ptsGanador: acertoGanador, bonoDif }
   } else {
-    // Exact one team's goals
-    let exactOne = 0
-    if (pHome === rHome) exactOne++
-    if (pAway === rAway) exactOne++
-    ptsExactOne = exactOne * (config.pts_exact_one ?? 1)
+    subtotal = Math.min(0, -descuento * Math.abs(difP - difR) + acertoGanador)
+    breakdown = { case: 'ganador_mal', penalizacion: subtotal }
   }
 
-  // Goal diff proximity: bonus = pts_diff_correct - distance, no floor
-  if (config.pts_diff_correct) {
-    const predDiff = pHome - pAway
-    const realDiff = rHome - rAway
-    distance = Math.abs(predDiff - realDiff)
-    ptsDiff = config.pts_diff_correct - distance
-  }
-
-  const subtotal = ptsWinner + ptsExactBoth + ptsExactOne + ptsDiff
-  const total = subtotal * mult
-
-  return {
-    total,
-    breakdown: {
-      ptsWinner,
-      ptsExactBoth,
-      ptsExactOne,
-      ptsDiff,
-      distance,
-      subtotal,
-      mult
-    }
-  }
+  subtotal += bonusExacto
+  return { total: subtotal * mult, breakdown: { ...breakdown, bonusExacto, subtotal, mult } }
 }
 
 function PredResult({ match, pred, t, config }) {
@@ -1515,30 +1497,36 @@ function PredResult({ match, pred, t, config }) {
       
       {breakdown && (
         <div className="pred-tooltip">
-          {breakdown.ptsWinner > 0 && (
+          {breakdown.case === 'empate' && (
             <div className="pred-tooltip-row">
-              <span>{t('rules.example_correct_winner')}</span>
-              <span style={{ color: 'var(--primary)', fontWeight: 600 }}>+{breakdown.ptsWinner}</span>
+              <span>{t('rules.match_draw_correct')}</span>
+              <span style={{ color: 'var(--primary)', fontWeight: 600 }}>+{breakdown.subtotal}</span>
             </div>
           )}
-          {breakdown.ptsExactBoth > 0 && (
+          {breakdown.case === 'ganador_ok' && (
+            <>
+              <div className="pred-tooltip-row">
+                <span>{t('rules.example_correct_winner')}</span>
+                <span style={{ color: 'var(--primary)', fontWeight: 600 }}>+{breakdown.ptsGanador}</span>
+              </div>
+              {breakdown.bonoDif > 0 && (
+                <div className="pred-tooltip-row">
+                  <span>{t('rules.bono_diferencia')}</span>
+                  <span style={{ color: 'var(--primary)', fontWeight: 600 }}>+{breakdown.bonoDif}</span>
+                </div>
+              )}
+            </>
+          )}
+          {breakdown.bonusExacto > 0 && (
             <div className="pred-tooltip-row">
-              <span>{t('rules.match_exact_both')}</span>
-              <span style={{ color: 'var(--primary)', fontWeight: 600 }}>+{breakdown.ptsExactBoth}</span>
+              <span>{t('rules.resultado_exacto')}</span>
+              <span style={{ color: 'var(--primary)', fontWeight: 600 }}>+{breakdown.bonusExacto}</span>
             </div>
           )}
-          {breakdown.ptsExactOne > 0 && (
+          {breakdown.case === 'ganador_mal' && breakdown.penalizacion < 0 && (
             <div className="pred-tooltip-row">
-              <span>{t('rules.example_exact_one')}</span>
-              <span style={{ color: 'var(--primary)', fontWeight: 600 }}>+{breakdown.ptsExactOne}</span>
-            </div>
-          )}
-          {config?.pts_diff_correct != null && (
-            <div className="pred-tooltip-row">
-              <span>{t('rules.example_diff', { predicted: pHome - pAway, actual: rHome - rAway })}</span>
-              <span style={{ color: breakdown.ptsDiff > 0 ? 'var(--primary)' : breakdown.ptsDiff < 0 ? 'var(--danger)' : 'inherit', fontWeight: 600 }}>
-                {breakdown.ptsDiff > 0 ? '+' : ''}{breakdown.ptsDiff}
-              </span>
+              <span>{t('rules.penalizacion_diferencia')}</span>
+              <span style={{ color: 'var(--danger)', fontWeight: 600 }}>{breakdown.penalizacion}</span>
             </div>
           )}
           <div className="pred-tooltip-row">

@@ -24,11 +24,11 @@ export default function TournamentsPage() {
   const [joining, setJoining] = useState(false)
   const RESERVED_SLUGS = ['perfil', 'posiciones', 'torneos', 'admin', 'login', 'registro', 'invitacion', 'guest', 'guest2', 'perfil-publico']
 const SCORING_DEFAULTS = {
-    pts_win: 3, pts_exact_both: 3, pts_exact_one: 1,
-    pts_diff_correct: 1, pts_diff_wrong: -1,
+    pts_ganador: 1, pts_empate: 3, pts_resultado_exacto: 1,
+    pts_diferencia_exacta: 4, pts_descuento_diferencia: 1, pts_goleada: 1,
     mult_r16: 2, mult_qf: 3, mult_sf: 4, mult_final: 6,
     pts_position_exact: 10, pts_semifinalist: 10, pts_finalist: 20, pts_champion_bonus: 30,
-    pts_win_pen: 2, pts_draw: 1,
+    pts_win_pen: 2, pts_draw: 1, pts_win: 3,
     mult_group_1st: 3, mult_group_2nd: 2, mult_group_3rd: 1,
     mult_world_1st: 7, mult_world_2nd: 6, mult_world_3rd: 5, mult_world_4th: 4,
   }

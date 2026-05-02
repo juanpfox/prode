@@ -29,7 +29,8 @@
       "WebFetch(domain:www.espn.com)",
       "WebFetch(domain:www.rotowire.com)",
       "Bash(python full_bracket_sim.py)",
-      "Bash(python -c ' *)"
+      "Bash(python -c ' *)",
+      "mcp__1455668c-96a1-4cdd-bd0d-f3ba7b4679de__apply_migration"
     ]
   }
 }

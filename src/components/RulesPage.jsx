@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
+import { SimuladorPuntosBody } from './SimuladorPuntos'
 import './config-rules.css'
 
 export default function RulesPage({ tournamentId, mode, config: propConfig }) {
@@ -30,17 +31,12 @@ export default function RulesPage({ tournamentId, mode, config: propConfig }) {
 
 function MatchRules({ config, t }) {
   const c = config
-
-  // Rows filtered to non-zero values
-  const isNonZero = v => v !== 0 && v !== null && v !== undefined
-  const scoringRows = [
-    { label: t('rules.match_correct_winner'),  value: c.pts_win,                       fmt: v => `+${v}` },
-    { label: t('rules.match_draw_correct'),    value: c.pts_draw_correct ?? c.pts_win, fmt: v => `+${v}` },
-    { label: t('rules.match_exact_both'),      value: c.pts_exact_both,                fmt: v => `+${v}` },
-    { label: t('rules.match_exact_one'),       value: c.pts_exact_one,                 fmt: v => `+${v} ${t('rules.per_team')}` },
-    { label: t('rules.match_diff_correct'),    value: c.pts_diff_correct,              fmt: v => `+${v} ${t('rules.per_goal')}` },
-    { label: t('rules.match_diff_wrong'),      value: c.pts_diff_wrong,                fmt: v => `${v} ${t('rules.per_goal')}` },
-  ].filter(r => isNonZero(r.value))
+  const acertoGanador = c.pts_ganador ?? 1
+  const acertoEmpate = c.pts_empate ?? 3
+  const resultadoExacto = c.pts_resultado_exacto ?? 1
+  const acertoDiferenciaExacta = c.pts_diferencia_exacta ?? 4
+  const descuento = c.pts_descuento_diferencia ?? 1
+  const extraGoleada = c.pts_goleada ?? 1
 
   const multRows = [
     { label: t('rules.phase_r16'),   value: c.mult_r16 },
@@ -51,34 +47,45 @@ function MatchRules({ config, t }) {
 
   return (
     <>
-      {/* Points table */}
       <div className="rules-section">
         <h3>{t('rules.scoring_title')}</h3>
         <table className="rules-table">
           <thead>
-            <tr>
-              <th>{t('rules.situation')}</th>
-              <th>{t('rules.points')}</th>
-            </tr>
+            <tr><th>{t('rules.situation')}</th><th>{t('rules.points')}</th></tr>
           </thead>
           <tbody>
-            {scoringRows.map((r, i) => (
-              <tr key={i}><td>{r.label}</td><td>{r.fmt(r.value)}</td></tr>
-            ))}
+            <tr><td>{t('rules.match_draw_correct')}</td><td>+{acertoEmpate}</td></tr>
+            <tr><td>{t('rules.match_draw_wrong')}</td><td>0</td></tr>
+            <tr><td>{t('rules.match_correct_winner')}</td><td>+{acertoGanador} + {t('rules.bono_diferencia').toLowerCase()}</td></tr>
+            <tr><td>{t('rules.match_wrong_winner')}</td><td>{t('rules.penalizacion_diferencia').toLowerCase()}</td></tr>
+            {resultadoExacto > 0 && <tr><td>{t('rules.resultado_exacto')}</td><td>+{resultadoExacto}</td></tr>}
           </tbody>
         </table>
       </div>
 
-      {/* Phase multipliers — only show if any differ from ×1 */}
+      <div className="rules-section">
+        <h3>{t('rules.match_params_title')}</h3>
+        <table className="rules-table">
+          <thead>
+            <tr><th>{t('rules.situation')}</th><th>{t('rules.points')}</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>{t('config.pts_ganador')}</td><td>{acertoGanador}</td></tr>
+            <tr><td>{t('config.pts_empate')}</td><td>{acertoEmpate}</td></tr>
+            <tr><td>{t('config.pts_resultado_exacto')}</td><td>{resultadoExacto}</td></tr>
+            <tr><td>{t('config.pts_diferencia_exacta')}</td><td>{acertoDiferenciaExacta}</td></tr>
+            <tr><td>{t('config.pts_descuento_diferencia')}</td><td>{descuento}</td></tr>
+            <tr><td>{t('config.pts_goleada')}</td><td>{extraGoleada}</td></tr>
+          </tbody>
+        </table>
+      </div>
+
       {multRows.length > 0 && (
         <div className="rules-section">
           <h3>{t('rules.multipliers_title')}</h3>
           <table className="rules-table">
             <thead>
-              <tr>
-                <th>{t('rules.phase')}</th>
-                <th>{t('rules.multiplier')}</th>
-              </tr>
+              <tr><th>{t('rules.phase')}</th><th>{t('rules.multiplier')}</th></tr>
             </thead>
             <tbody>
               {multRows.map((r, i) => (
@@ -89,32 +96,10 @@ function MatchRules({ config, t }) {
         </div>
       )}
 
-      {/* Example — only shown if at least one scoring rule is non-zero */}
-      {scoringRows.length > 0 && (() => {
-        const subtotal = (c.pts_win ?? 0) + (c.pts_exact_one ?? 0) + (c.pts_diff_wrong ?? 0)
-        const mult = c.mult_qf > 1 ? c.mult_qf : 1
-        return (
-          <div className="rules-section">
-            <h3>{t('rules.example_title')}</h3>
-            <div className="rules-example">
-              <p>
-                <strong>{t('rules.example_match_label')}</strong> Argentina 2-1 Brasil ({t('rules.phase_qf')})
-              </p>
-              <p>
-                <strong>{t('rules.example_prediction_label')}</strong> Argentina 3-1 Brasil
-              </p>
-              <p style={{ marginTop: '0.5rem' }}>
-                {c.pts_win > 0 && <>{t('rules.example_correct_winner')}: <span className="highlight">+{c.pts_win}</span><br /></>}
-                {c.pts_exact_one > 0 && <>{t('rules.example_exact_one')}: <span className="highlight">+{c.pts_exact_one}</span> (Brasil: 1)<br /></>}
-                {c.pts_diff_wrong !== 0 && <>{t('rules.example_diff', { predicted: 2, actual: 1 })} → <span className="highlight">{c.pts_diff_wrong}</span><br /></>}
-                {t('rules.example_subtotal')}: <span className="highlight">{subtotal}</span><br />
-                {mult > 1 && <>{t('rules.example_multiplier')}: ×{mult}<br /></>}
-                <strong>{t('rules.example_total')}: <span className="highlight">{subtotal * mult} pts</span></strong>
-              </p>
-            </div>
-          </div>
-        )
-      })()}
+      <div className="rules-section">
+        <h3>{t('rules.example_title')}</h3>
+        <SimuladorPuntosBody config={c} t={t} />
+      </div>
     </>
   )
 }

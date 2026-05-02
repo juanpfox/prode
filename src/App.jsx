@@ -15,6 +15,8 @@ import AdminResultsEntryPage from './pages/AdminResultsEntryPage'
 import PlayerPredictionsPage from './pages/PlayerPredictionsPage'
 import GuestLoginPage from './pages/GuestLoginPage'
 import Guest2LoginPage from './pages/Guest2LoginPage'
+import AvatarPage from './pages/AvatarPage'
+
 
 function LoadingScreen() {
   const { t } = useTranslation()
@@ -48,6 +50,8 @@ export default function App() {
           <Route path="/torneo/:id/jugador/:userId"  element={<PlayerPredictionsPage />} />
           <Route path="/posiciones"                element={<LeaderboardPage />} />
           <Route path="/perfil"                    element={<ProfilePage />} />
+          <Route path="/perfil/avatar"             element={<AvatarPage />} />
+
           
           {/* Guest login paths - Redirect to home if already logged in */}
           <Route path="/guest"                     element={<Navigate to="/" replace />} />

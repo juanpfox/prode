@@ -1,15 +1,16 @@
 import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
+import SimuladorPuntos from './SimuladorPuntos'
 import './config-rules.css'
 
 const MATCH_FIELDS = [
-  { key: 'pts_win',          label: 'config.pts_win',          min: 0 },
-  { key: 'pts_draw',         label: 'config.pts_draw',         min: 0 },
-  { key: 'pts_exact_both',   label: 'config.pts_exact_both',   min: 0 },
-  { key: 'pts_exact_one',    label: 'config.pts_exact_one',    min: 0 },
-  { key: 'pts_diff_correct', label: 'config.pts_diff_correct', min: -10 },
-  { key: 'pts_diff_wrong',   label: 'config.pts_diff_wrong',   min: -10 },
+  { key: 'pts_ganador',              label: 'config.pts_ganador',              min: 0 },
+  { key: 'pts_empate',               label: 'config.pts_empate',               min: 0 },
+  { key: 'pts_resultado_exacto',     label: 'config.pts_resultado_exacto',     min: 0 },
+  { key: 'pts_diferencia_exacta',    label: 'config.pts_diferencia_exacta',    min: 0 },
+  { key: 'pts_descuento_diferencia', label: 'config.pts_descuento_diferencia', min: 0 },
+  { key: 'pts_goleada',              label: 'config.pts_goleada',              min: 0 },
 ]
 
 const MATCH_MULT_FIELDS = [
@@ -206,6 +207,7 @@ export default function ConfigTab({
         <>
           {renderSection(t('config.section_points'), 'match_pts', MATCH_FIELDS)}
           {renderSection(t('config.section_multipliers'), 'match_mult', MATCH_MULT_FIELDS)}
+          <SimuladorPuntos config={effectiveConfig} t={t} />
         </>
       )}
 
@@ -219,3 +221,4 @@ export default function ConfigTab({
     </div>
   )
 }
+

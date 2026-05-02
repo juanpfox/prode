@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabase'
+import { Link } from 'react-router-dom'
 import AppShell from '../components/AppShell'
-import AvatarSelector, { Avatar } from '../components/AvatarSelector'
+import { Avatar } from '../components/AvatarSelector'
 
 export default function ProfilePage() {
   const { t } = useTranslation()
@@ -52,8 +53,15 @@ export default function ProfilePage() {
       <div className="animate-fade-in">
         <h2 className="home-section-title" style={{ marginBottom: '1.25rem' }}>{t('nav.profile')}</h2>
 
-        <div className="card card-sm" style={{ marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <Avatar id={avatarId} size="lg" />
+        <div className="card card-sm" style={{ marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '1.25rem', padding: '1.25rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+            <Link to="/perfil/avatar" style={{ textDecoration: 'none', transition: 'transform 0.2s' }} className="avatar-link">
+              <Avatar id={avatarId} size="lg" />
+            </Link>
+            <Link to="/perfil/avatar" style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: 600, textDecoration: 'none' }}>
+              {t('profile.change_avatar')}
+            </Link>
+          </div>
           <div>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginBottom: '0.2rem' }}>Email</p>
             <p style={{ fontWeight: 600, wordBreak: 'break-all' }}>{user.email}</p>
@@ -66,9 +74,6 @@ export default function ProfilePage() {
             <input className="input" value={displayName} maxLength={32}
               onChange={e => setDisplayName(e.target.value)}
               placeholder={t('profile.display_name_placeholder')} />
-
-            <label style={{ fontWeight: 600, fontSize: '0.875rem', marginTop: '0.5rem' }}>Avatar</label>
-            <AvatarSelector selectedId={avatarId} onSelect={setAvatarId} />
 
             <button className="btn btn-primary btn-sm" type="submit" disabled={saving} style={{ marginTop: '0.5rem' }}>
               {saved ? `✓ ${t('profile.saved')}` : saving ? t('common.loading') : t('profile.save')}
