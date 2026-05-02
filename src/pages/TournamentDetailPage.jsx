@@ -527,7 +527,7 @@ export default function TournamentDetailPage() {
               )}
               
               {/* Copy invitation button */}
-              {isApproved && (tournament.allow_member_invite !== false || myRole === 'owner') && (
+              {isApproved && (tournament.allow_member_invite !== false || tournament.created_by === user?.id) && (
                 <button
                   className="btn btn-ghost btn-sm"
                   onClick={copyInvitation}
