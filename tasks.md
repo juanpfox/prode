@@ -129,6 +129,9 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
     - [x] Ocultar pestañas "Mis torneos" y "Unirme a otro" si la lista de torneos propios está vacía.
     - [x] Mostrar mensaje "Elegí el torneo al que queres unirte" como título.
     - [x] Mostrar lista de torneos públicos directamente.
+  - [x] **Navegación: Ocultar tabs si no hay inscripción**
+    - [x] Implementar verificación de participación en `AppShell.jsx`.
+    - [x] Ocultar botones de "Pronósticos" y "Posiciones" si el usuario no participa en ningún torneo aprobado.
 
 ## Fase 5: Perfil y Personalización
 

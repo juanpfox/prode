@@ -5,6 +5,8 @@ import ThemeToggle from './ThemeToggle'
 import LangSelector from './LangSelector'
 import { Avatar } from './AvatarSelector'
 import WorldCupCountdown from './WorldCupCountdown'
+import { supabase } from '../lib/supabase'
+import { useState, useEffect } from 'react'
 
 export default function AppShell({ children, saveIndicator, wide }) {
   const { t } = useTranslation()
@@ -16,6 +18,22 @@ export default function AppShell({ children, saveIndicator, wide }) {
   const tournamentBasePath = getTournamentBasePath(pathname)
   if (tournamentBasePath) sessionStorage.setItem('lastTournamentPath', tournamentBasePath)
   const lastTournamentPath = tournamentBasePath || sessionStorage.getItem('lastTournamentPath')
+
+  const [hasTournaments, setHasTournaments] = useState(true) // Default to true to avoid flicker
+
+  useEffect(() => {
+    if (!user) {
+      setHasTournaments(false)
+      return
+    }
+    supabase.from('tournament_players')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .eq('status', 'approved')
+      .then(({ count }) => {
+        setHasTournaments(count > 0)
+      })
+  }, [user, pathname]) // Check on user change or navigation
 
   return (
     <div className="home-page">
@@ -61,10 +79,10 @@ export default function AppShell({ children, saveIndicator, wide }) {
       </main>
 
       <nav className="app-nav">
-        {lastTournamentPath && (
+        {hasTournaments && lastTournamentPath && (
           <NavItem icon="⚽" label={t('nav.predictions')} active={pathname.endsWith('/pronosticos')} onClick={() => navigate(`${lastTournamentPath}/pronosticos`)} />
         )}
-        {lastTournamentPath && (
+        {hasTournaments && lastTournamentPath && (
           <NavItem icon="📊" label={t('nav.standings')}   active={!!tournamentBasePath && pathname === tournamentBasePath} onClick={() => navigate(lastTournamentPath)} />
         )}
         <NavItem icon="🏆" label={t('nav.tournaments')} active={pathname === '/' || pathname.startsWith('/torneos')} onClick={() => navigate('/')} />
