@@ -4,7 +4,6 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-route
 import { useAuth } from './hooks/useAuth'
 import { useTheme, applyRTL } from './hooks/useTheme'
 import LoginPage from './pages/LoginPage'
-import HomePage from './pages/HomePage'
 import TournamentsPage from './pages/TournamentsPage'
 import TournamentDetailPage from './pages/TournamentDetailPage'
 import PredictionsPage from './pages/PredictionsPage'
@@ -18,14 +17,6 @@ import Guest2LoginPage from './pages/Guest2LoginPage'
 import AvatarPage from './pages/AvatarPage'
 
 
-function HomeRedirect() {
-  const navigate = useNavigate()
-  useEffect(() => {
-    const last = localStorage.getItem('lastTournament')
-    if (last) navigate(`/${last}`, { replace: true })
-  }, [])
-  return <HomePage />
-}
 
 function LoadingScreen() {
   const { t } = useTranslation()
@@ -52,8 +43,8 @@ export default function App() {
     <BrowserRouter>
       {user ? (
         <Routes>
-          <Route path="/"                          element={<HomeRedirect />} />
-          <Route path="/torneos"                   element={<TournamentsPage />} />
+          <Route path="/"                          element={<TournamentsPage />} />
+          <Route path="/torneos"                   element={<Navigate to="/" replace />} />
           <Route path="/torneo/:id"                element={<TournamentDetailPage />} />
           <Route path="/torneo/:id/pronosticos"    element={<PredictionsPage />} />
           <Route path="/torneo/:id/jugador/:userId"  element={<PlayerPredictionsPage />} />

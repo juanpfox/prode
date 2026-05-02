@@ -121,6 +121,10 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
   - [x] Implementar barra de sincronización en `PredictionsPage`.
   - [x] Permitir copiar predicciones desde/hacia otros torneos de la misma competición.
   - [x] Soportar guardado automático en todos los torneos hermanos (toggle "Guardar en todos").
+- [x] **Página de inicio predeterminada: Torneos**
+  - [x] Cambiar la ruta raíz `/` para que renderice `TournamentsPage.jsx` en lugar de `HomePage.jsx`.
+  - [x] Actualizar la navegación en `AppShell.jsx` para que el botón de Torneos apunte a `/` y se marque como activo.
+  - [x] Redirigir `/torneos` a `/` para unificar la URL.
 
 ## Fase 5: Perfil y Personalización
 
