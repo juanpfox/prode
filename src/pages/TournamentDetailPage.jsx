@@ -28,8 +28,9 @@ export default function TournamentDetailPage() {
   const [editName, setEditName] = useState('')
   const [editSlug, setEditSlug] = useState('')
   const [editPrize, setEditPrize] = useState('')
-  const [editAvatarUrl, setEditAvatarUrl] = useState(null)
+  const [editAvatarUrl, setEditAvatarUrl] = useState('')
   const [showBanned, setShowBanned] = useState(false)
+  const [selectingAvatar, setSelectingAvatar] = useState(false)
   const [confirmLeave, setConfirmLeave] = useState(false)
 
   const id = tournament?.id
@@ -546,15 +547,31 @@ export default function TournamentDetailPage() {
                 {/* Tournament settings: name, prize, visibility, join method */}
                 <div className="card card-sm" style={{ marginBottom: '1rem' }}>
                   <h3 style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '0.75rem' }}>{t('tournaments.avatar_label', 'Avatar del torneo')}</h3>
-                  <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '1.5rem' }}>
-                    <Avatar id={editAvatarUrl} size="lg" placeholder="others:1" />
-                    <div style={{ flex: 1 }}>
-                      <AvatarSelector 
-                        selectedId={editAvatarUrl} 
-                        onSelect={updateAvatar} 
-                        categories={['teams', 'others', 'animals']}
-                      />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.5rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                      <div onClick={() => setSelectingAvatar(prev => !prev)} style={{ cursor: 'pointer', transition: 'transform 0.2s' }} className="avatar-link">
+                        <Avatar id={editAvatarUrl} size="lg" placeholder="others:1" />
+                      </div>
+                      <button 
+                        onClick={() => setSelectingAvatar(prev => !prev)} 
+                        className="btn btn-ghost btn-sm" 
+                        style={{ fontSize: '0.85rem', color: 'var(--primary)', fontWeight: 600 }}
+                      >
+                        {t('profile.change_avatar', 'Cambiar avatar')}
+                      </button>
                     </div>
+                    {selectingAvatar && (
+                      <div className="animate-fade-in" style={{ width: '100%', marginTop: '0.5rem', background: 'var(--surface-2)', padding: '1rem', borderRadius: 'var(--r-md)' }}>
+                        <AvatarSelector 
+                          selectedId={editAvatarUrl} 
+                          onSelect={id => { 
+                            updateAvatar(id); 
+                            setSelectingAvatar(false); 
+                          }} 
+                          categories={['teams', 'others', 'animals']}
+                        />
+                      </div>
+                    )}
                   </div>
 
                   <h3 style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '0.5rem' }}>{t('tournaments.tournament_name')}</h3>

@@ -152,6 +152,7 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
   - [x] Modificar `ProfilePage.jsx` para quitar el selector directo y agregar un link en el avatar y uno debajo.
   - [x] Implementar autoguardado al seleccionar un avatar y eliminar botones manuales.
   - [x] Asegurar que la nueva página permita seleccionar el avatar y guardarlo automáticamente.
+  - [x] Replicar la misma lógica (click-to-open y autoguardado inline) para la creación y configuración de Torneos.
 - [x] **Limpieza de Home y Countdown en Top Bar**
   - [x] Eliminar la visualización del correo electrónico en la página de inicio.
   - [x] Mover el contador del mundial al top bar (AppShell) en formato reducido/compacto.

@@ -46,6 +46,7 @@ const SCORING_DEFAULTS = {
   })
   const [scoringOpenSections, setScoringOpenSections] = useState({})
   const [creating, setCreating] = useState(false)
+  const [selectingCreateAvatar, setSelectingCreateAvatar] = useState(false)
   const [competitions, setCompetitions] = useState([])
   const [error, setError] = useState(null)
   const [joinMsg, setJoinMsg] = useState(null)
@@ -350,15 +351,32 @@ const SCORING_DEFAULTS = {
               <h3 style={{ fontWeight: 700, fontSize: '0.9rem', marginTop: '0.25rem', marginBottom: '0.5rem' }}>
                 {t('tournaments.avatar_label', 'Avatar del torneo')}
               </h3>
-              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '0.5rem' }}>
-                <Avatar id={createForm.avatar_url} size="lg" placeholder="others:1" />
-                <div style={{ flex: 1 }}>
-                  <AvatarSelector 
-                    selectedId={createForm.avatar_url} 
-                    onSelect={id => setCreateForm(f => ({ ...f, avatar_url: id }))}
-                    categories={['teams', 'others', 'animals']}
-                  />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  <div onClick={() => setSelectingCreateAvatar(prev => !prev)} style={{ cursor: 'pointer', transition: 'transform 0.2s' }} className="avatar-link">
+                    <Avatar id={createForm.avatar_url} size="lg" placeholder="others:1" />
+                  </div>
+                  <button 
+                    type="button"
+                    onClick={() => setSelectingCreateAvatar(prev => !prev)} 
+                    className="btn btn-ghost btn-sm" 
+                    style={{ fontSize: '0.85rem', color: 'var(--primary)', fontWeight: 600 }}
+                  >
+                    {t('profile.change_avatar', 'Cambiar avatar')}
+                  </button>
                 </div>
+                {selectingCreateAvatar && (
+                  <div className="animate-fade-in" style={{ width: '100%', marginTop: '0.5rem', background: 'var(--surface-2)', padding: '1rem', borderRadius: 'var(--r-md)' }}>
+                    <AvatarSelector 
+                      selectedId={createForm.avatar_url} 
+                      onSelect={id => { 
+                        setCreateForm(f => ({ ...f, avatar_url: id }))
+                        setSelectingCreateAvatar(false)
+                      }}
+                      categories={['teams', 'others', 'animals']}
+                    />
+                  </div>
+                )}
               </div>
 
               {/* Competition selection removed — Always World Cup 2026 */}
