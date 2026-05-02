@@ -25,7 +25,7 @@ export default function TournamentsPage() {
   const RESERVED_SLUGS = ['perfil', 'posiciones', 'torneos', 'admin', 'login', 'registro', 'invitacion', 'guest', 'guest2', 'perfil-publico']
 const SCORING_DEFAULTS = {
     pts_ganador: 1, pts_empate: 3, pts_resultado_exacto: 1,
-    pts_diferencia_exacta: 4, pts_descuento_diferencia: 1, pts_goleada: 1, pts_penales: 2,
+    pts_diferencia_exacta: 4, pts_descuento_diferencia: 1, pts_goleada: 1, pts_penales: 2, pts_descuento_empate: 1,
     mult_r16: 2, mult_qf: 3, mult_sf: 4, mult_final: 6,
     pts_position_exact: 10, pts_semifinalist: 10, pts_finalist: 20, pts_champion_bonus: 30,
     pts_win_pen: 2, pts_draw: 1, pts_win: 3,

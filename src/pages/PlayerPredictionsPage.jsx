@@ -685,6 +685,7 @@ function calcMatchPoints(match, pred, config) {
 
   const acertoGanador = config.pts_ganador ?? 1
   const acertoEmpate = config.pts_empate ?? 3
+  const descuentoEmpate = config.pts_descuento_empate ?? 1
   const acertoDiferenciaExacta = config.pts_diferencia_exacta ?? 4
   const descuento = config.pts_descuento_diferencia ?? 1
   const extraGoleada = config.pts_goleada ?? 1
@@ -703,8 +704,10 @@ function calcMatchPoints(match, pred, config) {
   let subtotal, breakdown
 
   if (difP === 0 && difR === 0) {
-    subtotal = acertoEmpate
-    breakdown = { case: 'empate' }
+    const errorGoles = Math.abs(pHome - rHome)
+    const penalizacionEmpate = descuentoEmpate * errorGoles
+    subtotal = Math.max(1, acertoEmpate - penalizacionEmpate)
+    breakdown = { case: 'empate', penalizacionEmpate }
   } else if (difP === 0 || difR === 0) {
     subtotal = 0
     breakdown = { case: 'miss_empate' }
@@ -754,10 +757,18 @@ function PredResult({ match, pred, t, config }) {
       {breakdown && (
         <div className="pred-tooltip">
           {breakdown.case === 'empate' && (
-            <div className="pred-tooltip-row">
-              <span>{t('rules.match_draw_correct')}</span>
-              <span style={{ color: 'var(--primary)', fontWeight: 600 }}>+{breakdown.subtotal}</span>
-            </div>
+            <>
+              <div className="pred-tooltip-row">
+                <span>{t('rules.match_draw_correct')}</span>
+                <span style={{ color: 'var(--primary)', fontWeight: 600 }}>+{acertoEmpate}</span>
+              </div>
+              {breakdown.penalizacionEmpate > 0 && (
+                <div className="pred-tooltip-row">
+                  <span>{t('rules.match_draw_deduction')}</span>
+                  <span style={{ color: 'var(--danger)', fontWeight: 600 }}>-{breakdown.penalizacionEmpate}</span>
+                </div>
+              )}
+            </>
           )}
           {breakdown.case === 'ganador_ok' && (
             <>

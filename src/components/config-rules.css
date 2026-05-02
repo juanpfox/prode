@@ -271,6 +271,18 @@
   color: var(--primary);
 }
 
+/* ── Simulador match cards ────────────────────────────────── */
+.sim-cards {
+  display: flex;
+  gap: 0.625rem;
+}
+
+@media (max-width: 480px) {
+  .sim-cards {
+    flex-direction: column;
+  }
+}
+
 /* ── Config Autosave Bar ──────────────────────────────────── */
 .config-autosave-bar {
   display: flex;

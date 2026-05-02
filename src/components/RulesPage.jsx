@@ -36,6 +36,7 @@ function MatchRules({ config, t }) {
   const resultadoExacto = c.pts_resultado_exacto ?? 1
   const acertoDiferenciaExacta = c.pts_diferencia_exacta ?? 4
   const descuento = c.pts_descuento_diferencia ?? 1
+  const descuentoEmpate = c.pts_descuento_empate ?? 1
   const extraGoleada = c.pts_goleada ?? 1
 
   const multRows = [
@@ -75,6 +76,7 @@ function MatchRules({ config, t }) {
             <tr><td>{t('config.pts_resultado_exacto')}</td><td>{resultadoExacto}</td></tr>
             <tr><td>{t('config.pts_diferencia_exacta')}</td><td>{acertoDiferenciaExacta}</td></tr>
             <tr><td>{t('config.pts_descuento_diferencia')}</td><td>{descuento}</td></tr>
+            <tr><td>{t('config.pts_descuento_empate')}</td><td>{descuentoEmpate}</td></tr>
             <tr><td>{t('config.pts_goleada')}</td><td>{extraGoleada}</td></tr>
           </tbody>
         </table>

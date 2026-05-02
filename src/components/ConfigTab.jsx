@@ -7,6 +7,7 @@ import './config-rules.css'
 const MATCH_FIELDS = [
   { key: 'pts_ganador',              label: 'config.pts_ganador',              min: 0 },
   { key: 'pts_empate',               label: 'config.pts_empate',               min: 0 },
+  { key: 'pts_descuento_empate',     label: 'config.pts_descuento_empate',     min: 0 },
   { key: 'pts_resultado_exacto',     label: 'config.pts_resultado_exacto',     min: 0 },
   { key: 'pts_diferencia_exacta',    label: 'config.pts_diferencia_exacta',    min: 0 },
   { key: 'pts_descuento_diferencia', label: 'config.pts_descuento_diferencia', min: 0 },

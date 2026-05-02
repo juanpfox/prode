@@ -114,7 +114,15 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
 
   - [x] **Sistema de Avatares Personalizados**
     - [x] Generar catálogo de imágenes (Personas, Animales, Jugadores, Clubes, Famosos).
-    - [x] Crear componente `AvatarSelector` con visualización tipo grid y categorías.
+    - [x] Crear componente `AvatarSelector`.
+  - [x] **✅ 2.2. Penalización por empate fallido en goles (Modo Partidos)**
+    - [x] **Objetivo:** Implementar la regla de "descuento por diferencia de goles" al acertar un empate, con límite inferior de 1 punto.
+    - [x] Agregar `pts_descuento_empate` (default 1) a `tournament_config`.
+    - [x] Modificar la lógica de recálculo en la DB (`recalculate_scores_for_match` y `recalculate_tournament_scores`) para aplicar el descuento con `Math.max(1, pts_empate - (pts_descuento_empate * abs(dif_goles)))`.
+    - [x] Incluir la variable en `SCORING_DEFAULTS` y en `ConfigTab.jsx` (`MATCH_FIELDS`).
+    - [x] Mostrar el descuento en el componente de simulación de puntos en creación, configuración y reglas.
+    - [x] Actualizar `es.json` y `en.json` con las nuevas etiquetas de traducción.
+    - [x] Sincronizar tooltips de puntos en `PredictionsPage.jsx` y `PlayerPredictionsPage.jsx`.
   - [x] Implementar la lógica de selección en la edición de perfil.
   - [x] Asegurar que el avatar se muestre en los rankings y perfiles de usuario.
   - [x] Agregar celebs2.png a la categoría de Famosos.
