@@ -72,7 +72,9 @@ export default function AvatarPage() {
             </div>
           </div>
 
-          <AvatarSelector selectedId={avatarId} onSelect={setAvatarId} />
+          <div style={{ width: '100%' }}>
+            <AvatarSelector selectedId={avatarId} onSelect={setAvatarId} />
+          </div>
 
           <div style={{ width: '100%', display: 'flex', gap: '1rem', marginTop: '1rem' }}>
             <button 
