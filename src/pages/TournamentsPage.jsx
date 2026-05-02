@@ -38,7 +38,7 @@ const SCORING_DEFAULTS = {
     slug_manual: false,
     prize: '',
     competition_id: '00000000-0000-0000-0000-000000000001',
-    mode: '',
+    mode: 'partidos',
     is_public: false,
     requires_approval: false,
     avatar_url: null,
@@ -191,7 +191,7 @@ const SCORING_DEFAULTS = {
         await supabase.from('tournament_config').update(scoringPayload).eq('tournament_id', data.id)
       }
       setShowCreate(false)
-      setCreateForm({ name: '', slug: '', prize: '', competition_id: '', mode: '', is_public: false, requires_approval: false, avatar_url: null, scoring: { ...SCORING_DEFAULTS } })
+      setCreateForm({ name: '', slug: '', prize: '', competition_id: '', mode: 'partidos', is_public: false, requires_approval: false, avatar_url: null, scoring: { ...SCORING_DEFAULTS } })
       await loadData()
       navigate(`/${slugValue || data.id}`)
     } catch (err) {
@@ -381,49 +381,7 @@ const SCORING_DEFAULTS = {
 
               {/* Competition selection removed — Always World Cup 2026 */}
 
-              {/* Mode selector — only for World Cup */}
-              {createForm.competition_id && competitions.find(c => c.id === createForm.competition_id)?.type === 'world_cup' && (
-                <div>
-                  <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '0.625rem', fontWeight: 600 }}>
-                    {t('tournaments.select_mode')}
-                  </p>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.625rem' }}>
-                    {['partidos', 'posiciones'].map(m => (
-                      <button
-                        key={m}
-                        type="button"
-                        onClick={() => setCreateForm(f => ({ ...f, mode: m }))}
-                        style={{
-                          padding: '0.875rem 0.75rem',
-                          borderRadius: 'var(--r-md)',
-                          border: createForm.mode === m
-                            ? '2px solid var(--primary)'
-                            : '2px solid var(--border)',
-                          background: createForm.mode === m
-                            ? 'var(--primary-subtle)'
-                            : 'var(--surface-2)',
-                          cursor: 'pointer',
-                          textAlign: 'left',
-                          transition: 'all 0.15s ease',
-                          outline: 'none'
-                        }}
-                      >
-                        <p style={{
-                          fontWeight: 700,
-                          fontSize: '0.875rem',
-                          color: createForm.mode === m ? 'var(--primary)' : 'var(--text)',
-                          marginBottom: '0.25rem'
-                        }}>
-                          {m === 'posiciones' ? '🏆' : '⚽'} {t(`modes.${m}`)}
-                        </p>
-                        <p style={{ fontSize: '0.725rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>
-                          {t(`modes.${m}_desc`)}
-                        </p>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
+
               {/* Visibility and Approval selectors */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.25rem' }}>
                 {/* Visibility selector */}
