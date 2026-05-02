@@ -41,6 +41,7 @@ const SCORING_DEFAULTS = {
     mode: 'partidos',
     is_public: false,
     requires_approval: false,
+    allow_member_invite: true,
     avatar_url: null,
     scoring: { ...SCORING_DEFAULTS },
   })
@@ -177,6 +178,7 @@ const SCORING_DEFAULTS = {
           mode: effectiveMode,
           is_public: createForm.is_public,
           requires_approval: createForm.requires_approval,
+          allow_member_invite: createForm.allow_member_invite,
           avatar_url: createForm.avatar_url
         })
         .select('id').single()
@@ -467,6 +469,33 @@ const SCORING_DEFAULTS = {
                     ))}
                   </div>
                 </div>
+              </div>
+
+              {/* Allow member invite toggle */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem 1rem', background: 'var(--surface-2)', borderRadius: 'var(--r-md)' }}>
+                <div>
+                  <p style={{ fontWeight: 700, fontSize: '0.875rem', color: 'var(--text)', marginBottom: '0.125rem' }}>
+                    🔗 {t('tournaments.allow_member_invite', 'Permitir que los participantes inviten a otros')}
+                  </p>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                    {t('tournaments.allow_member_invite_desc', 'Los participantes podrán copiar el link de invitación')}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setCreateForm(f => ({ ...f, allow_member_invite: !f.allow_member_invite }))}
+                  style={{
+                    width: '44px', height: '24px', borderRadius: '12px', border: 'none', cursor: 'pointer', flexShrink: 0,
+                    background: createForm.allow_member_invite ? 'var(--primary)' : 'var(--border)',
+                    position: 'relative', transition: 'background 0.2s'
+                  }}
+                >
+                  <span style={{
+                    position: 'absolute', top: '2px', width: '20px', height: '20px', borderRadius: '50%',
+                    background: '#fff', transition: 'left 0.2s',
+                    left: createForm.allow_member_invite ? '22px' : '2px'
+                  }} />
+                </button>
               </div>
 
               {/* Scoring section — unified using ConfigTab component */}

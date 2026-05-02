@@ -271,6 +271,22 @@ export default function TournamentDetailPage() {
     }
   }
 
+  async function updateAllowMemberInvite(allow) {
+    setUpdating(true)
+    try {
+      const { error } = await supabase
+        .from('tournaments')
+        .update({ allow_member_invite: allow })
+        .eq('id', id)
+      if (error) throw error
+      setTournament(prev => ({ ...prev, allow_member_invite: allow }))
+    } catch {
+      alert(t('common.error_generic'))
+    } finally {
+      setUpdating(false)
+    }
+  }
+
   async function updateApproval(requires) {
     setUpdating(true)
     try {
@@ -511,7 +527,7 @@ export default function TournamentDetailPage() {
               )}
               
               {/* Copy invitation button */}
-              {isApproved && (
+              {isApproved && (tournament.allow_member_invite !== false || myRole === 'owner') && (
                 <button
                   className="btn btn-ghost btn-sm"
                   onClick={copyInvitation}
@@ -810,6 +826,35 @@ export default function TournamentDetailPage() {
                         </p>
                       </button>
                     ))}
+                  </div>
+                </div>
+
+                {/* Allow member invite toggle */}
+                <div className="card card-sm" style={{ marginBottom: '1rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
+                    <div>
+                      <p style={{ fontWeight: 700, fontSize: '0.875rem', color: 'var(--text)', marginBottom: '0.125rem' }}>
+                        🔗 {t('tournaments.allow_member_invite', 'Permitir que los participantes inviten a otros')}
+                      </p>
+                      <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                        {t('tournaments.allow_member_invite_desc', 'Los participantes podrán copiar el link de invitación')}
+                      </p>
+                    </div>
+                    <button
+                      disabled={updating}
+                      onClick={() => updateAllowMemberInvite(!tournament.allow_member_invite)}
+                      style={{
+                        width: '44px', height: '24px', borderRadius: '12px', border: 'none', cursor: 'pointer', flexShrink: 0,
+                        background: tournament.allow_member_invite ? 'var(--primary)' : 'var(--border)',
+                        position: 'relative', transition: 'background 0.2s'
+                      }}
+                    >
+                      <span style={{
+                        position: 'absolute', top: '2px', width: '20px', height: '20px', borderRadius: '50%',
+                        background: '#fff', transition: 'left 0.2s',
+                        left: tournament.allow_member_invite ? '22px' : '2px'
+                      }} />
+                    </button>
                   </div>
                 </div>
 
