@@ -24,7 +24,7 @@ export default function LoginPage() {
     setEmailError(false)
     setStatus('sending')
     setErrorMsg('')
-    const { error } = await signInWithEmail(email)
+    const { error } = await signInWithEmail(email, window.location.pathname)
     if (error) {
       setStatus('error')
       setErrorMsg(error.message)
@@ -36,7 +36,7 @@ export default function LoginPage() {
   const handleGoogleLogin = async () => {
     setStatus('sending')
     setErrorMsg('')
-    const { error } = await signInWithGoogle()
+    const { error } = await signInWithGoogle(window.location.pathname)
     if (error) {
       setStatus('error')
       setErrorMsg(error.message)

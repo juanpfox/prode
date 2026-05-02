@@ -137,6 +137,10 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
   - [x] Validar dimensiones (1x1) y estilo caricaturesco.
   - [x] **Bug Fix: Centrado de Avatares**
     - [x] Ajustar `background-size` y `transform: scale` para centrar perfectamente los iconos y eliminar bordes sangrantes en todas las categorías.
+  - [x] **Redirección post-login a la URL de origen**
+    - [x] Modificar `useAuth.jsx` para permitir pasar una ruta de redirección en `signInWithEmail` y `signInWithGoogle`.
+    - [x] Actualizar `LoginPage.jsx` para capturar la ruta actual y pasarla al iniciar sesión.
+    - [x] Verificar que al entrar a un torneo sin sesión, luego de loguearse se mantenga en ese torneo.
   - [x] **Rediseño: Hero de Página de Inicio**
     - [x] Reemplazar título, subtítulo y badge por la imagen `prodeImage.png`.
     - [x] Ajustar estilos CSS para asegurar responsividad y visualización premium.
@@ -145,7 +149,7 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
     - [x] Integrar `AvatarSelector` en el flujo de creación de torneos.
     - [x] Integrar `AvatarSelector` en la configuración del torneo.
     - [x] Asegurar que el avatar se visualice en las `TournamentCard` y en el detalle del torneo.
-    - [x] Filtrar categorías de avatares para torneos (usar `teams`, `others` y `animals`).
+    - [x] Filtrar categorías de avatares para torneos (usar `teams`, `others` and `animals`).
     - [x] Usar el avatar de trofeo (others:1) como placeholder por defecto para torneos sin avatar.
 
 - [x] **Countdown al Mundial 2026**

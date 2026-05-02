@@ -41,8 +41,9 @@ export function AuthProvider({ children }) {
     return () => subscription.unsubscribe()
   }, [])
 
-  const signInWithEmail = async (email) => {
-    const redirectUrl = import.meta.env.VITE_SITE_URL || window.location.origin
+  const signInWithEmail = async (email, path = '') => {
+    const baseUrl = import.meta.env.VITE_SITE_URL || window.location.origin
+    const redirectUrl = `${baseUrl}${path}`
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: { emailRedirectTo: redirectUrl },
@@ -50,8 +51,9 @@ export function AuthProvider({ children }) {
     return { error }
   }
 
-  const signInWithGoogle = async () => {
-    const redirectUrl = import.meta.env.VITE_SITE_URL || window.location.origin
+  const signInWithGoogle = async (path = '') => {
+    const baseUrl = import.meta.env.VITE_SITE_URL || window.location.origin
+    const redirectUrl = `${baseUrl}${path}`
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: redirectUrl },
