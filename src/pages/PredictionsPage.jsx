@@ -643,6 +643,11 @@ export default function PredictionsPage() {
 
         {view === 'groups' && (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem', marginBottom: '1.5rem', alignItems: 'center' }}>
+            <button onClick={() => setActiveGroup('all-tables')}
+              className={`btn btn-sm ${activeGroup === 'all-tables' ? 'btn-primary' : 'btn-ghost'}`}
+              style={{ fontSize: '0.75rem', padding: '0 0.75rem', height: '2.2rem', marginRight: '0.25rem' }}>
+              {t('predictions.tables_all', 'Tablas')}
+            </button>
             {groupLetters.map(l => (
               <button key={l} onClick={() => setActiveGroup(l)} 
                 className={`btn btn-sm ${activeGroup === l ? 'btn-primary' : 'btn-ghost'}`} 
@@ -692,7 +697,7 @@ export default function PredictionsPage() {
         ))}
 
         {/* --- VIEW: GROUPS --- */}
-        {view === 'groups' && activeGroup !== '3rds' && (
+        {view === 'groups' && activeGroup !== '3rds' && activeGroup !== 'all-tables' && (
           <div className="predictions-layout-grid">
             <div className="matches-column">
               <h3 style={{ fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.625rem' }}>
@@ -718,6 +723,20 @@ export default function PredictionsPage() {
                 />
               )}
             </div>
+          </div>
+        )}
+
+        {/* --- VIEW: ALL GROUP TABLES (predicted) --- */}
+        {view === 'groups' && activeGroup === 'all-tables' && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.25rem' }}>
+            {groupLetters.map(l => (
+              <GroupTable
+                key={l}
+                title={`${t('posiciones.group')} ${l}`}
+                rows={calculateGroupTable(groupMatches.filter(m => m.home_team?.group_name === l), predictions)}
+                t={t}
+              />
+            ))}
           </div>
         )}
 
