@@ -646,7 +646,7 @@ export default function PredictionsPage() {
             <button onClick={() => setActiveGroup('all-tables')}
               className={`btn btn-sm ${activeGroup === 'all-tables' ? 'btn-primary' : 'btn-ghost'}`}
               style={{ fontSize: '0.75rem', padding: '0 0.75rem', height: '2.2rem', marginRight: '0.25rem' }}>
-              {t('predictions.tables_all', 'Tablas')}
+              {t('predictions.tables_all', 'Todos')}
             </button>
             {groupLetters.map(l => (
               <button key={l} onClick={() => setActiveGroup(l)} 
