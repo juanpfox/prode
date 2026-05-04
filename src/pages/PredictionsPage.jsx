@@ -653,8 +653,6 @@ export default function PredictionsPage() {
               style={{ fontSize: '0.75rem', padding: '0 0.75rem', height: '2.2rem' }}>
               3º
             </button>
-            <button className="btn btn-ghost btn-sm" onClick={() => setView('playoffs')} 
-              style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginLeft: '0.5rem' }}>PlayOffs →</button>
           </div>
         )}
 
