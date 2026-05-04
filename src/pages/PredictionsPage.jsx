@@ -738,7 +738,7 @@ export default function PredictionsPage() {
                 action={
                   <button
                     onClick={() => { setActiveGroup(l); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
-                    className="btn btn-ghost btn-sm"
+                    className="btn btn-primary btn-sm"
                     style={{ fontSize: '0.7rem', padding: '0.25rem 0.55rem', whiteSpace: 'nowrap' }}>
                     {t('predictions.load_predictions', 'Cargar pronósticos')} →
                   </button>
