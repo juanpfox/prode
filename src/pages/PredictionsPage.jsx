@@ -712,11 +712,13 @@ export default function PredictionsPage() {
                 rows={calculateGroupTable(groupMatches.filter(m => m.home_team?.group_name === activeGroup), predictions)}
                 t={t}
               />
-              <GroupTable 
-                title={t('predictions.table.real_title')}
-                rows={calculateGroupTable(groupMatches.filter(m => m.home_team?.group_name === activeGroup), predictions, true)}
-                t={t}
-              />
+              {groupMatches.some(m => m.home_team?.group_name === activeGroup && m.home_goals !== null && m.away_goals !== null) && (
+                <GroupTable 
+                  title={t('predictions.table.real_title')}
+                  rows={calculateGroupTable(groupMatches.filter(m => m.home_team?.group_name === activeGroup), predictions, true)}
+                  t={t}
+                />
+              )}
             </div>
           </div>
         )}
@@ -731,13 +733,15 @@ export default function PredictionsPage() {
               showGroup={true}
               highlightCutoff={8}
             />
-            <GroupTable 
-              title={t('predictions.table.best_thirds_real')}
-              rows={calculateBestThirdsTable(matches, predictions, true)}
-              t={t}
-              showGroup={true}
-              highlightCutoff={8}
-            />
+            {groupMatches.some(m => m.home_goals !== null && m.away_goals !== null) && (
+              <GroupTable 
+                title={t('predictions.table.best_thirds_real')}
+                rows={calculateBestThirdsTable(matches, predictions, true)}
+                t={t}
+                showGroup={true}
+                highlightCutoff={8}
+              />
+            )}
           </div>
         )}
 
