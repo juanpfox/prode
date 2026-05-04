@@ -735,6 +735,14 @@ export default function PredictionsPage() {
                 title={`${t('posiciones.group')} ${l}`}
                 rows={calculateGroupTable(groupMatches.filter(m => m.home_team?.group_name === l), predictions)}
                 t={t}
+                action={
+                  <button
+                    onClick={() => { setActiveGroup(l); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+                    className="btn btn-ghost btn-sm"
+                    style={{ fontSize: '0.7rem', padding: '0.25rem 0.55rem', whiteSpace: 'nowrap' }}>
+                    {t('predictions.load_predictions', 'Cargar pronósticos')} →
+                  </button>
+                }
               />
             ))}
           </div>
@@ -1187,11 +1195,12 @@ function BracketTree({ byStage, bracketStages, simulatedBracket, sfResolved, tou
   )
 }
 
-function GroupTable({ rows, t, title, showGroup = false, highlightCutoff = null }) {
+function GroupTable({ rows, t, title, showGroup = false, highlightCutoff = null, action = null }) {
   return (
     <div className="card card-sm" style={{ padding: 0 }}>
-      <div style={{ padding: '0.75rem 0.875rem', borderBottom: '1px solid var(--border)' }}>
+      <div style={{ padding: '0.75rem 0.875rem', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem' }}>
         <h3 style={{ fontSize: '0.875rem', fontWeight: 800 }}>{title || t('nav.leaderboard')}</h3>
+        {action}
       </div>
       <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', fontSize: '0.75rem', borderCollapse: 'collapse' }}>
