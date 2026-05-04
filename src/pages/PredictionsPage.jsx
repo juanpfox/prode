@@ -78,7 +78,7 @@ export default function PredictionsPage() {
   const [loading, setLoading] = useState(true)
   const [myStatus, setMyStatus] = useState(null)
   const [view, setView] = useState(() => (new Date() >= new Date('2026-06-28T00:00:00-03:00') ? 'playoffs' : 'groups')) // 'dates' | 'groups' | 'playoffs'
-  const [activeGroup, setActiveGroup] = useState('A')
+  const [activeGroup, setActiveGroup] = useState('all-tables')
 
   // Multi-tournament sync
   const [siblingTournaments, setSiblingTournaments] = useState([])
@@ -507,7 +507,7 @@ export default function PredictionsPage() {
           
           <div style={{ textAlign: 'right' }}>
              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.25rem' }}>
-                <button className={`btn btn-sm ${view === 'groups' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setView('groups')} style={{ fontSize: '0.75rem', padding: '0.35rem 0.6rem' }}>
+                <button className={`btn btn-sm ${view === 'groups' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => { setView('groups'); setActiveGroup('all-tables') }} style={{ fontSize: '0.75rem', padding: '0.35rem 0.6rem' }}>
                   {t('predictions.views.groups')}
                 </button>
                 <button className={`btn btn-sm ${view === 'playoffs' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setView('playoffs')} style={{ fontSize: '0.75rem', padding: '0.35rem 0.6rem' }}>
