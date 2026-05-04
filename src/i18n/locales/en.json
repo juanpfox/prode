@@ -31,6 +31,7 @@
     "save": "Save",
     "you": "you",
     "cancel": "Cancel",
+    "confirm": "Confirm",
     "close": "Close"
   },
   "home": {
@@ -191,7 +192,9 @@
       "copy_action": "Copy",
       "copy_done": "Predictions copied!",
       "copy_error": "Error copying",
-      "copy_locked_note": "Only unlocked matches are copied"
+      "copy_locked_note": "Only unlocked matches are copied",
+      "copy_confirm_from": "Copy predictions from {{from}} to {{to}}",
+      "copy_confirm_to": "Copy predictions from {{from}} to {{to}}"
     }
   },
   "posiciones": {

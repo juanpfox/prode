@@ -31,6 +31,7 @@
     "save": "Guardar",
     "you": "vos",
     "cancel": "Cancelar",
+    "confirm": "Aceptar",
     "close": "Cerrar"
   },
   "home": {
@@ -206,7 +207,9 @@
       "copy_action": "Copiar",
       "copy_done": "¡Pronósticos copiados!",
       "copy_error": "Error al copiar",
-      "copy_locked_note": "Solo se copian partidos no bloqueados"
+      "copy_locked_note": "Solo se copian partidos no bloqueados",
+      "copy_confirm_from": "Copiar los pronósticos desde {{from}} hacia {{to}}",
+      "copy_confirm_to": "Copiar los pronósticos desde {{from}} hacia {{to}}"
     }
   },
   "posiciones": {

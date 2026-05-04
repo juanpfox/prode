@@ -83,9 +83,8 @@ export default function PredictionsPage() {
   // Multi-tournament sync
   const [siblingTournaments, setSiblingTournaments] = useState([])
   const [saveToAll, setSaveToAll] = useState(false)
-  const [copyPanelOpen, setCopyPanelOpen] = useState(false)
-  const [copyFromId, setCopyFromId] = useState('')
-  const [copyToId, setCopyToId] = useState('')
+  const [copyDropdown, setCopyDropdown] = useState(null) // null | 'from' | 'to'
+  const [copyConfirm, setCopyConfirm] = useState(null) // null | { type: 'from'|'to', tournamentId, tournamentName }
   const [copyStatus, setCopyStatus] = useState(null) // null | 'copying' | 'done' | 'error'
 
   // Pagination + swipe for playoffs view
@@ -199,10 +198,6 @@ export default function PredictionsPage() {
         .map(s => s.tournaments)
         .filter(t => t && t.competition_id === tr.competition_id && t.mode === tr.mode)
       setSiblingTournaments(siblings)
-      if (siblings.length > 0) {
-        setCopyFromId(siblings[0].id)
-        setCopyToId(siblings[0].id)
-      }
 
       const { data: tp } = await supabase
         .from('tournament_players')
@@ -555,15 +550,69 @@ export default function PredictionsPage() {
               </span>
             </label>
 
-            {/* Copy button */}
-            <button
-              className="btn btn-ghost btn-sm"
-              onClick={() => setCopyPanelOpen(o => !o)}
-              style={{ fontSize: '0.8rem', gap: '0.35rem', borderRadius: 'var(--r-full)',
-                background: copyPanelOpen ? 'var(--surface-3)' : undefined }}
-            >
-              📋 {t('predictions.sync.copy_btn')}
-            </button>
+            {/* Copy FROM button */}
+            {siblingTournaments.length > 0 && (
+              <div style={{ position: 'relative' }}>
+                <button
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => setCopyDropdown(d => d === 'from' ? null : 'from')}
+                  style={{ fontSize: '0.8rem', gap: '0.35rem', borderRadius: 'var(--r-full)',
+                    background: copyDropdown === 'from' ? 'var(--surface-3)' : undefined }}
+                >
+                  📋 {t('predictions.sync.copy_from_label')}
+                </button>
+                {copyDropdown === 'from' && (
+                  <div style={{ position: 'absolute', top: 'calc(100% + 0.35rem)', left: 0, zIndex: 200,
+                    background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)',
+                    boxShadow: 'var(--shadow-md)', minWidth: '11rem', overflow: 'hidden' }}>
+                    {siblingTournaments.map(t2 => (
+                      <button key={t2.id}
+                        onClick={() => { setCopyDropdown(null); setCopyConfirm({ type: 'from', tournamentId: t2.id, tournamentName: t2.name }) }}
+                        style={{ display: 'block', width: '100%', textAlign: 'left', padding: '0.55rem 0.85rem',
+                          background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.85rem',
+                          color: 'var(--text)', borderBottom: '1px solid var(--border)' }}
+                        onMouseEnter={e => e.currentTarget.style.background = 'var(--surface-2)'}
+                        onMouseLeave={e => e.currentTarget.style.background = 'none'}
+                      >
+                        {t2.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Copy TO button */}
+            {siblingTournaments.length > 0 && (
+              <div style={{ position: 'relative' }}>
+                <button
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => setCopyDropdown(d => d === 'to' ? null : 'to')}
+                  style={{ fontSize: '0.8rem', gap: '0.35rem', borderRadius: 'var(--r-full)',
+                    background: copyDropdown === 'to' ? 'var(--surface-3)' : undefined }}
+                >
+                  📋 {t('predictions.sync.copy_to_label')}
+                </button>
+                {copyDropdown === 'to' && (
+                  <div style={{ position: 'absolute', top: 'calc(100% + 0.35rem)', left: 0, zIndex: 200,
+                    background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)',
+                    boxShadow: 'var(--shadow-md)', minWidth: '11rem', overflow: 'hidden' }}>
+                    {siblingTournaments.map(t2 => (
+                      <button key={t2.id}
+                        onClick={() => { setCopyDropdown(null); setCopyConfirm({ type: 'to', tournamentId: t2.id, tournamentName: t2.name }) }}
+                        style={{ display: 'block', width: '100%', textAlign: 'left', padding: '0.55rem 0.85rem',
+                          background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.85rem',
+                          color: 'var(--text)', borderBottom: '1px solid var(--border)' }}
+                        onMouseEnter={e => e.currentTarget.style.background = 'var(--surface-2)'}
+                        onMouseLeave={e => e.currentTarget.style.background = 'none'}
+                      >
+                        {t2.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
 
             {copyStatus && (
               <span style={{ fontSize: '0.75rem', color: copyStatus === 'done' ? 'var(--primary)' : copyStatus === 'error' ? 'var(--danger, #e53e3e)' : 'var(--text-muted)' }}>
@@ -575,70 +624,38 @@ export default function PredictionsPage() {
           </div>
         )}
 
-        {/* ── Copy panel ── */}
-        {siblingTournaments.length > 0 && copyPanelOpen && (
-          <div className="card card-sm" style={{ marginBottom: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', position: 'relative' }}>
-            <button onClick={() => setCopyPanelOpen(false)}
-              style={{ position: 'absolute', top: '0.5rem', right: '0.75rem', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1.1rem', lineHeight: 1 }}>
-              ✕
-            </button>
-            <p style={{ fontWeight: 700, fontSize: '0.85rem', margin: 0 }}>📋 {t('predictions.sync.copy_btn')}</p>
-            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0 }}>
-              ⚠️ {t('predictions.sync.copy_locked_note')}
-            </p>
-
-            {/* Copy FROM */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', minWidth: '5rem' }}>
-                {t('predictions.sync.copy_from_label')}
-              </span>
-              <select
-                value={copyFromId}
-                onChange={e => setCopyFromId(e.target.value)}
-                style={{ flex: 1, minWidth: '8rem', padding: '0.35rem 0.5rem', borderRadius: 'var(--r-md)',
-                  border: '1px solid var(--border)', background: 'var(--surface)', color: 'var(--text)',
-                  fontSize: '0.85rem' }}
-              >
-                {siblingTournaments.map(t2 => (
-                  <option key={t2.id} value={t2.id}>{t2.name}</option>
-                ))}
-              </select>
-              <button
-                className="btn btn-primary btn-sm"
-                disabled={copyStatus === 'copying' || !copyFromId}
-                onClick={() => handleCopyFrom(copyFromId)}
-                style={{ fontSize: '0.8rem' }}
-              >
-                {t('predictions.sync.copy_action')} →
-              </button>
+        {/* ── Copy confirmation modal ── */}
+        {copyConfirm && (
+          <>
+            <div onClick={() => setCopyConfirm(null)}
+              style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', zIndex: 300 }} />
+            <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%,-50%)',
+              zIndex: 301, background: 'var(--surface)', borderRadius: 'var(--r-lg)',
+              padding: '1.5rem', width: 'min(90vw, 22rem)', boxShadow: 'var(--shadow-lg)',
+              display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <p style={{ margin: 0, fontSize: '0.9rem', lineHeight: 1.5 }}>
+                {copyConfirm.type === 'from'
+                  ? t('predictions.sync.copy_confirm_from', { from: copyConfirm.tournamentName, to: tournament?.name })
+                  : t('predictions.sync.copy_confirm_to', { from: tournament?.name, to: copyConfirm.tournamentName })
+                }
+              </p>
+              <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                <button className="btn btn-ghost btn-sm" onClick={() => setCopyConfirm(null)}>
+                  {t('common.cancel')}
+                </button>
+                <button className="btn btn-primary btn-sm"
+                  disabled={copyStatus === 'copying'}
+                  onClick={() => {
+                    const { type, tournamentId } = copyConfirm
+                    setCopyConfirm(null)
+                    if (type === 'from') handleCopyFrom(tournamentId)
+                    else handleCopyTo(tournamentId)
+                  }}>
+                  {t('common.confirm')}
+                </button>
+              </div>
             </div>
-
-            {/* Copy TO */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', minWidth: '5rem' }}>
-                {t('predictions.sync.copy_to_label')}
-              </span>
-              <select
-                value={copyToId}
-                onChange={e => setCopyToId(e.target.value)}
-                style={{ flex: 1, minWidth: '8rem', padding: '0.35rem 0.5rem', borderRadius: 'var(--r-md)',
-                  border: '1px solid var(--border)', background: 'var(--surface)', color: 'var(--text)',
-                  fontSize: '0.85rem' }}
-              >
-                {siblingTournaments.map(t2 => (
-                  <option key={t2.id} value={t2.id}>{t2.name}</option>
-                ))}
-              </select>
-              <button
-                className="btn btn-ghost btn-sm"
-                disabled={copyStatus === 'copying' || !copyToId}
-                onClick={() => handleCopyTo(copyToId)}
-                style={{ fontSize: '0.8rem' }}
-              >
-                → {t('predictions.sync.copy_action')}
-              </button>
-            </div>
-          </div>
+          </>
         )}
 
         {view === 'groups' && (
