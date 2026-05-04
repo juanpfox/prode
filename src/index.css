@@ -777,9 +777,6 @@ body {
   .predictions-layout-grid {
     grid-template-columns: 1fr;
   }
-  .table-column {
-    order: -1;
-  }
 }
 
 .posiciones-groups-grid {
