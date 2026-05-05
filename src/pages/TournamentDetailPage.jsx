@@ -32,6 +32,7 @@ export default function TournamentDetailPage() {
   const [showBanned, setShowBanned] = useState(false)
   const [selectingAvatar, setSelectingAvatar] = useState(false)
   const [confirmLeave, setConfirmLeave] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
   const [showTournamentDropdown, setShowTournamentDropdown] = useState(false)
   const [userTournaments, setUserTournaments] = useState([])
 
@@ -385,6 +386,20 @@ export default function TournamentDetailPage() {
       alert(t('common.error_generic'))
     } finally {
       setUpdating(false)
+    }
+  }
+
+  async function deleteTournament() {
+    setUpdating(true)
+    try {
+      const { error } = await supabase.from('tournaments').delete().eq('id', id)
+      if (error) throw error
+      navigate('/')
+    } catch {
+      alert(t('common.error_generic'))
+    } finally {
+      setUpdating(false)
+      setConfirmDelete(false)
     }
   }
 
@@ -865,6 +880,21 @@ export default function TournamentDetailPage() {
                 {/* Scoring config — points & multipliers */}
                 <ConfigTab tournamentId={id} isAdmin={true} mode={tournament.mode} />
 
+                {/* Danger zone — delete tournament */}
+                <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>
+                  <button
+                    onClick={() => setConfirmDelete(true)}
+                    style={{
+                      width: '100%', padding: '0.6rem 1rem', borderRadius: '8px',
+                      border: '1px solid var(--danger, #ef4444)', background: 'transparent',
+                      color: 'var(--danger, #ef4444)', fontWeight: 600, fontSize: '0.875rem',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    🗑️ {t('tournaments.delete_tournament', 'Eliminar torneo')}
+                  </button>
+                </div>
+
                 {/* Players management */}
                 <div style={{ marginTop: '1rem' }}>
                   {/* Pending approvals */}
@@ -1016,6 +1046,36 @@ export default function TournamentDetailPage() {
           </>
         )}
       </div>
+
+      {/* Delete tournament confirmation modal */}
+      {confirmDelete && (
+        <div style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem'
+        }}>
+          <div className="card" style={{ maxWidth: '360px', width: '100%', textAlign: 'center' }}>
+            <p style={{ fontWeight: 700, fontSize: '1rem', marginBottom: '0.5rem' }}>
+              🗑️ {t('tournaments.delete_tournament', 'Eliminar torneo')}
+            </p>
+            <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>
+              {t('tournaments.delete_confirm', '¿Estás seguro de que querés eliminar este torneo? Esta acción no se puede deshacer.')}
+            </p>
+            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
+              <button className="btn btn-ghost btn-sm" onClick={() => setConfirmDelete(false)} disabled={updating}>
+                {t('common.cancel')}
+              </button>
+              <button
+                className="btn btn-sm"
+                onClick={deleteTournament}
+                disabled={updating}
+                style={{ background: 'var(--danger, #ef4444)', color: '#fff', border: 'none' }}
+              >
+                {updating ? '…' : t('tournaments.delete_confirm_btn', 'Eliminar')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </AppShell>
   )
 }
