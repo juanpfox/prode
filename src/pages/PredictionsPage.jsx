@@ -83,6 +83,7 @@ export default function PredictionsPage() {
   // Multi-tournament sync
   const [siblingTournaments, setSiblingTournaments] = useState([])
   const [saveToAll, setSaveToAll] = useState(false)
+  const [siblingPredCounts, setSiblingPredCounts] = useState({}) // { [tournamentId]: number }
   const [copyDropdown, setCopyDropdown] = useState(null) // null | 'from' | 'to'
   const [copyConfirm, setCopyConfirm] = useState(null) // null | { type: 'from'|'to', tournamentId, tournamentName }
   const [copyStatus, setCopyStatus] = useState(null) // null | 'copying' | 'done' | 'error'
@@ -198,6 +199,22 @@ export default function PredictionsPage() {
         .map(s => s.tournaments)
         .filter(t => t && t.competition_id === tr.competition_id && t.mode === tr.mode)
       setSiblingTournaments(siblings)
+
+      if (siblings.length > 0) {
+        const siblingIds = siblings.map(s => s.id)
+        const { data: sibPreds } = await supabase
+          .from('match_predictions')
+          .select('tournament_id')
+          .in('tournament_id', siblingIds)
+          .eq('user_id', user.id)
+          .not('home_goals', 'is', null)
+          .not('away_goals', 'is', null)
+        const counts = {}
+        for (const p of sibPreds ?? []) {
+          counts[p.tournament_id] = (counts[p.tournament_id] ?? 0) + 1
+        }
+        setSiblingPredCounts(counts)
+      }
 
       const { data: tp } = await supabase
         .from('tournament_players')
@@ -564,17 +581,21 @@ export default function PredictionsPage() {
                 {copyDropdown === 'from' && (
                   <div style={{ position: 'absolute', top: 'calc(100% + 0.35rem)', left: 0, zIndex: 200,
                     background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)',
-                    boxShadow: 'var(--shadow-md)', minWidth: '11rem', overflow: 'hidden' }}>
-                    {siblingTournaments.map(t2 => (
+                    boxShadow: 'var(--shadow-md)', minWidth: '13rem', overflow: 'hidden' }}>
+                    {siblingTournaments.filter(t2 => (siblingPredCounts[t2.id] ?? 0) > 0).map(t2 => (
                       <button key={t2.id}
                         onClick={() => { setCopyDropdown(null); setCopyConfirm({ type: 'from', tournamentId: t2.id, tournamentName: t2.name }) }}
-                        style={{ display: 'block', width: '100%', textAlign: 'left', padding: '0.55rem 0.85rem',
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem',
+                          width: '100%', textAlign: 'left', padding: '0.55rem 0.85rem',
                           background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.85rem',
                           color: 'var(--text)', borderBottom: '1px solid var(--border)' }}
                         onMouseEnter={e => e.currentTarget.style.background = 'var(--surface-2)'}
                         onMouseLeave={e => e.currentTarget.style.background = 'none'}
                       >
-                        {t2.name}
+                        <span>{t2.name}</span>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                          {siblingPredCounts[t2.id] ?? 0}/{matches.length}
+                        </span>
                       </button>
                     ))}
                   </div>

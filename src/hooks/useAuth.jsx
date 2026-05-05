@@ -61,7 +61,7 @@ export function AuthProvider({ children }) {
     return { error }
   }
 
-  const signInAsGuest = async () => {
+const signInAsGuest = async () => {
     const { error } = await supabase.auth.signInWithPassword({
       email: GUEST_EMAIL,
       password: GUEST_PASS,

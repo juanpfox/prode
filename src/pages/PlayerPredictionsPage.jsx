@@ -261,9 +261,6 @@ export default function PlayerPredictionsPage() {
                   <Avatar id={targetUser?.avatar_url} size="sm" />
                   {targetUser?.display_name ?? "Jugador"}
                 </h2>
-                <p style={{ color: "var(--text-muted)", fontSize: "0.75rem", marginTop: "0.1rem" }}>
-                  {tournament?.name}
-                </p>
               </div>
             </div>
             <div style={{ display: "flex", gap: "0.5rem" }}>
