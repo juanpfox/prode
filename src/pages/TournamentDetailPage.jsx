@@ -427,12 +427,12 @@ export default function TournamentDetailPage() {
     setUpdating(true)
     try {
       const { error } = await supabase.from('tournament_players')
-        .insert({
+        .upsert({
           tournament_id: id,
           user_id: user.id,
           role: 'player',
           status: tournament.requires_approval ? 'pending' : 'approved'
-        })
+        }, { onConflict: 'tournament_id,user_id' })
       if (error) throw error
       loadTournament()
     } catch {
