@@ -115,7 +115,7 @@ export default function TournamentDetailPage() {
 
       setScores(mergedScores)
 
-      const me = pls?.find(p => p.user_id === user.id)
+      const me = user ? pls?.find(p => p.user_id === user.id) : null
       let myCurrentStatus = me?.status ?? null
 
       if (myCurrentStatus === 'pending' && !tr.requires_approval) {
@@ -405,6 +405,10 @@ export default function TournamentDetailPage() {
   }
 
   async function joinTournament() {
+    if (!user) {
+      navigate('/login')
+      return
+    }
     setUpdating(true)
     try {
       const { error } = await supabase.from('tournament_players')
