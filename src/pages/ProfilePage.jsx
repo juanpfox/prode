@@ -2,12 +2,13 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabase'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import AppShell from '../components/AppShell'
 import { Avatar } from '../components/AvatarSelector'
 
 export default function ProfilePage() {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const { user, refreshProfile, signOut } = useAuth()
   const [profile, setProfile] = useState(null)
   const [displayName, setDisplayName] = useState('')
@@ -44,7 +45,12 @@ export default function ProfilePage() {
   return (
     <AppShell>
       <div className="animate-fade-in">
-        <h2 className="home-section-title" style={{ marginBottom: '1.25rem' }}>{t('nav.profile')}</h2>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.25rem' }}>
+          <button className="btn btn-ghost btn-sm" onClick={() => navigate(-1)}>
+            ← {t('common.back')}
+          </button>
+          <h2 className="home-section-title" style={{ margin: 0 }}>{t('nav.profile')}</h2>
+        </div>
 
         <div className="card card-sm" style={{ marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '1.25rem', padding: '1.25rem' }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
