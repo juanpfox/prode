@@ -9,13 +9,14 @@ import { Avatar } from "../components/AvatarSelector"
 
 const FIFA_TO_ISO2 = {
   ARG: "ar", BRA: "br", FRA: "fr", GER: "de", ITA: "it", ESP: "es", POR: "pt", NED: "nl",
-  ENG: "gb", SCO: "gb", WAL: "gb", NIR: "gb", USA: "us", MEX: "mx", CAN: "ca",
+  ENG: "gb-eng", SCO: "gb-sct", WAL: "gb-wls", NIR: "gb-nir", USA: "us", MEX: "mx", CAN: "ca",
   JPN: "jp", KOR: "kr", AUS: "au", KSA: "sa", QAT: "qa", CRO: "hr", SRB: "rs",
   SUI: "ch", BEL: "be", DEN: "dk", POL: "pl", URU: "uy", COL: "co", CHI: "cl",
   PER: "pe", ECU: "ec", MAR: "ma", SEN: "sn", GHA: "gh", CMR: "cm", NGA: "ng",
   RSA: "za", BIH: "ba", CZE: "cz", GRE: "gr", TUR: "tr", EGY: "eg", TUN: "tn",
   CRC: "cr", PAN: "pa", JAM: "jm", HON: "hn", PAR: "py", BFA: "bf", MLI: "ml",
-  HAI: "ht", SWE: "se", CPV: "cv", IRQ: "iq", IRN: "ir",
+  HAI: "ht", SWE: "se", CPV: "cv", COD: "cd", IRQ: "iq", IRN: "ir", AUT: "at",
+  CUW: "cw", ALG: "dz",
 }
 
 function TeamFlag({ code, size = 18 }) {
