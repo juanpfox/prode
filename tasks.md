@@ -79,6 +79,9 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
     - [x] Reemplazar label "Todos" por "Unirme a otro torneo" en `es.json` y `en.json`.
     - [x] Filtrar lista de torneos públicos para excluir aquellos en los que el usuario ya participa.
     - [x] Mantener "Mis torneos" con solo los aprobados mientras se excluyen todos los unidos de la lista pública.
+  - [x] **Mostrar etiqueta (admin) en tabla de posiciones**
+    - [x] Identificar al owner del torneo en `TournamentDetailPage.jsx` y `LeaderboardPage.jsx`.
+    - [x] Agregar el texto "(admin)" pequeño y gris debajo del nombre del owner.
 
 ## Fase 3: Monetización e Integraciones Externas
 

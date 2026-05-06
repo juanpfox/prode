@@ -630,7 +630,12 @@ export default function TournamentDetailPage() {
                           {['🥇', '🥈', '🥉'][i] ?? i + 1}
                         </span>
                         <Avatar id={s.users?.avatar_url} size="sm" />
-                        <span style={{ flex: 1, fontWeight: 600 }}>{s.users?.display_name ?? 'Usuario'}</span>
+                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                          <span style={{ fontWeight: 600 }}>{s.users?.display_name ?? 'Usuario'}</span>
+                          {s.user_id === tournament.created_by && (
+                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', lineHeight: 1 }}>(admin)</span>
+                          )}
+                        </div>
                         <div style={{ textAlign: 'right' }}>
                           <p style={{ fontWeight: 800, color: 'var(--primary)', fontSize: '1rem' }}>
                             {s.total_points} pts

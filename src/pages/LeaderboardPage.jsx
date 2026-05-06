@@ -19,7 +19,7 @@ export default function LeaderboardPage() {
 
   useEffect(() => {
     supabase.from('tournament_players')
-      .select('tournaments(id, name, slug)')
+      .select('tournaments(id, name, slug, created_by)')
       .eq('user_id', user.id).eq('status', 'approved')
       .then(({ data }) => {
         const ts = data?.map(tp => tp.tournaments).filter(Boolean) ?? []
@@ -110,7 +110,12 @@ export default function LeaderboardPage() {
                       {MEDALS[i] ?? i + 1}
                     </span>
                     <Avatar id={s.users?.avatar_url} size="sm" />
-                    <span style={{ flex: 1, fontWeight: 600 }}>{s.users?.display_name ?? 'Usuario'}</span>
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                      <span style={{ fontWeight: 600 }}>{s.users?.display_name ?? 'Usuario'}</span>
+                      {s.user_id === myTournaments.find(t => t.id === selected)?.created_by && (
+                        <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', lineHeight: 1 }}>(admin)</span>
+                      )}
+                    </div>
                     <div style={{ textAlign: 'right' }}>
                       <p style={{ fontWeight: 800, color: 'var(--primary)', fontSize: '1rem' }}>
                         {s.total_points} pts

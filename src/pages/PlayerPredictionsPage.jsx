@@ -259,7 +259,12 @@ export default function PlayerPredictionsPage() {
               <div>
                 <h2 className="home-section-title" style={{ margin: 0, fontSize: "1.2rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
                   <Avatar id={targetUser?.avatar_url} size="sm" />
-                  {targetUser?.display_name ?? "Jugador"}
+                  <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
+                    <span style={{ fontWeight: 600 }}>{targetUser?.display_name ?? "Jugador"}</span>
+                    {targetUserId === tournament?.created_by && (
+                      <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>(admin)</span>
+                    )}
+                  </div>
                 </h2>
               </div>
             </div>
