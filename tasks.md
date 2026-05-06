@@ -82,6 +82,8 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
   - [x] **Mostrar etiqueta (admin) en tabla de posiciones**
     - [x] Identificar al owner del torneo en `TournamentDetailPage.jsx` y `LeaderboardPage.jsx`.
     - [x] Agregar el texto "(admin)" pequeño y gris debajo del nombre del owner.
+  - [x] **Bug Fix: Bandera de Irak corregida**
+    - [x] Corregir mapeo `FIFA_TO_ISO2` en `PredictionsPage.jsx`, `PosicionesPredictionsPage.jsx`, `PlayerPredictionsPage.jsx` y `AdminResultsEntryPage.jsx` para asignar el código `iq` a `IRQ`.
 
 ## Fase 3: Monetización e Integraciones Externas
 
