@@ -82,10 +82,15 @@ const SCORING_DEFAULTS = {
           .order('is_featured', { ascending: false })
           .order('created_at', { ascending: false }).limit(30),
         supabase.from('competitions').select('id, name, type, status').order('name'),
-        supabase.from('tournament_players').select('tournament_id').eq('user_id', user.id)
+        supabase.from('tournament_players').select('tournament_id, status').eq('user_id', user.id)
       ])
 
-      const joinedIds = new Set(allJoined?.map(tp => tp.tournament_id) ?? [])
+      // Only hide active memberships; left/rejected users should still see public tournaments to rejoin.
+      const joinedIds = new Set(
+        (allJoined ?? [])
+          .filter(tp => ['approved', 'pending', 'banned'].includes(tp.status))
+          .map(tp => tp.tournament_id)
+      )
 
       setMyTournaments(myData
         ?.filter(tp => tp.tournaments && !tp.tournaments.deleted_at)
