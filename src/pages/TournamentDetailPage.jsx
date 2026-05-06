@@ -887,6 +887,19 @@ export default function TournamentDetailPage() {
 
                 {/* Danger zone — delete tournament (hidden, functionality preserved) */}
 
+                {/* Info: how to delete a tournament */}
+                <div style={{
+                  marginTop: '1.5rem', padding: '1rem', borderRadius: '8px',
+                  background: 'var(--surface-2, var(--border))', border: '1px solid var(--border)'
+                }}>
+                  <p style={{ fontWeight: 700, fontSize: '0.875rem', color: 'var(--text)', marginBottom: '0.4rem' }}>
+                    ❓ {t('tournaments.delete_info_title', '¿Se puede eliminar el torneo?')}
+                  </p>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.5, margin: 0 }}>
+                    {t('tournaments.delete_info_body', 'Los torneos no se pueden eliminar unilateralmente. La única manera de que un torneo sea eliminado es que todos sus miembros lo abandonen. Si el miembro creador del torneo lo abandona, otro miembro pasará a ser el administrador del torneo.')}
+                  </p>
+                </div>
+
                 {/* Players management */}
                 <div style={{ marginTop: '1rem' }}>
                   {/* Pending approvals */}
