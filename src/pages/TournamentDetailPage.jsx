@@ -513,7 +513,7 @@ export default function TournamentDetailPage() {
             )}
           </div>}
 
-          <button className="btn btn-ghost btn-sm" onClick={() => navigate('/torneos?tab=public')}>
+          <button className="btn btn-ghost btn-sm" onClick={() => navigate('/?tab=public')}>
             Unirme a otro torneo
           </button>
           <button className="btn btn-ghost btn-sm" onClick={() => navigate('/torneos?new=1')}>
