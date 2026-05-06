@@ -61,9 +61,9 @@ const SCORING_DEFAULTS = {
       const [{ data: myData }, { data: pubData }, { data: comps }, { data: allJoined }] = await Promise.all([
         supabase.from('tournament_players')
           .select(`
-            role, 
+            role,
             tournaments(
-              id, name, slug, mode, invite_code, competition_id, prize, is_featured, avatar_url,
+              id, name, slug, mode, invite_code, competition_id, prize, is_featured, avatar_url, deleted_at,
               competitions(name, type),
               creator:users!tournaments_created_by_fkey(display_name),
               participants:tournament_players(count)
@@ -78,6 +78,7 @@ const SCORING_DEFAULTS = {
             participants:tournament_players(count)
           `)
           .eq('is_public', true)
+          .is('deleted_at', null)
           .order('is_featured', { ascending: false })
           .order('created_at', { ascending: false }).limit(30),
         supabase.from('competitions').select('id, name, type, status').order('name'),
@@ -86,12 +87,14 @@ const SCORING_DEFAULTS = {
 
       const joinedIds = new Set(allJoined?.map(tp => tp.tournament_id) ?? [])
 
-      setMyTournaments(myData?.map(tp => ({ 
-        ...tp.tournaments, 
-        role: tp.role,
-        creator_name: tp.tournaments.creator?.display_name,
-        participants_count: tp.tournaments.participants?.[0]?.count ?? 0
-      })) ?? [])
+      setMyTournaments(myData
+        ?.filter(tp => tp.tournaments && !tp.tournaments.deleted_at)
+        .map(tp => ({
+          ...tp.tournaments,
+          role: tp.role,
+          creator_name: tp.tournaments.creator?.display_name,
+          participants_count: tp.tournaments.participants?.[0]?.count ?? 0
+        })) ?? [])
 
       setPublicTournaments(pubData
         ?.filter(tr => !joinedIds.has(tr.id))
@@ -222,7 +225,9 @@ const SCORING_DEFAULTS = {
     try {
       const { data: tournament, error: tErr } = await supabase
         .from('tournaments').select('id, name, requires_approval')
-        .eq('invite_code', joinCode.trim().toUpperCase()).single()
+        .eq('invite_code', joinCode.trim().toUpperCase())
+        .is('deleted_at', null)
+        .single()
       if (tErr || !tournament) throw new Error(t('tournaments.invalid_code'))
 
       // Check if already a member

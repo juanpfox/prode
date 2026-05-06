@@ -188,12 +188,13 @@ export default function PredictionsPage() {
       setTournament(tr)
       const tournamentId = tr.id
 
-      // Fetch sibling tournaments (same competition + mode, user approved)
+      // Fetch sibling tournaments (same competition + mode). Include 'left' so users
+      // can still copy from tournaments they have abandoned or that have been deleted.
       const { data: siblingPlayers } = await supabase
         .from('tournament_players')
         .select('tournament_id, tournaments(id, name, competition_id, mode)')
         .eq('user_id', user.id)
-        .eq('status', 'approved')
+        .in('status', ['approved', 'left'])
         .neq('tournament_id', tr.id)
       const siblings = (siblingPlayers ?? [])
         .map(s => s.tournaments)

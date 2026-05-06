@@ -19,7 +19,7 @@ export default function TournamentDetailPage() {
   const [tournament, setTournament] = useState(null)
   const [players, setPlayers] = useState([])
   const [scores, setScores] = useState([])
-  const [tab, setTab] = useState('leaderboard') // 'leaderboard' | 'rules' | 'config'
+  const [tab, setTab] = useState('leaderboard') // 'leaderboard' | 'rules' | 'config' | 'menu'
   const [myRole, setMyRole] = useState(null)
   const [myStatus, setMyStatus] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -51,10 +51,10 @@ export default function TournamentDetailPage() {
     if (!user) return
     const { data } = await supabase
       .from('tournament_players')
-      .select('tournaments(id, name, slug, avatar_url)')
+      .select('tournaments(id, name, slug, avatar_url, deleted_at)')
       .eq('user_id', user.id)
       .eq('status', 'approved')
-    setUserTournaments(data?.map(r => r.tournaments).filter(Boolean) ?? [])
+    setUserTournaments(data?.map(r => r.tournaments).filter(t => t && !t.deleted_at) ?? [])
   }
 
   async function loadTournament() {
@@ -66,7 +66,8 @@ export default function TournamentDetailPage() {
       let query = supabase
         .from('tournaments')
         .select('*, competitions(name, type, status, available_modes)')
-      
+        .is('deleted_at', null)
+
       if (isUUID) {
         query = query.eq('id', identifier)
       } else {
@@ -74,7 +75,7 @@ export default function TournamentDetailPage() {
       }
 
       const { data: tr } = await query.maybeSingle()
-      
+
       if (!tr) {
         setTournament(null)
         return
@@ -392,7 +393,10 @@ export default function TournamentDetailPage() {
   async function deleteTournament() {
     setUpdating(true)
     try {
-      const { error } = await supabase.from('tournaments').delete().eq('id', id)
+      const { error } = await supabase
+        .from('tournaments')
+        .update({ deleted_at: new Date().toISOString() })
+        .eq('id', id)
       if (error) throw error
       navigate('/')
     } catch {
@@ -588,18 +592,19 @@ export default function TournamentDetailPage() {
         {isApproved && (
           <>
             <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '1px solid var(--border)', marginBottom: '1.25rem', paddingBottom: '0.25rem', overflowX: 'auto' }}>
-              {['leaderboard', 'rules', ...(myRole === 'admin' ? ['config'] : [])].map(tId => (
+              {['leaderboard', 'rules', ...(myRole === 'admin' ? ['config'] : []), 'menu'].map(tId => (
                 <button
                   key={tId}
                   className={`btn btn-sm ${tab === tId ? 'btn-primary' : 'btn-ghost'}`}
                   style={{ borderBottom: tab === tId ? '2px solid var(--primary)' : 'none', borderRadius: 0, whiteSpace: 'nowrap' }}
                   onClick={() => setTab(tId)}
                 >
-                  {tId === 'leaderboard' ? '📊' : tId === 'rules' ? '📖' : '⚙️'}
+                  {tId === 'leaderboard' ? '📊' : tId === 'rules' ? '📖' : tId === 'config' ? '⚙️' : '☰'}
                   <span style={{ marginLeft: '0.4rem' }}>
                     {tId === 'leaderboard' ? t('nav.leaderboard')
                       : tId === 'rules' ? t('config.tab_rules')
-                      : t('actions.settings')}
+                      : tId === 'config' ? t('actions.settings')
+                      : t('tournaments.menu_tab', 'Menú')}
                   </span>
                 </button>
               ))}
@@ -1010,42 +1015,51 @@ export default function TournamentDetailPage() {
               </section>
             )}
 
-            {/* Leave tournament — player only (not admin), shown below posiciones */}
-            {tab === 'leaderboard' && myRole !== 'admin' && (
-              <div style={{ marginTop: '2rem' }}>
-                {!confirmLeave ? (
-                  <button
-                    className="btn btn-ghost btn-sm"
-                    onClick={() => setConfirmLeave(true)}
-                    style={{ color: 'var(--error, #ef4444)', border: '1px solid var(--error, #ef4444)', width: '100%' }}
-                  >
-                    {t('tournaments.leave_tournament')}
-                  </button>
-                ) : (
-                  <div className="card card-sm" style={{ border: '1px solid var(--error, #ef4444)', textAlign: 'center' }}>
-                    <p style={{ fontWeight: 600, marginBottom: '0.75rem', fontSize: '0.9rem' }}>
-                      {t('tournaments.confirm_leave')}
-                    </p>
-                    <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
-                      <button className="btn btn-ghost btn-sm" onClick={() => setConfirmLeave(false)}>
-                        {t('common.cancel')}
-                      </button>
-                      <button
-                        className="btn btn-sm"
-                        onClick={leaveTournament}
-                        disabled={updating}
-                        style={{ background: 'var(--error, #ef4444)', color: '#fff', border: 'none' }}
-                      >
-                        {updating ? '…' : t('tournaments.leave_confirm_btn')}
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
+            {/* MENU TAB — leave tournament (everyone approved) */}
+            {tab === 'menu' && (
+              <section className="animate-slide-up">
+                <button
+                  className="btn btn-ghost"
+                  onClick={() => setConfirmLeave(true)}
+                  style={{ color: 'var(--error, #ef4444)', border: '1px solid var(--error, #ef4444)', width: '100%' }}
+                >
+                  🚪 {t('tournaments.leave_tournament')}
+                </button>
+              </section>
             )}
           </>
         )}
       </div>
+
+      {/* Leave tournament confirmation modal */}
+      {confirmLeave && (
+        <div style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem'
+        }}>
+          <div className="card" style={{ maxWidth: '360px', width: '100%', textAlign: 'center' }}>
+            <p style={{ fontWeight: 700, fontSize: '1rem', marginBottom: '0.5rem' }}>
+              🚪 {t('tournaments.leave_tournament')}
+            </p>
+            <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>
+              {t('tournaments.confirm_leave')}
+            </p>
+            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
+              <button className="btn btn-ghost btn-sm" onClick={() => setConfirmLeave(false)} disabled={updating}>
+                {t('common.cancel')}
+              </button>
+              <button
+                className="btn btn-sm"
+                onClick={leaveTournament}
+                disabled={updating}
+                style={{ background: 'var(--error, #ef4444)', color: '#fff', border: 'none' }}
+              >
+                {updating ? '…' : t('tournaments.leave_confirm_btn')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Delete tournament confirmation modal */}
       {confirmDelete && (
