@@ -885,20 +885,7 @@ export default function TournamentDetailPage() {
                 {/* Scoring config — points & multipliers */}
                 <ConfigTab tournamentId={id} isAdmin={true} mode={tournament.mode} />
 
-                {/* Danger zone — delete tournament */}
-                <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>
-                  <button
-                    onClick={() => setConfirmDelete(true)}
-                    style={{
-                      width: '100%', padding: '0.6rem 1rem', borderRadius: '8px',
-                      border: '1px solid var(--danger, #ef4444)', background: 'transparent',
-                      color: 'var(--danger, #ef4444)', fontWeight: 600, fontSize: '0.875rem',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    🗑️ {t('tournaments.delete_tournament', 'Eliminar torneo')}
-                  </button>
-                </div>
+                {/* Danger zone — delete tournament (hidden, functionality preserved) */}
 
                 {/* Players management */}
                 <div style={{ marginTop: '1rem' }}>
