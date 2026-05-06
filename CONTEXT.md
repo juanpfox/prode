@@ -68,7 +68,7 @@ Pronóstico de **resultado exacto**.
 - [x] Contador regresivo al Mundial 2026 en Login y Home.
 - [x] Rediseño de la página de Login (Layout Desktop con imagen a la izquierda y form/contador a la derecha).
 - [x] Mejora Navegación: Botón "Volver" dinámico en vista de otros jugadores.
-- [x] Bug Fix: Corrección de banderas de Irak, Inglaterra, Escocia, Austria, Curazao y RD Congo.
+- [x] Bug Fix: Corrección de banderas (Irak, Inglaterra, etc.) y cambio de nombre de "Congo" a "RD Congo".
 - [ ] Elegir e integrar API de resultados automáticos (API-Football)
 - [ ] Implementar lógica de puntos automática en Supabase (Edge Functions / Triggers)
 - [ ] Crear bot/ping para evitar pausa de Supabase Free

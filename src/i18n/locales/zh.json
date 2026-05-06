@@ -69,5 +69,8 @@
   },
   "predictions": {
     "no_playoff_matches": "暂无季后赛比赛"
+  },
+  "teams": {
+    "COD": "民主刚果"
   }
 }

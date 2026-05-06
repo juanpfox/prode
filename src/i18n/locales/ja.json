@@ -69,5 +69,8 @@
   },
   "predictions": {
     "no_playoff_matches": "プレーオフの試合はまだありません"
+  },
+  "teams": {
+    "COD": "民主コンゴ"
   }
 }

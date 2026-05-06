@@ -69,5 +69,8 @@
   },
   "predictions": {
     "no_playoff_matches": "এখনও কোনো প্লেঅফ ম্যাচ নেই"
+  },
+  "teams": {
+    "COD": "ডিআর কঙ্গো"
   }
 }

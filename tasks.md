@@ -82,8 +82,9 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
   - [x] **Mostrar etiqueta (admin) en tabla de posiciones**
     - [x] Identificar al owner del torneo en `TournamentDetailPage.jsx` y `LeaderboardPage.jsx`.
     - [x] Agregar el texto "(admin)" pequeño y gris debajo del nombre del owner.
-  - [x] **Bug Fix: Banderas corregidas**
-    - [x] Corregir mapeo `FIFA_TO_ISO2` en múltiples páginas para asignar los códigos correctos a Irak, Inglaterra, Escocia, Austria, Curazao y RD Congo.
+  - [x] **Bug Fix: Banderas y nombres corregidos**
+    - [x] Corregir mapeo `FIFA_TO_ISO2` en múltiples páginas para Irak, Inglaterra, Escocia, Austria, Curazao y RD Congo.
+    - [x] Cambiar nombre de "Congo" a "RD Congo" en todos los idiomas (i18n) y base de datos.
 
 ## Fase 3: Monetización e Integraciones Externas
 

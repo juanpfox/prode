@@ -87,5 +87,8 @@
       "playoffs": "Fase Final"
     },
     "no_playoff_matches": "Nenhuma partida de playoffs disponível ainda"
+  },
+  "teams": {
+    "COD": "RD Congo"
   }
 }

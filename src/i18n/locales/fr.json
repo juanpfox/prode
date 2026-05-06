@@ -83,5 +83,8 @@
       "playoffs": "Matchs à élimination directe"
     },
     "no_playoff_matches": "Pas encore de matchs de playoffs disponibles"
+  },
+  "teams": {
+    "COD": "RD Congo"
   }
 }

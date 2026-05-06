@@ -69,5 +69,8 @@
   },
   "predictions": {
     "no_playoff_matches": "아직 플레이오프 경기가 없습니다"
+  },
+  "teams": {
+    "COD": "민주 콩고"
   }
 }
