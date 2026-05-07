@@ -53,27 +53,15 @@ Pronóstico de **resultado exacto**.
 ---
 
 ## Roadmap / Estado del Proyecto
-- [X] Configuración PWA e instalabilidad
-- [X] i18n soporte para 11 idiomas
-- [X] Admin Results Management (Carga de resultados reales)
-- [X] Refinar Playoff Brackets (Mobile-ready + Full Desktop View + 1600px wide layout)
-- [X] Sistema de tie-break por `initial_position` en tablas de grupo
-- [X] Pestañas de configuración de puntos (Creación + Edición) y reglas dinámicas
-- [X] Sistema de Torneos Destacados (Admin only) y ordenamiento prioritario
-- [X] Sub-URLs personalizadas para torneos (Slugs) — ej: `prode.mundial.com/mi-torneo`
-- [x] Simplificación de UI: eliminación de etiquetas de competición y modo en fichas de torneos.
-- [x] Sistema de Avatares Personalizados (Catálogo de 100+ iconos caricaturizados, incluyendo Famosos) con página de selección dedicada.
-- [x] Rediseño del Hero en Landing Page (Uso de imagen de marca `prodeImage.png`).
-- [x] Avatares para Torneos (Uso de categorías 'Clubes', 'Otros' y 'Animales', con el avatar de trofeo como fallback por defecto).
-- [x] Contador regresivo al Mundial 2026 en Login y Home.
-- [x] Rediseño de la página de Login (Layout Desktop con imagen a la izquierda y form/contador a la derecha).
-- [x] Mejora Navegación: Botón "Volver" dinámico en vista de otros jugadores.
-- [x] Bug Fix: Corrección de banderas (Irak, Inglaterra, etc.) y cambio de nombre de "Congo" a "RD Congo".
-- [ ] Elegir e integrar API de resultados automáticos (API-Football)
-- [ ] Implementar lógica de puntos automática en Supabase (Edge Functions / Triggers)
-- [ ] Crear bot/ping para evitar pausa de Supabase Free
-- [ ] Integración MercadoPago para quitar límites de torneos/jugadores
-- [ ] Exportar resultados de competiciones a XLSX (Admin)
+
+Para mantener este documento escalable, el detalle de las tareas se maneja en archivos separados:
+- **Tareas pendientes y roadmap activo:** Ver `tasks.md`.
+- **Historial de logros y tareas completadas:** Ver `CHANGELOG.md`.
+
+*Features principales ya implementadas:*
+- PWA e instalabilidad, i18n (11 idiomas).
+- Lógica completa de torneos, predicciones y cálculo de puntos (modos Posiciones y Partidos).
+- Avatares personalizados y URLs únicas (slugs) para torneos.
 
 ---
 

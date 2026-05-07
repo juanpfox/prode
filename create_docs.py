@@ -1,0 +1,28 @@
+import os
+
+docs = {
+    "agent-quickstart.md": "# Agent Quickstart\n\nPara empezar a trabajar como agente de IA en este proyecto:\n1. Lee `CONTEXT.md`.\n2. Revisa `agents.md` para las reglas.\n3. Revisa `tasks.md` para ver el trabajo pendiente.\n4. Revisa `CHANGELOG.md` para el historial.",
+    "ai-skill.md": "# AI Skills\n\nHabilidades requeridas para agentes en este proyecto:\n- Frontend: React, Vite, CSS Vainilla, Responsive Design.\n- Backend: Supabase (Auth, DB, Edge Functions, RLS).\n- Tooling: npm, git, vite-plugin-pwa.",
+    "ai-tools.md": "# AI Tools\n\nHerramientas de IA habilitadas:\n- Herramientas de edición de archivos y terminal.\n- Integración con Supabase MCP para leer esquema y logs.\n- Herramientas de visualización (Browser) para verificar la UI.",
+    "architecture.md": "# Arquitectura (Prode Mundial)\n\n## Frontend\n- **Framework**: React JS + Vite\n- **Styling**: Vanilla CSS, variables globales, diseño glassmorphism.\n- **PWA**: vite-plugin-pwa para offline y acceso nativo.\n- **Estado & Fetching**: TanStack Query (React Query).\n- **Routing**: React Router (con soporte para slugs de torneos).\n\n## Backend (Supabase)\n- **Auth**: Email/Password y Google OAuth.\n- **Database**: PostgreSQL (tablas: users, tournaments, matches, predictions, etc).\n- **Funciones**: Edge Functions para ingesta de datos de APIs externas (API-Football).",
+    "automation-service.md": "# Automation Service\n\nEl servicio de automatización de resultados (Fase 1) se encarga de:\n1. Ejecutar Edge Functions periódicamente (vía GitHub Actions o cron).\n2. Consultar la API-Football para partidos recientes de UCL y Mundial.\n3. Actualizar la tabla `matches`.\n4. Disparar el recálculo automático de puntajes en la tabla `predictions`.",
+    "cli.md": "# Comandos CLI Útiles\n\n## Desarrollo Frontend\n- `npm run dev`: Inicia el servidor de desarrollo.\n- `npm run build`: Construye la app para producción.\n\n## Supabase CLI\n- `npx supabase start`: Inicia el entorno local de Supabase.\n- `npx supabase edge-functions serve sync-ucl-results`: Prueba la edge function localmente.\n- `npx supabase db push`: Sube cambios de esquema.",
+    "current-status.md": "# Current Status\n\nEl estado actual del proyecto se divide en:\n- **Tareas pendientes**: Ver `tasks.md`.\n- **Historial de cambios**: Ver `CHANGELOG.md`.\n- **Contexto del proyecto**: Ver `CONTEXT.md`.\n\nEl foco actual está en la integración de resultados automáticos y monetización.",
+    "debugging.md": "# Debugging Guide\n\n- **Errores de UI/CSS**: Usar React Developer Tools e inspeccionar variables CSS globales en `:root`.\n- **Errores de Fetch/Datos**: Verificar la pestaña Network y el estado de TanStack Query.\n- **Errores Backend**: Usar `npx supabase functions serve` para probar Edge Functions, y revisar los logs de Supabase en el Dashboard para RLS y Policies.",
+    "embeddable-runtime.md": "# Embeddable Runtime\n\nEn el contexto de Prode Mundial, la aplicación se distribuye como una PWA (Progressive Web App). \nEsto permite que la aplicación sea instalable (embedded) en dispositivos móviles Android/iOS y en el escritorio sin necesidad de tiendas de aplicaciones nativas.",
+    "initial-spec.md": "# Initial Spec\n\n**Prode Mundial** nace como una aplicación web para organizar torneos de predicciones de resultados deportivos (World Cup 2026, Champions League).\n\nRequerimientos iniciales:\n- Multitorneo y multiusuario.\n- Puntuación personalizable (Posiciones y Partidos).\n- Soporte multilingüe (11 idiomas).\n- Avatares personalizados y rankings dinámicos.",
+    "known-gaps.md": "# Known Gaps & Issues\n\n- **Datos Automáticos**: Falta integración completa de API para Mundial 2026.\n- **Límites de Uso**: Supabase Free tier puede pausarse por inactividad. Falta bot de ping.\n- **Monetización**: Aún no hay integración de pagos (MercadoPago) para levantar límites de usuarios.\n- **Tipado**: El proyecto usa JS vanilla; una migración a TypeScript mejoraría la robustez.",
+    "mcp-migration.md": "# MCP Migration\n\nNo aplicable directamente a la arquitectura de la app, pero para los agentes de IA, se recomienda usar el **Supabase MCP Server** para administrar la base de datos local y remota, explorar esquemas y ejecutar consultas SQL de manera segura.",
+    "modding-reference.md": "# Modding / Customization Reference\n\nLa personalización de torneos (modding) incluye:\n- **Puntuación**: Ajustes en `tournament_config` (pts por ganador, empate, resultado exacto, diferencia de gol).\n- **Avatares**: Asignación de avatares especiales (animales, clubes, famosos).\n- **Reglas de Desempate**: Configuración paramétrica del descuento por empate fallido.",
+    "scenario-checkpoints.md": "# Scenario Checkpoints\n\nPara pruebas manuales y automatizadas, verificar estos flujos (Checkpoints):\n1. Login como invitado (`/guest` o `/guest2`).\n2. Creación de torneo (verificar asignación de admin y slug).\n3. Carga de predicciones (verificar autoguardado).\n4. Configuración del torneo (cambiar reglas y verificar recálculo automático).\n5. Sincronización multi-torneo (copiar predicciones).",
+    "testing.md": "# Testing Strategy\n\nEl proyecto actualmente prioriza el **testing manual** y por escenarios:\n- Usar cuentas `/guest` y `/guest2` para verificar flujos rápidos.\n- Mockear respuestas de la API de fútbol durante el desarrollo local.\n- Revisar las edge cases en el cálculo de puntos del Bracket de Playoffs."
+}
+
+os.makedirs("docs", exist_ok=True)
+
+for filename, content in docs.items():
+    path = os.path.join("docs", filename)
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(content)
+        
+print("Archivos MD creados exitosamente en la carpeta docs/.")

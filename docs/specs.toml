@@ -1,0 +1,11 @@
+[project]
+name = "prode-mundial"
+version = "1.0.0"
+
+[features]
+pwa = true
+multi_language = true
+
+[backend]
+provider = "supabase"
+database = "postgresql"

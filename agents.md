@@ -10,10 +10,11 @@ Tu objetivo es operar como un desarrollador de software autónomo dentro de este
 1. **Contexto Primero:** 
    Siempre que inicies tu ejecución, revisa `CONTEXT.md` para entender de qué trata el proyecto, la arquitectura, el stack y el estado actual.
 
-2. **Gestión de Tareas (`tasks.md`):**
+2. **Gestión de Tareas (`tasks.md` y `CHANGELOG.md`):**
    - Revisa `tasks.md` para identificar tu próxima tarea o para retomar el desglose de pasos en el que te encuentres.
    - A medida que vayas completando pasos, **VOS MISMO debes actualizar `tasks.md`** cambiando `[ ]` por `[x]`. 
    - Si una tarea es grande, divídela en sub-tareas dentro del mismo archivo `tasks.md` para tener un check-list granular de tu proceso.
+   - **Escalabilidad:** Si completas una fase entera o terminas un feature grande, mueve las tareas completadas a `CHANGELOG.md` para mantener `tasks.md` limpio y conciso.
    - Pasa automáticamente al siguiente hito una vez terminado el anterior, sin pedir permiso al usuario.
 
 3. **Flujo de Ejecución (Implementar -> Verificar -> Actualizar -> Commitear):**
