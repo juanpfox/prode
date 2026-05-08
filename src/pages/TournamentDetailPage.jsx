@@ -617,30 +617,45 @@ export default function TournamentDetailPage() {
                 </button>
               ))}
             </div>
-            <div className="show-mobile" style={{ position: 'relative', marginBottom: '1rem' }}>
-              <button
-                className={`btn btn-ghost btn-sm ${showTabsMenu ? 'btn-primary' : ''}`}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setShowTabsMenu(v => !v)
-                }}
-                style={{ width: '100%', justifyContent: 'space-between', paddingInline: '1rem' }}
-              >
-                <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <span style={{ fontSize: '1rem' }}>☰</span>
-                  <span>{t('tournaments.more_tab', 'Más...')}</span>
-                </span>
-                <span>{showTabsMenu ? '▲' : '▼'}</span>
-              </button>
+            <div className="show-mobile" style={{ display: 'block', marginBottom: '1rem', position: 'relative' }}>
+              <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.25rem', overflowX: 'auto' }}>
+                {['leaderboard', 'rules'].map(tId => (
+                  <button
+                    key={tId}
+                    className={`btn btn-sm ${tab === tId ? 'btn-primary' : 'btn-ghost'}`}
+                    style={{ borderBottom: tab === tId ? '2px solid var(--primary)' : 'none', borderRadius: 0, whiteSpace: 'nowrap', flex: '1 0 auto' }}
+                    onClick={() => {
+                      setTab(tId)
+                      setShowTabsMenu(false)
+                    }}
+                  >
+                    {tId === 'leaderboard' ? '📊' : '📖'}
+                    <span style={{ marginLeft: '0.4rem' }}>
+                      {tId === 'leaderboard' ? t('nav.leaderboard') : t('config.tab_rules')}
+                    </span>
+                  </button>
+                ))}
+                <button
+                  className={`btn btn-sm ${(tab === 'config' || tab === 'menu' || showTabsMenu) ? 'btn-primary' : 'btn-ghost'}`}
+                  aria-label={t('tournaments.more_tab', 'Más...')}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setShowTabsMenu(v => !v)
+                  }}
+                  style={{ borderBottom: (tab === 'config' || tab === 'menu') ? '2px solid var(--primary)' : 'none', borderRadius: 0, minWidth: '4rem' }}
+                >
+                  ☰
+                </button>
+              </div>
               {showTabsMenu && (
                 <div
                   onClick={e => e.stopPropagation()}
                   style={{
                     position: 'absolute',
                     top: 'calc(100% + 0.35rem)',
-                    left: 0,
                     right: 0,
                     zIndex: 50,
+                    minWidth: '190px',
                     background: 'var(--surface)',
                     border: '1px solid var(--border)',
                     borderRadius: 'var(--r-lg)',
@@ -648,7 +663,7 @@ export default function TournamentDetailPage() {
                     overflow: 'hidden',
                   }}
                 >
-                  {['leaderboard', 'rules', ...(myRole === 'admin' ? ['config'] : []), 'menu'].map(tId => (
+                  {[...(myRole === 'admin' ? ['config'] : []), 'menu'].map(tId => (
                     <button
                       key={tId}
                       className="btn btn-ghost btn-sm"
@@ -667,12 +682,9 @@ export default function TournamentDetailPage() {
                         color: tab === tId ? 'var(--primary)' : 'var(--text)',
                       }}
                     >
-                      {tId === 'leaderboard' ? '📊' : tId === 'rules' ? '📖' : tId === 'config' ? '⚙️' : '☰'}
+                      {tId === 'config' ? '⚙️' : '☰'}
                       <span style={{ marginLeft: '0.5rem' }}>
-                        {tId === 'leaderboard' ? t('nav.leaderboard')
-                          : tId === 'rules' ? t('config.tab_rules')
-                          : tId === 'config' ? t('actions.settings')
-                          : t('tournaments.menu_tab', 'Menú')}
+                        {tId === 'config' ? t('actions.settings') : t('tournaments.menu_tab', 'Menú')}
                       </span>
                     </button>
                   ))}
