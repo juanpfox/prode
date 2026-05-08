@@ -599,7 +599,7 @@ export default function TournamentDetailPage() {
         {/* Tabs: Posiciones | Reglas | Configuración (admin) */}
         {isApproved && (
           <>
-            <div className="hide-mobile" style={{ display: 'flex', gap: '0.5rem', borderBottom: '1px solid var(--border)', marginBottom: '1.25rem', paddingBottom: '0.25rem', overflowX: 'auto' }}>
+            <div className="hide-mobile" style={{ gap: '0.5rem', borderBottom: '1px solid var(--border)', marginBottom: '1.25rem', paddingBottom: '0.25rem', overflowX: 'auto' }}>
               {['leaderboard', 'rules', ...(myRole === 'admin' ? ['config'] : []), 'menu'].map(tId => (
                 <button
                   key={tId}
@@ -617,7 +617,7 @@ export default function TournamentDetailPage() {
                 </button>
               ))}
             </div>
-            <div className="show-mobile" style={{ display: 'block', marginBottom: '1rem', position: 'relative' }}>
+            <div className="show-mobile" style={{ marginBottom: '1rem', position: 'relative' }}>
               <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.25rem', overflowX: 'auto' }}>
                 {['leaderboard', 'rules'].map(tId => (
                   <button
@@ -678,13 +678,15 @@ export default function TournamentDetailPage() {
                         border: 'none',
                         borderBottom: '1px solid var(--border)',
                         padding: '0.85rem 1rem',
-                        background: tab === tId ? 'var(--primary-subtle)' : 'transparent',
-                        color: tab === tId ? 'var(--primary)' : 'var(--text)',
+                        background: 'transparent',
+                        color: 'var(--text)',
                       }}
                     >
-                      {tId === 'config' ? '⚙️' : '☰'}
-                      <span style={{ marginLeft: '0.5rem' }}>
-                        {tId === 'config' ? t('actions.settings') : t('tournaments.menu_tab', 'Menú')}
+                      <span style={{ width: '1.5rem', display: 'inline-flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 }}>
+                        {tId === 'config' ? '⚙️' : '⋯'}
+                      </span>
+                      <span style={{ marginLeft: '0.75rem' }}>
+                        {tId === 'config' ? t('actions.settings') : t('tournaments.more_tab', 'Más')}
                       </span>
                     </button>
                   ))}
