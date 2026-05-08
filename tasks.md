@@ -19,6 +19,7 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
 - [ ] **Crear bot/ping para evitar pausa de Supabase Free**
   - [ ] Diseñar un bot, script web o trigger externo que realice una lectura / escritura en la base de datos de Supabase cada X tiempo (ej: 24 hs o 3 días) para mantener vivo el proyecto y evitar que entre en pause por inactividad.
 - [ ] **Resolución de bugs o mantenimientos menores (sección abierta)**
+  - [x] En mobile, mover `Configuración` y `Menú` del torneo a un desplegable bajo el icono de tres rayas, renombrando el acceso a `Más...` / `More...`.
   - *(Agrega aquí cualquier bug o detalle a corregir que encuentres)*
 
 ## Fase 3: Monetización e Integraciones Externas

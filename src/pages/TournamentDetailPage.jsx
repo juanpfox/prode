@@ -34,6 +34,7 @@ export default function TournamentDetailPage() {
   const [confirmLeave, setConfirmLeave] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [showTournamentDropdown, setShowTournamentDropdown] = useState(false)
+  const [showTabsMenu, setShowTabsMenu] = useState(false)
   const [userTournaments, setUserTournaments] = useState([])
 
   const id = tournament?.id
@@ -46,6 +47,13 @@ export default function TournamentDetailPage() {
     document.addEventListener('click', close)
     return () => document.removeEventListener('click', close)
   }, [showTournamentDropdown])
+
+  useEffect(() => {
+    if (!showTabsMenu) return
+    const close = () => setShowTabsMenu(false)
+    document.addEventListener('click', close)
+    return () => document.removeEventListener('click', close)
+  }, [showTabsMenu])
 
   async function loadUserTournaments() {
     if (!user) return
@@ -591,7 +599,7 @@ export default function TournamentDetailPage() {
         {/* Tabs: Posiciones | Reglas | Configuración (admin) */}
         {isApproved && (
           <>
-            <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '1px solid var(--border)', marginBottom: '1.25rem', paddingBottom: '0.25rem', overflowX: 'auto' }}>
+            <div className="hide-mobile" style={{ display: 'flex', gap: '0.5rem', borderBottom: '1px solid var(--border)', marginBottom: '1.25rem', paddingBottom: '0.25rem', overflowX: 'auto' }}>
               {['leaderboard', 'rules', ...(myRole === 'admin' ? ['config'] : []), 'menu'].map(tId => (
                 <button
                   key={tId}
@@ -608,6 +616,68 @@ export default function TournamentDetailPage() {
                   </span>
                 </button>
               ))}
+            </div>
+            <div className="show-mobile" style={{ position: 'relative', marginBottom: '1rem' }}>
+              <button
+                className={`btn btn-ghost btn-sm ${showTabsMenu ? 'btn-primary' : ''}`}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setShowTabsMenu(v => !v)
+                }}
+                style={{ width: '100%', justifyContent: 'space-between', paddingInline: '1rem' }}
+              >
+                <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <span style={{ fontSize: '1rem' }}>☰</span>
+                  <span>{t('tournaments.more_tab', 'Más...')}</span>
+                </span>
+                <span>{showTabsMenu ? '▲' : '▼'}</span>
+              </button>
+              {showTabsMenu && (
+                <div
+                  onClick={e => e.stopPropagation()}
+                  style={{
+                    position: 'absolute',
+                    top: 'calc(100% + 0.35rem)',
+                    left: 0,
+                    right: 0,
+                    zIndex: 50,
+                    background: 'var(--surface)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--r-lg)',
+                    boxShadow: 'var(--shadow-lg)',
+                    overflow: 'hidden',
+                  }}
+                >
+                  {['leaderboard', 'rules', ...(myRole === 'admin' ? ['config'] : []), 'menu'].map(tId => (
+                    <button
+                      key={tId}
+                      className="btn btn-ghost btn-sm"
+                      onClick={() => {
+                        setTab(tId)
+                        setShowTabsMenu(false)
+                      }}
+                      style={{
+                        width: '100%',
+                        justifyContent: 'flex-start',
+                        borderRadius: 0,
+                        border: 'none',
+                        borderBottom: '1px solid var(--border)',
+                        padding: '0.85rem 1rem',
+                        background: tab === tId ? 'var(--primary-subtle)' : 'transparent',
+                        color: tab === tId ? 'var(--primary)' : 'var(--text)',
+                      }}
+                    >
+                      {tId === 'leaderboard' ? '📊' : tId === 'rules' ? '📖' : tId === 'config' ? '⚙️' : '☰'}
+                      <span style={{ marginLeft: '0.5rem' }}>
+                        {tId === 'leaderboard' ? t('nav.leaderboard')
+                          : tId === 'rules' ? t('config.tab_rules')
+                          : tId === 'config' ? t('actions.settings')
+                          : t('tournaments.menu_tab', 'Menú')}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* LEADERBOARD TAB */}
