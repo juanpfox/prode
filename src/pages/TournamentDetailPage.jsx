@@ -926,10 +926,12 @@ export default function TournamentDetailPage() {
                         )}
                       </div>
                     )}
-                    <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginLeft: '0.5rem', lineHeight: 1.4 }}>
-                      {t('tournaments.slug_help_full', 'El torneo será accesible en:')} <br/>
-                      <strong style={{ color: 'var(--primary)' }}>prodemundial.pages.dev/{editSlug || tournament.id}</strong>
-                    </p>
+                    {slugStatus !== 'taken' && (
+                      <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginLeft: '0.5rem', lineHeight: 1.4 }}>
+                        {t('tournaments.slug_help_full', 'El torneo será accesible en:')} <br/>
+                        <strong style={{ color: 'var(--primary)' }}>prodemundial.pages.dev/{editSlug || tournament.id}</strong>
+                      </p>
+                    )}
                   </div>
 
                   <h3 style={{ fontWeight: 700, fontSize: '0.9rem', marginTop: '1rem', marginBottom: '0.5rem' }}>
