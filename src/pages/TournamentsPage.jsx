@@ -144,6 +144,7 @@ const SCORING_DEFAULTS = {
           .from('tournaments')
           .select('id')
           .eq('slug', slugValue)
+          .is('deleted_at', null)
           .maybeSingle()
         
         if (error) throw error
