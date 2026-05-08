@@ -19,7 +19,7 @@ export default function TournamentDetailPage() {
   const [tournament, setTournament] = useState(null)
   const [players, setPlayers] = useState([])
   const [scores, setScores] = useState([])
-  const [tab, setTab] = useState('leaderboard') // 'leaderboard' | 'rules' | 'config' | 'menu'
+  const [tab, setTab] = useState('leaderboard') // 'requests' | 'leaderboard' | 'rules' | 'config' | 'menu'
   const [myRole, setMyRole] = useState(null)
   const [myStatus, setMyStatus] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -102,6 +102,7 @@ export default function TournamentDetailPage() {
         .select('user_id, role, status, users(display_name, avatar_url)')
         .eq('tournament_id', id)
       setPlayers(pls ?? [])
+      setTab(tr.created_by === user?.id && (pls ?? []).some(p => p.status === 'pending') ? 'requests' : 'leaderboard')
 
       const { data: scs } = await supabase
         .from('scores')
@@ -320,21 +321,6 @@ export default function TournamentDetailPage() {
     }
   }
 
-  async function approveAllPlayers() {
-    setUpdating(true)
-    try {
-      const { error } = await supabase.from('tournament_players')
-        .update({ status: 'approved' })
-        .eq('tournament_id', id).eq('status', 'pending')
-      if (error) throw error
-      loadTournament()
-    } catch {
-      alert(t('common.error_generic'))
-    } finally {
-      setUpdating(false)
-    }
-  }
-
   async function approvePlayer(userId) {
     await supabase.from('tournament_players')
       .update({ status: 'approved' })
@@ -462,6 +448,46 @@ export default function TournamentDetailPage() {
     setTimeout(() => setCopied(false), 2000)
   }
 
+  const approved = players.filter(p => p.status === 'approved')
+  const pending  = players.filter(p => p.status === 'pending')
+  const banned   = players.filter(p => p.status === 'banned')
+  const isApproved = myStatus === 'approved'
+  const isPending  = myStatus === 'pending'
+  const isBanned   = myStatus === 'banned'
+  const isOwner = tournament?.created_by === user?.id
+  const showRequestsTab = isOwner && pending.length > 0
+  const primaryTabs = [
+    ...(showRequestsTab ? ['requests'] : []),
+    'leaderboard',
+    'rules',
+  ]
+  const secondaryTabs = [
+    ...(myRole === 'admin' ? ['config'] : []),
+    'menu',
+  ]
+
+  useEffect(() => {
+    if (!showRequestsTab && tab === 'requests') {
+      setTab('leaderboard')
+    }
+  }, [showRequestsTab, tab])
+
+  function getTabIcon(tabId) {
+    if (tabId === 'requests') return '⏳'
+    if (tabId === 'leaderboard') return '📊'
+    if (tabId === 'rules') return '📖'
+    if (tabId === 'config') return '⚙️'
+    return '☰'
+  }
+
+  function getTabLabel(tabId) {
+    if (tabId === 'requests') return t('tournaments.requests_tab', 'Solicitudes')
+    if (tabId === 'leaderboard') return t('nav.leaderboard')
+    if (tabId === 'rules') return t('config.tab_rules')
+    if (tabId === 'config') return t('actions.settings')
+    return t('tournaments.menu_tab', 'Menú')
+  }
+
   if (loading) return (
     <AppShell>
       <p style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '3rem' }}>{t('common.loading')}</p>
@@ -472,13 +498,6 @@ export default function TournamentDetailPage() {
       <p style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '3rem' }}>{t('tournaments.not_found')}</p>
     </AppShell>
   )
-
-  const approved = players.filter(p => p.status === 'approved')
-  const pending  = players.filter(p => p.status === 'pending')
-  const banned   = players.filter(p => p.status === 'banned')
-  const isApproved = myStatus === 'approved'
-  const isPending  = myStatus === 'pending'
-  const isBanned   = myStatus === 'banned'
 
   return (
     <AppShell>
@@ -596,30 +615,27 @@ export default function TournamentDetailPage() {
 
         </div>
 
-        {/* Tabs: Posiciones | Reglas | Configuración (admin) */}
+        {/* Tabs: Solicitudes (owner) | Posiciones | Reglas | Configuración (admin) */}
         {isApproved && (
           <>
             <div className="hide-mobile" style={{ gap: '0.5rem', borderBottom: '1px solid var(--border)', marginBottom: '1.25rem', paddingBottom: '0.25rem', overflowX: 'auto' }}>
-              {['leaderboard', 'rules', ...(myRole === 'admin' ? ['config'] : []), 'menu'].map(tId => (
+              {[...primaryTabs, ...secondaryTabs].map(tId => (
                 <button
                   key={tId}
                   className={`btn btn-sm ${tab === tId ? 'btn-primary' : 'btn-ghost'}`}
                   style={{ borderBottom: tab === tId ? '2px solid var(--primary)' : 'none', borderRadius: 0, whiteSpace: 'nowrap' }}
                   onClick={() => setTab(tId)}
                 >
-                  {tId === 'leaderboard' ? '📊' : tId === 'rules' ? '📖' : tId === 'config' ? '⚙️' : '☰'}
+                  {getTabIcon(tId)}
                   <span style={{ marginLeft: '0.4rem' }}>
-                    {tId === 'leaderboard' ? t('nav.leaderboard')
-                      : tId === 'rules' ? t('config.tab_rules')
-                      : tId === 'config' ? t('actions.settings')
-                      : t('tournaments.menu_tab', 'Menú')}
+                    {getTabLabel(tId)}
                   </span>
                 </button>
               ))}
             </div>
             <div className="show-mobile" style={{ marginBottom: '1rem', position: 'relative' }}>
               <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.25rem', overflowX: 'auto' }}>
-                {['leaderboard', 'rules'].map(tId => (
+                {primaryTabs.map(tId => (
                   <button
                     key={tId}
                     className={`btn btn-sm ${tab === tId ? 'btn-primary' : 'btn-ghost'}`}
@@ -629,9 +645,9 @@ export default function TournamentDetailPage() {
                       setShowTabsMenu(false)
                     }}
                   >
-                    {tId === 'leaderboard' ? '📊' : '📖'}
+                    {getTabIcon(tId)}
                     <span style={{ marginLeft: '0.4rem' }}>
-                      {tId === 'leaderboard' ? t('nav.leaderboard') : t('config.tab_rules')}
+                      {getTabLabel(tId)}
                     </span>
                   </button>
                 ))}
@@ -663,7 +679,7 @@ export default function TournamentDetailPage() {
                     overflow: 'hidden',
                   }}
                 >
-                  {[...(myRole === 'admin' ? ['config'] : []), 'menu'].map(tId => (
+                  {secondaryTabs.map(tId => (
                     <button
                       key={tId}
                       className="btn btn-ghost btn-sm"
@@ -683,16 +699,57 @@ export default function TournamentDetailPage() {
                       }}
                     >
                       <span style={{ width: '1.5rem', display: 'inline-flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 }}>
-                        {tId === 'config' ? '⚙️' : '⋯'}
+                        {getTabIcon(tId)}
                       </span>
                       <span style={{ marginLeft: '0.75rem' }}>
-                        {tId === 'config' ? t('actions.settings') : t('tournaments.more_tab', 'Más')}
+                        {tId === 'menu' ? t('tournaments.more_tab', 'Más') : getTabLabel(tId)}
                       </span>
                     </button>
                   ))}
                 </div>
               )}
             </div>
+
+            {/* REQUESTS TAB (owner only) */}
+            {tab === 'requests' && showRequestsTab && (
+              <section className="animate-slide-up">
+                <div style={{ marginBottom: '1rem' }}>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: 1.5 }}>
+                    {t('tournaments.requests_desc', 'Esta es la lista de usuarios que desean unirse al torneo')}
+                  </p>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  {pending.map(p => (
+                    <div
+                      key={p.user_id}
+                      className="card card-sm"
+                      style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}
+                    >
+                      <Avatar id={p.users?.avatar_url} size="sm" />
+                      <span style={{ flex: '1 1 10rem', fontWeight: 700, minWidth: 0 }}>
+                        {p.users?.display_name ?? 'Usuario'}
+                      </span>
+                      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                        <button
+                          className="btn btn-primary btn-sm"
+                          onClick={() => approvePlayer(p.user_id)}
+                          disabled={updating}
+                        >
+                          {t('common.approve')}
+                        </button>
+                        <button
+                          className="btn btn-ghost btn-sm"
+                          onClick={() => rejectPlayer(p.user_id)}
+                          disabled={updating}
+                        >
+                          {t('common.reject', 'Rechazar')}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
 
             {/* LEADERBOARD TAB */}
             {tab === 'leaderboard' && (
@@ -991,31 +1048,6 @@ export default function TournamentDetailPage() {
 
                 {/* Players management */}
                 <div style={{ marginTop: '1rem' }}>
-                  {/* Pending approvals */}
-                  {pending.length > 0 && (
-                    <div className="card card-sm" style={{ marginBottom: '0.75rem', border: '1px dashed var(--warning)' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.625rem' }}>
-                        <h4 style={{ fontWeight: 700, fontSize: '0.8rem', color: 'var(--warning)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                          ⏳ {t('tournaments.pending_approval')} ({pending.length})
-                        </h4>
-                        <button className="btn btn-ghost btn-sm" onClick={approveAllPlayers} disabled={updating}>
-                          {t('tournaments.approve_all')}
-                        </button>
-                      </div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                        {pending.map(p => (
-                          <div key={p.user_id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{p.users?.display_name ?? 'Usuario'}</span>
-                            <div style={{ display: 'flex', gap: '0.4rem' }}>
-                              <button className="btn btn-primary btn-sm" onClick={() => approvePlayer(p.user_id)} style={{ padding: '0.25rem 0.6rem' }}>✓</button>
-                              <button className="btn btn-ghost btn-sm" onClick={() => rejectPlayer(p.user_id)} style={{ padding: '0.25rem 0.6rem' }}>✕</button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
                   {/* Approved players */}
                   <div className="card card-sm">
                     <h4 style={{ fontWeight: 700, fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
