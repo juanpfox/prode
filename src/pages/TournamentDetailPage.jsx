@@ -461,10 +461,20 @@ export default function TournamentDetailPage() {
     'leaderboard',
     'rules',
   ]
+  const mobilePrimaryTabs = [
+    ...(showRequestsTab ? ['requests'] : []),
+    'leaderboard',
+    ...(!showRequestsTab ? ['rules'] : []),
+  ]
   const secondaryTabs = [
     ...(myRole === 'admin' ? ['config'] : []),
     'menu',
   ]
+  const mobileSecondaryTabs = [
+    ...(showRequestsTab ? ['rules'] : []),
+    ...secondaryTabs,
+  ]
+  const isTabsMenuActive = mobileSecondaryTabs.includes(tab) || showTabsMenu
 
   useEffect(() => {
     if (!showRequestsTab && tab === 'requests') {
@@ -635,7 +645,7 @@ export default function TournamentDetailPage() {
             </div>
             <div className="show-mobile" style={{ marginBottom: '1rem', position: 'relative' }}>
               <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.25rem', overflowX: 'auto' }}>
-                {primaryTabs.map(tId => (
+                {mobilePrimaryTabs.map(tId => (
                   <button
                     key={tId}
                     className={`btn btn-sm ${tab === tId ? 'btn-primary' : 'btn-ghost'}`}
@@ -652,13 +662,13 @@ export default function TournamentDetailPage() {
                   </button>
                 ))}
                 <button
-                  className={`btn btn-sm ${(tab === 'config' || tab === 'menu' || showTabsMenu) ? 'btn-primary' : 'btn-ghost'}`}
+                  className={`btn btn-sm ${isTabsMenuActive ? 'btn-primary' : 'btn-ghost'}`}
                   aria-label={t('tournaments.more_tab', 'Más...')}
                   onClick={(e) => {
                     e.stopPropagation()
                     setShowTabsMenu(v => !v)
                   }}
-                  style={{ borderBottom: (tab === 'config' || tab === 'menu') ? '2px solid var(--primary)' : 'none', borderRadius: 0, minWidth: '4rem' }}
+                  style={{ borderBottom: mobileSecondaryTabs.includes(tab) ? '2px solid var(--primary)' : 'none', borderRadius: 0, minWidth: '4rem', flex: '0 0 4rem' }}
                 >
                   ☰
                 </button>
@@ -679,7 +689,7 @@ export default function TournamentDetailPage() {
                     overflow: 'hidden',
                   }}
                 >
-                  {secondaryTabs.map(tId => (
+                  {mobileSecondaryTabs.map(tId => (
                     <button
                       key={tId}
                       className="btn btn-ghost btn-sm"

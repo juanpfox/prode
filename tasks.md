@@ -21,6 +21,7 @@ Este archivo sirve como el roadmap activo del proyecto. Los agentes deben usar e
 - [ ] **Resolución de bugs o mantenimientos menores (sección abierta)**
   - [x] En mobile, mover `Configuración` y `Menú` del torneo a un desplegable bajo el icono de tres rayas, renombrando el acceso a `Más...` / `More...`.
   - [x] Mostrar al owner una pestaña `Solicitudes` antes de `Posiciones` cuando haya usuarios pendientes de aprobación, usándola como vista predeterminada.
+  - [x] En mobile, mover `Reglas` al desplegable cuando `Solicitudes` deja sin ancho suficiente a las pestañas principales.
   - *(Agrega aquí cualquier bug o detalle a corregir que encuentres)*
 
 ## Fase 3: Monetización e Integraciones Externas
