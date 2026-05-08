@@ -203,6 +203,7 @@ export default function TournamentDetailPage() {
           .select('id')
           .eq('slug', slugValue)
           .neq('id', tournament.id)
+          .is('deleted_at', null)
           .maybeSingle()
         
         if (error) throw error
