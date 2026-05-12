@@ -75,5 +75,13 @@
   },
   "teams": {
     "COD": "DR Kongo"
+  },
+  "errors": {
+    "crash": {
+      "title": "Etwas ist schiefgelaufen",
+      "body": "Unerwarteter Fehler. Versuchen Sie es erneut oder laden Sie sauber neu.",
+      "retry": "Erneut versuchen",
+      "reload": "Sauber neu laden"
+    }
   }
 }

@@ -3,4 +3,38 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+/**
+ * Storage wrapper that never throws.
+ *
+ * Why: Safari in Private Browsing, certain ITP states, "Block all cookies",
+ * and some content blockers can make `localStorage.setItem` throw a
+ * QuotaExceededError or SecurityError. If Supabase auth hits that during
+ * initialisation the whole module crashes and React never renders.
+ *
+ * Falling back to an in-memory Map keeps the session usable for the lifetime
+ * of the tab (the user just has to log in again next time).
+ */
+const memoryStore = new Map()
+const safeStorage = {
+  getItem(key) {
+    try { return window.localStorage.getItem(key) }
+    catch { return memoryStore.has(key) ? memoryStore.get(key) : null }
+  },
+  setItem(key, value) {
+    try { window.localStorage.setItem(key, value) }
+    catch { memoryStore.set(key, value) }
+  },
+  removeItem(key) {
+    try { window.localStorage.removeItem(key) }
+    catch { memoryStore.delete(key) }
+  },
+}
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    storage: safeStorage,
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+  },
+})

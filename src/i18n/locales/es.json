@@ -397,5 +397,13 @@
     "pos_champion_bonus": "Equipo sale campeón",
     "pos_example_setup": "Ejemplo: pusiste a España como Campeón (×{{mult_world_1st}})",
     "pos_example_detail": "Cada victoria de España suma {{win_pts}} × {{mult}} = {{total_per_win}} pts. Si España sale campeón, sumás además {{champion_bonus}} pts de bonus."
+  },
+  "errors": {
+    "crash": {
+      "title": "Algo salió mal",
+      "body": "Hubo un error inesperado. Probá reintentar; si sigue fallando, recargá limpio para borrar caché.",
+      "retry": "Reintentar",
+      "reload": "Recargar limpio"
+    }
   }
 }

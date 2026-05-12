@@ -9,27 +9,112 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>Prode Mundial</title>
-    <!-- Prevent flash of unstyled content for dark mode -->
+    <!-- Boot bootstrap: theme + dir + crash guard.
+         Runs before bundle to:
+           1) avoid FOUC for dark mode and RTL
+           2) capture errors that happen before React mounts
+           3) show a recovery UI if React never mounts (stale chunk, blocker, etc.) -->
     <script>
       (function () {
+        // ----- Theme & direction (FOUC prevention) -----
+        var lang = 'en';
         try {
           var stored = localStorage.getItem('theme');
           var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
           var theme = stored === 'dark' || stored === 'light' ? stored : (prefersDark ? 'dark' : 'light');
           document.documentElement.setAttribute('data-theme', theme);
-          var lang = localStorage.getItem('i18nextLng') || navigator.language || 'en';
-          var isRTL = lang.startsWith('ar');
-          document.documentElement.setAttribute('dir', isRTL ? 'rtl' : 'ltr');
+          lang = localStorage.getItem('i18nextLng') || navigator.language || 'en';
+          document.documentElement.setAttribute('dir', lang.indexOf('ar') === 0 ? 'rtl' : 'ltr');
         } catch (e) {
-          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+          var pd = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          document.documentElement.setAttribute('data-theme', pd ? 'dark' : 'light');
           document.documentElement.setAttribute('dir', 'ltr');
+          lang = navigator.language || 'en';
         }
+        window.__lang = lang;
+
+        // ----- Pre-bundle error buffer (flushed to Sentry after init) -----
+        window.__bootErrors = [];
+        function capture(payload) {
+          try {
+            window.__bootErrors.push(Object.assign(
+              { ts: Date.now(), ua: navigator.userAgent, url: location.href },
+              payload
+            ));
+          } catch (_) {}
+        }
+        window.addEventListener('error', function (e) {
+          capture({ kind: 'error', msg: e.message, file: e.filename, line: e.lineno, col: e.colno });
+        });
+        window.addEventListener('unhandledrejection', function (e) {
+          var r = e.reason;
+          capture({ kind: 'unhandledrejection', msg: String(r && r.message ? r.message : r) });
+        });
+
+        // ----- Localized strings for the fallback UI -----
+        window.__BOOT_MSGS = {
+          es: { title: 'No pudimos cargar la app', body: 'Probablemente quedó caché vieja en tu navegador. Tocá el botón para recargar limpio.', btn: 'Recargar limpio' },
+          en: { title: 'We could not load the app', body: 'There may be stale cache in your browser. Tap the button for a clean reload.', btn: 'Clean reload' },
+          pt: { title: 'Não foi possível carregar', body: 'Pode haver cache antigo no navegador. Toque para recarregar limpo.', btn: 'Recarregar' },
+          fr: { title: "Impossible de charger l'app", body: 'Le cache du navigateur est peut-être obsolète. Touchez pour recharger proprement.', btn: 'Recharger' },
+          de: { title: 'App konnte nicht geladen werden', body: 'Möglicherweise ist der Browser-Cache veraltet. Tippen Sie für einen sauberen Neustart.', btn: 'Neu laden' }
+        };
+
+        // ----- Boot watchdog: surface fallback UI if React never mounts -----
+        // 10s is generous for slow networks but bounded so users never see
+        // a blank screen forever. Cleared as soon as main.jsx executes.
+        window.__bootTimer = setTimeout(function () {
+          var root = document.getElementById('root');
+          if (root && root.childElementCount > 0) return; // React mounted, all good
+          var fb = document.getElementById('boot-fallback');
+          if (fb) {
+            var msgs = window.__BOOT_MSGS[(window.__lang || 'en').slice(0, 2)] || window.__BOOT_MSGS.en;
+            fb.querySelector('[data-k="title"]').textContent = msgs.title;
+            fb.querySelector('[data-k="body"]').textContent = msgs.body;
+            fb.querySelector('[data-k="btn"]').textContent = msgs.btn;
+            fb.style.display = 'block';
+          }
+          capture({ kind: 'timeout', msg: 'React did not mount within 10s' });
+        }, 10000);
+
+        // ----- Hard recovery: wipe SW + caches + reload bypassing cache -----
+        window.__bustAndReload = function () {
+          var done = function () {
+            location.replace(location.pathname + '?_=' + Date.now());
+          };
+          try {
+            var ps = [];
+            if ('serviceWorker' in navigator) {
+              ps.push(navigator.serviceWorker.getRegistrations().then(function (rs) {
+                return Promise.all(rs.map(function (r) { return r.unregister(); }));
+              }));
+            }
+            if ('caches' in window) {
+              ps.push(caches.keys().then(function (ks) {
+                return Promise.all(ks.map(function (k) { return caches.delete(k); }));
+              }));
+            }
+            Promise.allSettled(ps).then(done, done);
+          } catch (_) { done(); }
+        };
       })();
     </script>
+    <style>
+      #boot-fallback{display:none;padding:32px 20px;font-family:system-ui,-apple-system,Segoe UI,sans-serif;text-align:center;max-width:480px;margin:80px auto;color:#0c1a0f}
+      [data-theme="dark"] #boot-fallback{color:#e7f5ec}
+      #boot-fallback h2{font-size:1.25rem;margin:0 0 12px;font-weight:600}
+      #boot-fallback p{margin:0 0 24px;opacity:.8;line-height:1.5;font-size:.95rem}
+      #boot-fallback button{background:#16a34a;color:#fff;border:0;padding:12px 28px;border-radius:10px;font-size:1rem;font-weight:600;cursor:pointer;min-height:48px;-webkit-appearance:none}
+      #boot-fallback button:active{opacity:.85}
+    </style>
   </head>
   <body>
     <div id="root"></div>
+    <div id="boot-fallback" role="alert" aria-live="assertive">
+      <h2 data-k="title">We could not load the app</h2>
+      <p data-k="body">There may be stale cache in your browser. Tap the button for a clean reload.</p>
+      <button type="button" data-k="btn" onclick="window.__bustAndReload()">Clean reload</button>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

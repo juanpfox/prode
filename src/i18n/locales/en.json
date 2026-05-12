@@ -382,5 +382,13 @@
     "pos_champion_bonus": "Team wins championship",
     "pos_example_setup": "Example: you put Spain as Champion (×{{mult_world_1st}})",
     "pos_example_detail": "Each Spain win earns {{win_pts}} × {{mult}} = {{total_per_win}} pts. If Spain wins the championship, you also earn {{champion_bonus}} bonus pts."
+  },
+  "errors": {
+    "crash": {
+      "title": "Something went wrong",
+      "body": "An unexpected error occurred. Try again, or clean reload to clear cache.",
+      "retry": "Try again",
+      "reload": "Clean reload"
+    }
   }
 }

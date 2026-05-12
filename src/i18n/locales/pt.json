@@ -90,5 +90,13 @@
   },
   "teams": {
     "COD": "RD Congo"
+  },
+  "errors": {
+    "crash": {
+      "title": "Algo deu errado",
+      "body": "Ocorreu um erro inesperado. Tente novamente ou recarregue limpo para limpar o cache.",
+      "retry": "Tentar novamente",
+      "reload": "Recarregar limpo"
+    }
   }
 }

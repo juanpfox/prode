@@ -6,8 +6,10 @@ import './i18n'
 import './index.css'
 import App from './App.jsx'
 import { AuthProvider } from './hooks/useAuth'
+import AppErrorFallback from './components/AppErrorFallback.jsx'
 import { registerSW } from 'virtual:pwa-register'
 
+// ---- Sentry ----
 Sentry.init({
   dsn: import.meta.env.VITE_SENTRY_DSN,
   enabled: !!import.meta.env.VITE_SENTRY_DSN,
@@ -16,7 +18,63 @@ Sentry.init({
   environment: import.meta.env.MODE,
 })
 
-registerSW({ immediate: true })
+// Flush any pre-bundle boot errors captured in index.html.
+// These are errors that happened *before* this bundle executed —
+// content blockers, parser errors, missing chunks, etc.
+if (Array.isArray(window.__bootErrors) && window.__bootErrors.length) {
+  for (const e of window.__bootErrors) {
+    Sentry.captureMessage(`boot:${e.kind} ${e.msg || ''}`.trim(), {
+      level: 'error',
+      extra: e,
+    })
+  }
+  window.__bootErrors.length = 0
+}
+
+// ---- Stale-chunk auto recovery ----
+// `vite:preloadError` fires when a dynamic import points to a chunk that no
+// longer exists (typical right after a Cloudflare deploy on a tab that had
+// the old index.html cached). We reload once; a sessionStorage flag prevents
+// infinite loops if the reload itself does not fix things.
+window.addEventListener('vite:preloadError', (event) => {
+  Sentry.captureMessage('vite:preloadError', {
+    level: 'warning',
+    extra: { reason: String(event?.payload || event?.message || '') },
+  })
+  if (!sessionStorage.getItem('chunk-reload')) {
+    sessionStorage.setItem('chunk-reload', '1')
+    // Hard wipe (SW + caches) is safer than location.reload() here because
+    // a plain reload may still serve a cached HTML pointing to dead chunks.
+    if (typeof window.__bustAndReload === 'function') window.__bustAndReload()
+    else window.location.reload()
+  }
+})
+// Clear the guard once we have successfully booted at least once this session.
+queueMicrotask(() => {
+  try { sessionStorage.removeItem('chunk-reload') } catch (_) {}
+})
+
+// React is about to mount — disarm the boot watchdog from index.html.
+if (window.__bootTimer) {
+  clearTimeout(window.__bootTimer)
+  window.__bootTimer = null
+}
+// Hide the fallback in case the timer already fired (slow boot, not failure).
+const _fb = document.getElementById('boot-fallback')
+if (_fb) _fb.style.display = 'none'
+
+// ---- Service Worker ----
+registerSW({
+  immediate: true,
+  onRegisteredSW(_url, registration) {
+    if (registration) {
+      // Check for updates every hour while the tab is open.
+      setInterval(() => {
+        registration.update().catch(() => {})
+      }, 60 * 60 * 1000)
+    }
+  },
+})
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -29,7 +87,12 @@ const queryClient = new QueryClient({
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <Sentry.ErrorBoundary fallback={null} showDialog={false}>
+    <Sentry.ErrorBoundary
+      fallback={({ resetError, eventId }) => (
+        <AppErrorFallback resetError={resetError} eventId={eventId} />
+      )}
+      showDialog={false}
+    >
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <App />
