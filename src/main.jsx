@@ -33,8 +33,9 @@ window.addEventListener('vite:preloadError', (event) => {
     { message: 'vite:preloadError', stack: null },
     String(event?.payload || event?.message || '')
   )
-  if (!sessionStorage.getItem('chunk-reload')) {
-    sessionStorage.setItem('chunk-reload', '1')
+  const chunkReloaded = (() => { try { return sessionStorage.getItem('chunk-reload') } catch { return null } })()
+  if (!chunkReloaded) {
+    try { sessionStorage.setItem('chunk-reload', '1') } catch { /* ignore */ }
     // Hard wipe (SW + caches) is safer than location.reload() here because
     // a plain reload may still serve a cached HTML pointing to dead chunks.
     if (typeof window.__bustAndReload === 'function') window.__bustAndReload()
@@ -43,7 +44,7 @@ window.addEventListener('vite:preloadError', (event) => {
 })
 // Clear the guard once we have successfully booted at least once this session.
 queueMicrotask(() => {
-  try { sessionStorage.removeItem('chunk-reload') } catch (_) {}
+  try { sessionStorage.removeItem('chunk-reload') } catch { /* ignore */ }
 })
 
 // React is about to mount — disarm the boot watchdog from index.html.

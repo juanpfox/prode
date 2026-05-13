@@ -95,7 +95,7 @@ export default function TournamentDetailPage() {
       setEditSlug(tr.slug ?? '')
       setEditPrize(tr.prize ?? '')
       setEditAvatarUrl(tr.avatar_url ?? null)
-      localStorage.setItem('lastTournament', tr.slug || tr.id)
+      try { localStorage.setItem('lastTournament', tr.slug || tr.id) } catch { /* ignore */ }
 
       const { data: pls } = await supabase
         .from('tournament_players')

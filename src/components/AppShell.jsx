@@ -16,8 +16,8 @@ export default function AppShell({ children, saveIndicator, wide }) {
 
   const isAdmin = user?.email === 'guest@prodemundial.dev' || user?.email === 'juanpatriciofox@gmail.com'
   const tournamentBasePath = getTournamentBasePath(pathname)
-  if (tournamentBasePath) sessionStorage.setItem('lastTournamentPath', tournamentBasePath)
-  const lastTournamentPath = tournamentBasePath || sessionStorage.getItem('lastTournamentPath')
+  if (tournamentBasePath) { try { sessionStorage.setItem('lastTournamentPath', tournamentBasePath) } catch { /* ignore */ } }
+  const lastTournamentPath = tournamentBasePath || (() => { try { return sessionStorage.getItem('lastTournamentPath') } catch { return null } })()
 
   const [hasTournaments, setHasTournaments] = useState(true) // Default to true to avoid flicker
 
