@@ -1,32 +1,24 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import * as Sentry from '@sentry/react'
 import './i18n'
 import './index.css'
 import App from './App.jsx'
 import { AuthProvider } from './hooks/useAuth'
 import AppErrorFallback from './components/AppErrorFallback.jsx'
+import ErrorBoundary from './components/ErrorBoundary.jsx'
 import { registerSW } from 'virtual:pwa-register'
-
-// ---- Sentry ----
-Sentry.init({
-  dsn: import.meta.env.VITE_SENTRY_DSN,
-  enabled: !!import.meta.env.VITE_SENTRY_DSN,
-  integrations: [Sentry.browserTracingIntegration()],
-  tracesSampleRate: 0.2,
-  environment: import.meta.env.MODE,
-})
+import { logError } from './lib/errorLogger'
 
 // Flush any pre-bundle boot errors captured in index.html.
 // These are errors that happened *before* this bundle executed —
 // content blockers, parser errors, missing chunks, etc.
 if (Array.isArray(window.__bootErrors) && window.__bootErrors.length) {
   for (const e of window.__bootErrors) {
-    Sentry.captureMessage(`boot:${e.kind} ${e.msg || ''}`.trim(), {
-      level: 'error',
-      extra: e,
-    })
+    logError(
+      { message: `boot:${e.kind} ${e.msg || ''}`.trim(), stack: null },
+      'boot'
+    )
   }
   window.__bootErrors.length = 0
 }
@@ -37,10 +29,10 @@ if (Array.isArray(window.__bootErrors) && window.__bootErrors.length) {
 // the old index.html cached). We reload once; a sessionStorage flag prevents
 // infinite loops if the reload itself does not fix things.
 window.addEventListener('vite:preloadError', (event) => {
-  Sentry.captureMessage('vite:preloadError', {
-    level: 'warning',
-    extra: { reason: String(event?.payload || event?.message || '') },
-  })
+  logError(
+    { message: 'vite:preloadError', stack: null },
+    String(event?.payload || event?.message || '')
+  )
   if (!sessionStorage.getItem('chunk-reload')) {
     sessionStorage.setItem('chunk-reload', '1')
     // Hard wipe (SW + caches) is safer than location.reload() here because
@@ -62,6 +54,14 @@ if (window.__bootTimer) {
 // Hide the fallback in case the timer already fired (slow boot, not failure).
 const _fb = document.getElementById('boot-fallback')
 if (_fb) _fb.style.display = 'none'
+
+// ---- Global unhandled error listeners ----
+window.addEventListener('error', (event) => {
+  logError(event.error ?? new Error(event.message), 'window.onerror')
+})
+window.addEventListener('unhandledrejection', (event) => {
+  logError(event.reason, 'unhandledrejection')
+})
 
 // ---- Service Worker ----
 registerSW({
@@ -87,17 +87,12 @@ const queryClient = new QueryClient({
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <Sentry.ErrorBoundary
-      fallback={({ resetError, eventId }) => (
-        <AppErrorFallback resetError={resetError} eventId={eventId} />
-      )}
-      showDialog={false}
-    >
+    <ErrorBoundary fallback={({ resetError }) => <AppErrorFallback resetError={resetError} />}>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <App />
         </AuthProvider>
       </QueryClientProvider>
-    </Sentry.ErrorBoundary>
+    </ErrorBoundary>
   </StrictMode>,
 )

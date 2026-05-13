@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
  * Mirrors the look of the pre-bundle fallback in index.html so the recovery
  * surface feels consistent regardless of where the failure happened.
  */
-export default function AppErrorFallback({ resetError, eventId }) {
+export default function AppErrorFallback({ resetError }) {
   const { t } = useTranslation()
 
   const reloadClean = () => {
@@ -32,11 +32,6 @@ export default function AppErrorFallback({ resetError, eventId }) {
           {t('errors.crash.reload', 'Recargar limpio')}
         </button>
       </div>
-      {eventId && (
-        <small style={styles.eventId}>
-          ID: {String(eventId).slice(0, 8)}
-        </small>
-      )}
     </div>
   )
 }
@@ -62,9 +57,5 @@ const styles = {
     border: '1px solid currentColor', padding: '12px 28px',
     borderRadius: 10, fontSize: '1rem', fontWeight: 600,
     cursor: 'pointer', minHeight: 48, opacity: 0.85,
-  },
-  eventId: {
-    display: 'block', marginTop: 24, opacity: 0.5,
-    fontSize: '0.7rem', fontFamily: 'ui-monospace, monospace',
   },
 }
