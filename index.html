@@ -33,14 +33,33 @@
         }
         window.__lang = lang;
 
-        // ----- Pre-bundle error buffer (flushed to Sentry after init) -----
+        // ----- Pre-bundle error capture: logs directly to Supabase via fetch -----
+        // Runs before the JS bundle so it catches failures the bundle never sees.
         window.__bootErrors = [];
         function capture(payload) {
           try {
-            window.__bootErrors.push(Object.assign(
+            var entry = Object.assign(
               { ts: Date.now(), ua: navigator.userAgent, url: location.href },
               payload
-            ));
+            );
+            window.__bootErrors.push(entry);
+            // Send immediately via fetch — don't wait for the bundle to load.
+            fetch('%VITE_SUPABASE_URL%/rest/v1/error_logs', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'apikey': '%VITE_SUPABASE_ANON_KEY%',
+                'Authorization': 'Bearer %VITE_SUPABASE_ANON_KEY%',
+                'Prefer': 'return=minimal'
+              },
+              body: JSON.stringify({
+                message: String(payload.kind) + ': ' + String(payload.msg || ''),
+                context: 'boot-inline',
+                url: location.href,
+                user_agent: navigator.userAgent,
+                language: navigator.language
+              })
+            }).catch(function () {});
           } catch (_) {}
         }
         window.addEventListener('error', function (e) {
