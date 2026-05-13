@@ -54,6 +54,7 @@
               },
               body: JSON.stringify({
                 message: String(payload.kind) + ': ' + String(payload.msg || ''),
+                stack: payload.file ? (String(payload.file) + ':' + String(payload.line || '') + ':' + String(payload.col || '')) : null,
                 context: 'boot-inline',
                 url: location.href,
                 user_agent: navigator.userAgent,
