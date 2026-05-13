@@ -15,6 +15,24 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
  * of the tab (the user just has to log in again next time).
  */
 const memoryStore = new Map()
+
+// Shared safe wrapper used for both auth (localStorage) and realtime (sessionStorage).
+const makeStorageWrapper = (nativeStorage) => ({
+  getItem(key) {
+    try { return nativeStorage.getItem(key) } catch { return memoryStore.get(key) ?? null }
+  },
+  setItem(key, value) {
+    try { nativeStorage.setItem(key, value) } catch { memoryStore.set(key, value) }
+  },
+  removeItem(key) {
+    try { nativeStorage.removeItem(key) } catch { memoryStore.delete(key) }
+  },
+})
+
+const safeSessionStorage = makeStorageWrapper(
+  typeof window !== 'undefined' ? window.sessionStorage : { getItem: () => null, setItem: () => {}, removeItem: () => {} }
+)
+
 const safeStorage = {
   getItem(key) {
     try { return window.localStorage.getItem(key) }
@@ -36,5 +54,10 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: true,
+  },
+  realtime: {
+    // Supabase Realtime accesses sessionStorage directly for connection state.
+    // Safari with blocked storage throws SecurityError there — pass a safe wrapper.
+    sessionStorage: safeSessionStorage,
   },
 })
