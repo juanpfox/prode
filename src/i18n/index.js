@@ -1,6 +1,5 @@
 import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
-import LanguageDetector from 'i18next-browser-languagedetector'
 
 import es from './locales/es.json'
 import pt from './locales/pt.json'
@@ -14,8 +13,28 @@ import ja from './locales/ja.json'
 import ko from './locales/ko.json'
 import zh from './locales/zh.json'
 
+// Custom language detector that wraps localStorage in try/catch.
+// i18next-browser-languagedetector accesses localStorage directly without
+// error handling, which throws SecurityError in Safari with "Block All Cookies"
+// or strict ITP — crashing the entire module before React mounts.
+const SafeLanguageDetector = {
+  type: 'languageDetector',
+  async: false,
+  detect() {
+    try {
+      const stored = window.localStorage.getItem('i18nextLng')
+      if (stored) return stored
+    } catch { /* storage blocked */ }
+    return navigator.language || 'en'
+  },
+  init() {},
+  cacheUserLanguage(lng) {
+    try { window.localStorage.setItem('i18nextLng', lng) } catch { /* ignore */ }
+  },
+}
+
 i18n
-  .use(LanguageDetector)
+  .use(SafeLanguageDetector)
   .use(initReactI18next)
   .init({
     resources: {
@@ -32,10 +51,6 @@ i18n
       zh: { translation: zh },
     },
     fallbackLng: 'en',
-    detection: {
-      order: ['localStorage', 'navigator'],
-      caches: ['localStorage'],
-    },
     interpolation: { escapeValue: false },
   })
 
