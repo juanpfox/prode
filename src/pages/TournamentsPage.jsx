@@ -63,19 +63,17 @@ const SCORING_DEFAULTS = {
           .select(`
             role,
             tournaments(
-              id, name, slug, mode, invite_code, competition_id, prize, is_featured, avatar_url, deleted_at,
+              id, name, slug, mode, invite_code, competition_id, prize, is_featured, avatar_url, deleted_at, approved_players_count,
               competitions(name, type),
-              creator:users!tournaments_created_by_fkey(display_name),
-              participants:tournament_players(count)
+              creator:users!tournaments_created_by_fkey(display_name)
             )
           `)
           .eq('user_id', user.id).eq('status', 'approved'),
         supabase.from('tournaments')
           .select(`
-            id, name, slug, mode, invite_code, competition_id, is_public, prize, is_featured, avatar_url,
+            id, name, slug, mode, invite_code, competition_id, is_public, prize, is_featured, avatar_url, approved_players_count,
             competitions(name, type),
-            creator:users!tournaments_created_by_fkey(display_name),
-            participants:tournament_players(count)
+            creator:users!tournaments_created_by_fkey(display_name)
           `)
           .eq('is_public', true)
           .is('deleted_at', null)
@@ -98,7 +96,7 @@ const SCORING_DEFAULTS = {
           ...tp.tournaments,
           role: tp.role,
           creator_name: tp.tournaments.creator?.display_name,
-          participants_count: tp.tournaments.participants?.[0]?.count ?? 0
+          participants_count: tp.tournaments.approved_players_count ?? 0
         })) ?? [])
 
       setPublicTournaments(pubData
@@ -106,7 +104,7 @@ const SCORING_DEFAULTS = {
         .map(tr => ({
           ...tr,
           creator_name: tr.creator?.display_name,
-          participants_count: tr.participants?.[0]?.count ?? 0
+          participants_count: tr.approved_players_count ?? 0
         }))
         .sort((a, b) => {
           if (a.is_featured && !b.is_featured) return -1;
